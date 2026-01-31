@@ -1,65 +1,35 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 import { CampusHeatmap } from "@/components/events/CampusHeatmap";
 import { EventCard } from "@/components/events/EventCard";
 
-const featuredEvents = [
-    {
-        id: "1",
-        title: "SEECS Tech Fest 2026",
-        description: "The biggest tech event at NUST featuring hackathons, workshops, and amazing speakers.",
-        start_time: "2026-02-15T10:00:00",
-        end_time: "2026-02-15T18:00:00",
-        venue_name: "SEECS Auditorium",
-        tags: ["Tech", "Hackathon"],
-        is_official: true,
-        rsvp_count: 234,
-        checkin_count: 45,
-        sentiment: "pos" as const,
-    },
-    {
-        id: "2",
-        title: "Cultural Night: Rang-e-Tehzeeb",
-        description: "Celebrate Pakistan's rich cultural heritage with performances, food, and art.",
-        start_time: "2026-02-10T17:00:00",
-        end_time: "2026-02-10T22:00:00",
-        venue_name: "Student Center",
-        tags: ["Culture", "Music"],
-        is_official: false,
-        rsvp_count: 189,
-        checkin_count: 0,
-        sentiment: null,
-    },
-    {
-        id: "3",
-        title: "Career Fair 2026",
-        description: "Connect with top companies and explore internship and job opportunities.",
-        start_time: "2026-02-20T09:00:00",
-        end_time: "2026-02-20T16:00:00",
-        venue_name: "Convention Center",
-        tags: ["Career", "Networking"],
-        is_official: true,
-        rsvp_count: 456,
-        checkin_count: 0,
-        sentiment: null,
-    },
-    {
-        id: "5",
-        title: "AI/ML Workshop Series",
-        description: "Hands-on workshops covering machine learning fundamentals.",
-        start_time: "2026-02-12T14:00:00",
-        end_time: "2026-02-12T18:00:00",
-        venue_name: "RCMS Lab 3",
-        tags: ["Workshop", "AI"],
-        is_official: true,
-        rsvp_count: 120,
-        checkin_count: 0,
-        sentiment: null,
-    },
-];
-
 export default function HomePage() {
+    const [featuredEvents, setFeaturedEvents] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchFeatured = async () => {
+            const supabase = createClient();
+            const { data, error } = await supabase
+                .from("events")
+                .select("*, rsvps(count), checkins(count)")
+                .gte("start_time", new Date().toISOString())
+                .order("start_time", { ascending: true })
+                .limit(4);
+
+            if (error) {
+                console.error("Error loading featured events:", error);
+            } else {
+                setFeaturedEvents(data || []);
+            }
+            setLoading(false);
+        };
+        fetchFeatured();
+    }, []);
+
     return (
         <div className="min-h-screen overflow-hidden bg-cream">
 
@@ -71,18 +41,18 @@ export default function HomePage() {
                     backgroundSize: "100px 100px",
                 }}
             >
-                {/* Decorative Hero Collage - 4 Images */}
-                <div className="absolute top-10 -left-16 md:-left-5 w-56 md:w-80 opacity-60 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block rotate-12 pointer-events-none mix-blend-multiply z-0">
-                    <img src="/images/hero_badminton.jpg" alt="Sports at NUST" className="rounded-xl border-4 border-nust-blue shadow-[8px_8px_0px_var(--nust-blue)] aspect-[3/4] object-cover" />
+                {/* Decorative Hero Images (Static for now, could be dynamic later) */}
+                <div className="absolute top-10 -left-16 md:-left-5 w-56 md:w-80 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block rotate-12 pointer-events-none z-0">
+                    <img src="/images/hero_badminton.jpg" alt="Sports at NUST" className="rounded-xl border-4 border-nust-blue shadow-[8px_8px_0px_var(--nust-blue)] aspect-[3/4] object-cover bg-white" />
                 </div>
-                <div className="absolute bottom-10 -left-10 md:left-10 w-64 md:w-96 opacity-50 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block -rotate-6 pointer-events-none mix-blend-multiply z-0">
-                    <img src="/images/hero_aerial_1.jpg" alt="Campus Aerial" className="rounded-xl border-4 border-nust-blue shadow-[8px_8px_0px_var(--nust-blue)]" />
+                <div className="absolute bottom-10 -left-10 md:left-10 w-64 md:w-96 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block -rotate-6 pointer-events-none z-0">
+                    <img src="/images/hero_aerial_1.jpg" alt="Campus Aerial" className="rounded-xl border-4 border-nust-blue shadow-[8px_8px_0px_var(--nust-blue)] bg-white" />
                 </div>
-                <div className="absolute top-5 -right-16 md:-right-5 w-64 md:w-96 opacity-50 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block -rotate-3 pointer-events-none mix-blend-multiply z-0">
-                    <img src="/images/hero_concert.jpg" alt="Concert Vibes" className="rounded-xl border-4 border-nust-blue shadow-[8px_8px_0px_var(--nust-blue)]" />
+                <div className="absolute top-5 -right-16 md:-right-5 w-64 md:w-96 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block -rotate-3 pointer-events-none z-0">
+                    <img src="/images/hero_concert.jpg" alt="Concert Vibes" className="rounded-xl border-4 border-nust-blue shadow-[8px_8px_0px_var(--nust-blue)] bg-white" />
                 </div>
-                <div className="absolute -bottom-5 -right-10 md:-right-10 w-56 md:w-80 opacity-60 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block rotate-6 pointer-events-none mix-blend-multiply z-0">
-                    <img src="/images/hero_aerial_2.jpg" alt="NUST Wide Shot" className="rounded-xl border-4 border-nust-blue shadow-[8px_8px_0px_var(--nust-blue)]" />
+                <div className="absolute -bottom-5 -right-10 md:-right-10 w-56 md:w-80 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block rotate-6 pointer-events-none z-0">
+                    <img src="/images/hero_aerial_2.jpg" alt="NUST Wide Shot" className="rounded-xl border-4 border-nust-blue shadow-[8px_8px_0px_var(--nust-blue)] bg-white" />
                 </div>
                 <div className="container relative z-10">
                     <div className="max-w-4xl mx-auto text-center">
@@ -109,13 +79,13 @@ export default function HomePage() {
                             <Link href="/events" className="btn btn-primary text-xl px-12 py-5 shadow-[8px_8px_0px_var(--nust-orange)] hover:shadow-none hover:translate-x-[8px] hover:translate-y-[8px] transition-all font-heading tracking-wider border-2 border-nust-blue">
                                 FIND THE VIBE
                             </Link>
-                            <Link href="/auth?mode=signup" className="btn btn-outline text-xl px-12 py-5 hover:bg-nust-blue hover:text-white transition-all font-heading tracking-wider border-2 border-nust-blue bg-white shadow-[8px_8px_0px_rgba(0,0,0,0.1)]">
+                            <Link href="/auth?mode=signup" className="btn btn-outline text-xl px-12 py-5 hover:text-white transition-all font-heading tracking-wider border-2 border-nust-blue bg-white shadow-[8px_8px_0px_rgba(0,0,0,0.1)] hover:-translate-y-[2px] hover:shadow-[4px_4px_0px_var(--nust-blue)] hover:bg-nust-blue">
                                 JOIN THE SQUAD
                             </Link>
                         </div>
 
                         <div className="animate-bounce mt-8">
-                            <p className="font-heading text-lg text-nust-blue/70 mb-2">CHECK OUT WHAT&apos;S HOT</p>
+                            <p className="font-heading text-lg text-nust-blue/70 mb-2">CHECK OUT WHAT'S HOT</p>
                             <svg className="w-8 h-8 mx-auto text-nust-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                             </svg>
@@ -129,13 +99,13 @@ export default function HomePage() {
                 <div className="container">
                     <div className="mb-10 flex flex-col md:flex-row items-start md:items-end justify-between gap-4">
                         <div>
-                            <h2 className="text-5xl md:text-6xl text-nust-blue mb-2">WHAT&apos;S HOT 🔥</h2>
+                            <h2 className="text-5xl md:text-6xl text-nust-blue mb-2">WHAT'S HOT 🔥</h2>
                             <p className="font-display text-lg text-nust-blue/60 uppercase tracking-widest">
                                 Live Activity @ NUST H-12
                             </p>
                         </div>
                         <p className="text-sm text-nust-blue/50 max-w-xs md:text-right font-display">
-                            Real-time activity based on check-ins and social mentions
+                            Real-time activity based on events and locations.
                         </p>
                     </div>
 
@@ -176,17 +146,30 @@ export default function HomePage() {
                             </Link>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                            {featuredEvents.map((event, index) => (
-                                <div key={event.id} className={`transform ${index % 2 === 0 ? 'rotate-1' : '-rotate-1'} hover:rotate-0 transition-transform duration-300`}>
-                                    <EventCard event={event} index={index} />
-                                </div>
-                            ))}
-                        </div>
+                        {loading ? (
+                            <div className="flex justify-center py-20">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                                {featuredEvents.map((event, index) => (
+                                    <div key={event.id} className={`transform ${index % 2 === 0 ? 'rotate-1' : '-rotate-1'} hover:rotate-0 transition-transform duration-300`}>
+                                        <EventCard
+                                            event={{
+                                                ...event,
+                                                rsvp_count: event.rsvps?.[0]?.count || 0,
+                                                checkin_count: event.checkins?.[0]?.count || 0
+                                            }}
+                                            index={index}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </section>
 
-                {/* Bottom Tape - Overlays Footer (Extreme overlap) */}
+                {/* Bottom Tape */}
                 <div className="absolute -bottom-16 left-0 right-0 z-[100] bg-nust-orange py-3 border-y-2 border-nust-blue overflow-hidden transform rotate-1 scale-110 origin-right shadow-[0px_-4px_10px_rgba(0,0,0,0.1)] pointer-events-none">
                     <div className="animate-marquee flex gap-16 whitespace-nowrap">
                         <span className="font-heading text-xl text-nust-blue tracking-widest">
