@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Bebas_Neue, Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
 import { NavBar } from "@/components/layout/NavBar";
+import { Footer } from "@/components/layout/Footer";
 
 // Typography Setup - Pretty Patty Inspired
 const bebasNeue = Bebas_Neue({
@@ -85,6 +86,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-cream text-foreground antialiased relative selection:bg-nust-orange selection:text-white">
         <NavBar />
         <main className="pt-24">{children}</main>
+        <Footer />
       </body>
     </html>
   );

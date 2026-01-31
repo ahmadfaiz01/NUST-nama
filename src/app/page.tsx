@@ -187,14 +187,6 @@ export default function HomePage() {
                 </div>
             </div>
 
-            <footer className="py-12 bg-cream">
-                <div className="container text-center">
-                    <p className="text-nust-blue/50 font-display text-sm">
-                        What&apos;s Up NUST • Campus Intelligence Platform
-                    </p>
-                </div>
-            </footer>
-
         </div>
     );
 }
