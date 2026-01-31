@@ -23,25 +23,22 @@ const hotspots = [
     { id: "5", name: "NBS", event: "Business Gala", people: 120, lat: 33.6410, lng: 72.9860, intensity: "medium" },
 ];
 
-// Single Color (Orange) with varying Opacity
+// Gradient: Yellow (Low) -> Orange (Mid) -> Red (High)
 const intensityStyles = {
-    high: { opacity: 0.9, radius: 25, label: "High Hype" },
-    medium: { opacity: 0.6, radius: 20, label: "Medium Vibes" },
-    low: { opacity: 0.3, radius: 15, label: "Lowkey" },
+    high: { color: "#EF4444", fillColor: "#EF4444", fillOpacity: 0.8, radius: 25, label: "LIT 🔥" }, // Red
+    medium: { color: "#F97316", fillColor: "#F97316", fillOpacity: 0.6, radius: 20, label: "VIBING 😎" }, // Orange
+    low: { color: "#EAB308", fillColor: "#EAB308", fillOpacity: 0.4, radius: 15, label: "CHILL ☕" }, // Yellow
 };
 
 export default function LeafletMap() {
     return (
         <div className="h-full w-full rounded-2xl overflow-hidden border-2 border-nust-blue shadow-lg z-0 relative bg-cream group">
 
-            {/* 
-        Emoji Background Pattern - High Contrast 
-        Using repeated SVG background
-      */}
-            <div className="absolute inset-0 z-[1] pointer-events-none opacity-10"
+            {/* Emoji Background Pattern */}
+            <div className="absolute inset-0 z-[1] pointer-events-none opacity-[0.06] overflow-hidden select-none"
                 style={{
-                    backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ctext x='25' y='25' font-size='30' text-anchor='middle'%3E🔥%3C/text%3E%3Ctext x='75' y='75' font-size='30' text-anchor='middle'%3E💯%3C/text%3E%3C/svg%3E\")",
-                    backgroundSize: "60px 60px"
+                    backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ctext x='25' y='25' font-size='35' text-anchor='middle'%3E🔥%3C/text%3E%3Ctext x='75' y='75' font-size='35' text-anchor='middle'%3E💯%3C/text%3E%3C/svg%3E\")",
+                    backgroundSize: "80px 80px"
                 }}>
             </div>
 
@@ -56,7 +53,7 @@ export default function LeafletMap() {
                 <TileLayer
                     attribution='&copy; <a href="https://carto.com/">CARTO</a>'
                     url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-                    className="opacity-80 mix-blend-multiply" // Blend with emoji bg
+                    className="opacity-90 mix-blend-multiply"
                 />
 
                 {hotspots.map((spot) => {
@@ -67,18 +64,19 @@ export default function LeafletMap() {
                             center={[spot.lat, spot.lng]}
                             radius={style.radius}
                             pathOptions={{
-                                color: "#E59500", // Outline same color
+                                color: "white",
                                 weight: 2,
-                                fillColor: "#E59500", // NUST Orange
-                                fillOpacity: style.opacity,
+                                fillColor: style.fillColor,
+                                fillOpacity: style.fillOpacity,
                             }}
                         >
+                            {/* Event Label */}
                             <Tooltip
                                 direction="top"
                                 offset={[0, -style.radius - 5]}
                                 opacity={1}
                                 permanent
-                                className="!bg-white !border-2 !border-nust-orange !text-nust-blue !font-bold !rounded-md !px-2 !py-0.5 !shadow-md !text-xs !font-display uppercase tracking-widest"
+                                className="!bg-white !border-2 !border-nust-blue !text-nust-blue !font-bold !rounded-md !px-2 !py-0.5 !shadow-md !text-xs !font-display uppercase tracking-widest"
                             >
                                 {spot.event}
                             </Tooltip>
@@ -90,6 +88,12 @@ export default function LeafletMap() {
                                         <span>🔥</span>
                                         <span>{spot.people} here</span>
                                     </div>
+                                    <a
+                                        href={`/events/${spot.id}`}
+                                        className="block w-full bg-nust-blue text-white text-[10px] font-bold py-1.5 rounded hover:bg-nust-blue/90"
+                                    >
+                                        CHECK IN
+                                    </a>
                                 </div>
                             </Popup>
                         </CircleMarker>
@@ -97,21 +101,21 @@ export default function LeafletMap() {
                 })}
             </MapContainer>
 
-            {/* Opacity Legend */}
-            <div className="absolute bottom-4 right-4 z-[400] bg-white/90 backdrop-blur border border-nust-orange p-3 rounded-xl shadow-lg">
-                <h4 className="font-heading text-nust-blue text-xs mb-2">HYPE LEVEL</h4>
+            {/* Legend */}
+            <div className="absolute bottom-4 right-4 z-[400] bg-white/95 backdrop-blur border border-nust-orange/30 p-3 rounded-xl shadow-lg">
+                <h4 className="font-heading text-nust-blue text-xs mb-2">HYPE METER</h4>
                 <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded-full bg-nust-orange opacity-90 border border-nust-orange"></div>
-                        <span className="text-xs font-bold text-nust-blue">High Hype</span>
+                        <div className="w-4 h-4 rounded-full bg-red-500 opacity-80 border border-red-600"></div>
+                        <span className="text-xs font-bold text-nust-blue">High (Lit)</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded-full bg-nust-orange opacity-60 border border-nust-orange"></div>
-                        <span className="text-xs font-bold text-nust-blue">Mid Vibes</span>
+                        <div className="w-4 h-4 rounded-full bg-orange-500 opacity-60 border border-orange-600"></div>
+                        <span className="text-xs font-bold text-nust-blue">Mid (Vibing)</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded-full bg-nust-orange opacity-30 border border-nust-orange"></div>
-                        <span className="text-xs font-bold text-nust-blue">Chill</span>
+                        <div className="w-4 h-4 rounded-full bg-yellow-500 opacity-40 border border-yellow-600"></div>
+                        <span className="text-xs font-bold text-nust-blue">Low (Chill)</span>
                     </div>
                 </div>
             </div>
