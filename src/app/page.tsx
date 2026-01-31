@@ -71,6 +71,13 @@ export default function HomePage() {
                     backgroundSize: "100px 100px",
                 }}
             >
+                {/* Decorative B&W Images */}
+                <div className="absolute top-10 left-0 md:left-10 w-48 md:w-64 opacity-60 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block rotate-3 pointer-events-none">
+                    <img src="/images/nust_building_1.png" alt="NUST H-12" className="rounded-xl border-2 border-nust-blue shadow-[4px_4px_0px_var(--nust-blue)]" />
+                </div>
+                <div className="absolute bottom-10 right-0 md:right-10 w-48 md:w-64 opacity-60 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block -rotate-6 pointer-events-none">
+                    <img src="/images/nust_building_2.png" alt="NUST Aerial" className="rounded-xl border-2 border-nust-blue shadow-[4px_4px_0px_var(--nust-blue)]" />
+                </div>
                 <div className="container relative z-10">
                     <div className="max-w-5xl mx-auto text-center">
 
