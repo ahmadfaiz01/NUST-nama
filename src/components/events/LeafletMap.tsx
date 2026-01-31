@@ -20,19 +20,19 @@ const hotspots = [
     { id: "1", name: "SEECS", event: "Tech Fest 2026", people: 234, lat: 33.6455, lng: 72.9915, intensity: "high" },
     { id: "2", name: "Student Center", event: "Cultural Night", people: 189, lat: 33.6420, lng: 72.9880, intensity: "medium" },
     { id: "3", name: "Sports Complex", event: "Football Match", people: 78, lat: 33.6400, lng: 72.9950, intensity: "medium" },
-    { id: "4", name: "Library", event: "Study Session", people: 45, lat: 33.6440, lng: 72.9930, intensity: "low" },
+    { id: "4", name: "Central Library", event: "Study Session", people: 45, lat: 33.6440, lng: 72.9930, intensity: "low" },
     { id: "5", name: "NBS", event: "Business Gala", people: 120, lat: 33.6410, lng: 72.9860, intensity: "medium" },
 ];
 
-const intensityColors = {
-    high: "#E59500",    // NUST Orange for high
-    medium: "#004B87",  // NUST Blue for medium
-    low: "#6B7280",     // Gray for low
+const intensityStyles = {
+    high: { color: "#004B87", fillColor: "#004B87", fillOpacity: 0.4, radius: 35 },
+    medium: { color: "#E59500", fillColor: "#E59500", fillOpacity: 0.3, radius: 28 },
+    low: { color: "#004B87", fillColor: "#004B87", fillOpacity: 0.15, radius: 22 },
 };
 
 export default function LeafletMap() {
     return (
-        <div className="h-full w-full rounded-2xl overflow-hidden border-2 border-nust-blue/20 shadow-xl relative bg-white">
+        <div className="h-full w-full rounded-2xl overflow-hidden border-2 border-nust-blue/20 shadow-lg z-0 relative bg-gray-100">
             <MapContainer
                 center={CENTER}
                 zoom={15}
@@ -41,71 +41,79 @@ export default function LeafletMap() {
                 zoomControl={false}
                 className="z-0"
             >
-                {/* Clean, minimal grayscale map tiles */}
+                {/* Grey/Minimal Map Tiles (Stamen Toner Lite / CartoDB Positron) */}
                 <TileLayer
                     attribution='&copy; <a href="https://carto.com/">CARTO</a>'
                     url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
                 />
 
-                {hotspots.map((spot) => (
-                    <CircleMarker
-                        key={spot.id}
-                        center={[spot.lat, spot.lng]}
-                        radius={spot.intensity === "high" ? 25 : spot.intensity === "medium" ? 18 : 12}
-                        pathOptions={{
-                            color: "white",
-                            fillColor: intensityColors[spot.intensity as keyof typeof intensityColors],
-                            fillOpacity: 0.85,
-                            weight: 3
-                        }}
-                    >
-                        <Tooltip
-                            direction="top"
-                            offset={[0, -15]}
-                            opacity={1}
-                            className="!bg-nust-blue !text-white !border-0 !rounded-lg !px-3 !py-1 !font-display !text-sm !shadow-lg"
+                {hotspots.map((spot) => {
+                    const style = intensityStyles[spot.intensity as keyof typeof intensityStyles];
+                    return (
+                        <CircleMarker
+                            key={spot.id}
+                            center={[spot.lat, spot.lng]}
+                            radius={style.radius}
+                            pathOptions={{
+                                color: style.color,
+                                fillColor: style.fillColor,
+                                fillOpacity: style.fillOpacity,
+                                weight: 2,
+                                opacity: 0.8,
+                            }}
                         >
-                            <span className="font-bold">{spot.event}</span>
-                            <br />
-                            <span className="text-white/70 text-xs">👥 {spot.people}</span>
-                        </Tooltip>
-                        <Popup className="font-sans">
-                            <div className="p-1 min-w-[150px]">
-                                <h3 className="font-heading text-lg text-nust-blue m-0 mb-1">{spot.name}</h3>
-                                <p className="text-nust-orange text-sm font-bold uppercase tracking-wide m-0 mb-2">{spot.event}</p>
-                                <div className="text-sm text-gray-600 mb-3">
-                                    👥 {spot.people} people here now
+                            {/* Location Name Label */}
+                            <Tooltip
+                                direction="top"
+                                offset={[0, -style.radius]}
+                                opacity={1}
+                                permanent
+                                className="!bg-transparent !border-0 !shadow-none !p-0"
+                            >
+                                <div className="text-center">
+                                    <span className="font-heading text-sm text-nust-blue drop-shadow-sm">
+                                        {spot.name}
+                                    </span>
                                 </div>
-                                <a href={`/events/${spot.id}`} className="block w-full text-center bg-nust-blue text-white text-sm px-3 py-2 rounded-lg font-bold hover:bg-nust-blue/90 transition-colors">
-                                    View Event →
-                                </a>
-                            </div>
-                        </Popup>
-                    </CircleMarker>
-                ))}
+                            </Tooltip>
+
+                            <Popup className="minimal-popup">
+                                <div className="p-2 text-center">
+                                    <h3 className="font-heading text-xl text-nust-blue mb-1">{spot.name}</h3>
+                                    <p className="text-nust-orange font-bold text-sm mb-2">{spot.event}</p>
+                                    <div className="text-sm text-nust-blue/70 mb-3">
+                                        👥 {spot.people} people here
+                                    </div>
+                                    <a
+                                        href={`/events/${spot.id}`}
+                                        className="inline-block bg-nust-blue text-white text-xs font-bold px-4 py-2 rounded-full hover:bg-nust-blue/90 transition-colors"
+                                    >
+                                        View Event
+                                    </a>
+                                </div>
+                            </Popup>
+                        </CircleMarker>
+                    );
+                })}
             </MapContainer>
 
             {/* Minimal Legend */}
-            <div className="absolute bottom-3 left-3 z-[400] bg-white/95 backdrop-blur-sm border border-gray-200 px-3 py-2 rounded-lg shadow-sm">
-                <div className="flex items-center gap-4 text-xs">
-                    <div className="flex items-center gap-1.5">
-                        <div className="w-3 h-3 rounded-full bg-nust-orange"></div>
-                        <span className="text-gray-600">Hot</span>
+            <div className="absolute bottom-4 left-4 z-[400] bg-white/95 backdrop-blur-sm border border-gray-200 p-3 rounded-xl shadow-sm">
+                <h4 className="font-heading text-nust-blue text-xs mb-2 uppercase tracking-wider">Activity</h4>
+                <div className="space-y-1.5">
+                    <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded-full bg-nust-blue/40 border border-nust-blue"></div>
+                        <span className="text-xs text-gray-600">High</span>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                        <div className="w-3 h-3 rounded-full bg-nust-blue"></div>
-                        <span className="text-gray-600">Active</span>
+                    <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded-full bg-nust-orange/30 border border-nust-orange"></div>
+                        <span className="text-xs text-gray-600">Medium</span>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                        <div className="w-3 h-3 rounded-full bg-gray-400"></div>
-                        <span className="text-gray-600">Quiet</span>
+                    <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded-full bg-nust-blue/15 border border-nust-blue/50"></div>
+                        <span className="text-xs text-gray-600">Low</span>
                     </div>
                 </div>
-            </div>
-
-            {/* Badge */}
-            <div className="absolute top-3 right-3 z-[400] bg-nust-orange text-nust-blue px-3 py-1 rounded-full font-heading text-sm shadow-md">
-                LIVE
             </div>
         </div>
     );
