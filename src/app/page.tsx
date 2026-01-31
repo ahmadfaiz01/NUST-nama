@@ -71,15 +71,15 @@ export default function HomePage() {
                     backgroundSize: "100px 100px",
                 }}
             >
-                {/* Decorative B&W Images */}
-                <div className="absolute top-10 left-0 md:left-10 w-48 md:w-64 opacity-60 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block rotate-3 pointer-events-none">
-                    <img src="/images/nust_building_1.png" alt="NUST H-12" className="rounded-xl border-2 border-nust-blue shadow-[4px_4px_0px_var(--nust-blue)]" />
+                {/* Decorative B&W Images - Bigger & Sticker style */}
+                <div className="absolute top-0 -left-10 md:left-0 w-64 md:w-96 opacity-50 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block rotate-6 pointer-events-none mix-blend-multiply">
+                    <img src="/images/nust_building_1.png" alt="NUST H-12" className="rounded-xl border-4 border-nust-blue shadow-[8px_8px_0px_var(--nust-blue)]" />
                 </div>
-                <div className="absolute bottom-10 right-0 md:right-10 w-48 md:w-64 opacity-60 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block -rotate-6 pointer-events-none">
-                    <img src="/images/nust_building_2.png" alt="NUST Aerial" className="rounded-xl border-2 border-nust-blue shadow-[4px_4px_0px_var(--nust-blue)]" />
+                <div className="absolute bottom-0 -right-10 md:right-0 w-64 md:w-96 opacity-50 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block -rotate-6 pointer-events-none mix-blend-multiply">
+                    <img src="/images/nust_building_2.png" alt="NUST Aerial" className="rounded-xl border-4 border-nust-blue shadow-[8px_8px_0px_var(--nust-blue)]" />
                 </div>
                 <div className="container relative z-10">
-                    <div className="max-w-5xl mx-auto text-center">
+                    <div className="max-w-4xl mx-auto text-center">
 
                         <div className="absolute top-0 right-0 md:right-20 animate-float hidden md:block">
                             <div className="w-24 h-24 bg-nust-orange rounded-full border-2 border-nust-blue flex items-center justify-center rotate-12 shadow-[4px_4px_0px_var(--nust-blue)]">
@@ -87,25 +87,24 @@ export default function HomePage() {
                             </div>
                         </div>
 
-                        <h1 className="text-6xl md:text-8xl lg:text-9xl text-nust-blue mb-6 leading-[0.85] drop-shadow-[4px_4px_0px_rgba(229,149,0,0.5)]">
-                            YOUR CAMPUS<br />
-                            <span className="text-stroke" style={{ WebkitTextStroke: "2px var(--nust-blue)", color: "transparent" }}>INTELLIGENCE</span><br />
-                            PLATFORM
+                        <h1 className="text-7xl md:text-9xl lg:text-[10rem] text-nust-blue mb-6 leading-[0.8] drop-shadow-[4px_4px_0px_rgba(229,149,0,0.5)] transform -rotate-1">
+                            CAMPUS LIFE.<br />
+                            <span className="text-stroke text-white" style={{ WebkitTextStroke: "3px var(--nust-blue)" }}>UNFILTERED.</span>
                         </h1>
 
-                        <p className="text-xl md:text-2xl text-nust-blue/80 max-w-2xl mx-auto mb-10 font-display font-medium">
-                            Real-time events, crowd sentiment, and social vibes. <br />
-                            <span className="bg-nust-orange/20 px-2 rounded-lg -rotate-1 inline-block border border-nust-orange/50 mt-2">
-                                All in one place.
+                        <p className="text-xl md:text-2xl text-nust-blue/80 max-w-2xl mx-auto mb-10 font-display font-medium leading-relaxed">
+                            Realtime vibes, spotted events, and zero FOMO. <br />
+                            <span className="bg-nust-orange px-2 py-1 transform -rotate-2 inline-block border-2 border-nust-blue text-white font-bold mt-2 shadow-[4px_4px_0px_var(--nust-blue)]">
+                                Literally everything happening at NUST.
                             </span>
                         </p>
 
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16">
-                            <Link href="/events" className="btn btn-primary text-xl px-10 py-4 shadow-[6px_6px_0px_var(--nust-orange)] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px] transition-all">
-                                Explore Events
+                            <Link href="/events" className="btn btn-primary text-xl px-12 py-5 shadow-[8px_8px_0px_var(--nust-orange)] hover:shadow-none hover:translate-x-[8px] hover:translate-y-[8px] transition-all font-heading tracking-wider border-2 border-nust-blue">
+                                FIND THE VIBE
                             </Link>
-                            <Link href="/auth?mode=signup" className="btn btn-outline text-xl px-10 py-4 hover:bg-nust-blue hover:text-white transition-all">
-                                Join the Vibe
+                            <Link href="/auth?mode=signup" className="btn btn-outline text-xl px-12 py-5 hover:bg-nust-blue hover:text-white transition-all font-heading tracking-wider border-2 border-nust-blue bg-white shadow-[8px_8px_0px_rgba(0,0,0,0.1)]">
+                                JOIN THE SQUAD
                             </Link>
                         </div>
 
