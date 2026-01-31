@@ -1,101 +1,30 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 import { EventCalendar } from "@/components/events/EventCalendar";
 
-// Mock events with various dates
-const calendarEvents = [
-    {
-        id: "1",
-        title: "SEECS Tech Fest 2026",
-        description: "The biggest tech event at NUST featuring hackathons, workshops, and amazing speakers.",
-        start_time: "2026-02-15T10:00:00",
-        end_time: "2026-02-15T18:00:00",
-        venue_name: "SEECS Auditorium",
-        tags: ["Tech", "Hackathon"],
-        is_official: true,
-        rsvp_count: 234,
-        checkin_count: 0,
-        sentiment: null,
-    },
-    {
-        id: "2",
-        title: "Cultural Night",
-        description: "Celebrate Pakistan's rich cultural heritage.",
-        start_time: "2026-02-10T17:00:00",
-        end_time: "2026-02-10T22:00:00",
-        venue_name: "Student Center",
-        tags: ["Culture"],
-        is_official: false,
-        rsvp_count: 189,
-        checkin_count: 0,
-        sentiment: null,
-    },
-    {
-        id: "3",
-        title: "Career Fair",
-        description: "Connect with top companies.",
-        start_time: "2026-02-20T09:00:00",
-        end_time: "2026-02-20T16:00:00",
-        venue_name: "Convention Center",
-        tags: ["Career"],
-        is_official: true,
-        rsvp_count: 456,
-        checkin_count: 0,
-        sentiment: null,
-    },
-    {
-        id: "4",
-        title: "Football Match",
-        description: "SEECS vs SMME friendly.",
-        start_time: "2026-02-08T20:00:00",
-        end_time: "2026-02-08T22:00:00",
-        venue_name: "Sports Complex",
-        tags: ["Sports"],
-        is_official: false,
-        rsvp_count: 78,
-        checkin_count: 0,
-        sentiment: null,
-    },
-    {
-        id: "5",
-        title: "AI Workshop",
-        description: "Introduction to Machine Learning.",
-        start_time: "2026-02-12T14:00:00",
-        end_time: "2026-02-12T17:00:00",
-        venue_name: "RCMS Lab",
-        tags: ["Workshop", "AI"],
-        is_official: true,
-        rsvp_count: 120,
-        checkin_count: 0,
-        sentiment: null,
-    },
-    {
-        id: "6",
-        title: "Open Mic Night",
-        description: "Poetry and music.",
-        start_time: "2026-02-14T19:00:00",
-        end_time: "2026-02-14T22:00:00",
-        venue_name: "Cafe 101",
-        tags: ["Entertainment"],
-        is_official: false,
-        rsvp_count: 67,
-        checkin_count: 0,
-        sentiment: null,
-    },
-    {
-        id: "7",
-        title: "Debate Finals",
-        description: "NUST Debate Championship finals.",
-        start_time: "2026-02-15T14:00:00",
-        end_time: "2026-02-15T18:00:00",
-        venue_name: "Main Auditorium",
-        tags: ["Competition"],
-        is_official: true,
-        rsvp_count: 150,
-        checkin_count: 0,
-        sentiment: null,
-    },
-];
-
 export default function CalendarPage() {
+    const [events, setEvents] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchEvents = async () => {
+            const supabase = createClient();
+            const { data, error } = await supabase
+                .from("events")
+                .select("*, rsvps(count), checkins(count)");
+
+            if (error) {
+                console.error("Error loading calendar events:", error);
+            } else {
+                setEvents(data || []);
+            }
+            setLoading(false);
+        };
+        fetchEvents();
+    }, []);
+
     return (
         <div
             className="min-h-screen"
@@ -120,7 +49,19 @@ export default function CalendarPage() {
             {/* Calendar */}
             <section className="py-12">
                 <div className="container">
-                    <EventCalendar events={calendarEvents} />
+                    {loading ? (
+                        <div className="flex justify-center">
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-nust-blue"></div>
+                        </div>
+                    ) : (
+                        <EventCalendar
+                            events={events.map(e => ({
+                                ...e,
+                                rsvp_count: e.rsvps?.[0]?.count || 0,
+                                checkin_count: e.checkins?.[0]?.count || 0
+                            }))}
+                        />
+                    )}
                 </div>
             </section>
         </div>

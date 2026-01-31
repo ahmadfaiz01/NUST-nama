@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+import { findVenueCoordinates } from "@/lib/nust_venues";
 
 export default function PostEventPage() {
     const [step, setStep] = useState(1);
@@ -18,7 +20,11 @@ export default function PostEventPage() {
         allowGuests: false,
         isPrivate: false,
     });
+
+    // New state for location & images
+    const [venueLocation, setVenueLocation] = useState<{ name: string, lat: number, lng: number } | null>(null);
     const [images, setImages] = useState<File[]>([]);
+    const [uploading, setUploading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
 
     const categories = [
@@ -43,6 +49,19 @@ export default function PostEventPage() {
         }));
     };
 
+    // Auto-detect venue coordinates on blur
+    const handleVenueBlur = () => {
+        if (!formData.venue) return;
+        const found = findVenueCoordinates(formData.venue);
+        if (found) {
+            setVenueLocation(found);
+            // Optional: Auto-correct the name to the official one
+            // setFormData(prev => ({ ...prev, venue: found.name }));
+        } else {
+            setVenueLocation(null);
+        }
+    };
+
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             setImages(prev => [...prev, ...Array.from(e.target.files!)]);
@@ -53,10 +72,84 @@ export default function PostEventPage() {
         setImages(prev => prev.filter((_, i) => i !== index));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // In production, this would POST to Supabase
-        setSubmitted(true);
+        setUploading(true);
+
+        try {
+            const supabase = createClient();
+
+            // 1. Auth Check
+            const { data: { user }, error: authError } = await supabase.auth.getUser();
+            if (authError || !user) {
+                alert("You must be logged in to post an event.");
+                setUploading(false);
+                return;
+            }
+
+            // 2. Upload Image (if any)
+            let posterUrl = null;
+            if (images.length > 0) {
+                const file = images[0]; // Taking the first one as thumbnail/poster
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+                const { error: uploadError } = await supabase.storage
+                    .from('event-posters')
+                    .upload(fileName, file);
+
+                if (uploadError) throw uploadError;
+
+                // Get Public URL
+                const { data: { publicUrl } } = supabase.storage
+                    .from('event-posters')
+                    .getPublicUrl(fileName);
+
+                posterUrl = publicUrl;
+            } else {
+                // Fallback placeholder
+                posterUrl = `https://source.unsplash.com/random/800x600/?event,${formData.category}`;
+            }
+
+            // 3. Prepare Data
+            const startDateTime = new Date(`${formData.date}T${formData.startTime}:00`);
+            const endDateTime = formData.endTime
+                ? new Date(`${formData.date}T${formData.endTime}:00`)
+                : new Date(startDateTime.getTime() + 2 * 60 * 60 * 1000);
+
+            const tagList = formData.tags.split(",").map(t => t.trim()).filter(t => t.length > 0);
+
+            // Use geocoded location or null
+            const lat = venueLocation?.lat || null;
+            const lng = venueLocation?.lng || null;
+
+            // 4. Insert Event
+            const { error } = await supabase.from("events").insert({
+                title: formData.title,
+                description: formData.description,
+                start_time: startDateTime.toISOString(),
+                end_time: endDateTime.toISOString(),
+                venue_name: formData.venue,
+                venue_lat: lat,
+                venue_lng: lng,
+                category: formData.category,
+                tags: [formData.category, ...tagList],
+                registration_url: formData.registrationUrl,
+                allow_guests: formData.allowGuests,
+                poster_url: posterUrl,
+                created_by: user.id,
+                is_official: false,
+            });
+
+            if (error) throw error;
+
+            setSubmitted(true);
+        } catch (err: any) {
+            console.error("Error posting event:", err);
+            alert(`Failed to post event: ${err.message}`);
+        } finally {
+            setUploading(false);
+        }
     };
 
     if (submitted) {
@@ -66,21 +159,15 @@ export default function PostEventPage() {
                     <div className="text-6xl mb-6">🎉</div>
                     <h1 className="font-heading text-4xl text-nust-blue mb-4">EVENT SUBMITTED!</h1>
                     <p className="font-display text-nust-blue/70 mb-6">
-                        Your event is pending review. You&apos;ll be notified once it&apos;s approved (usually within 24 hours).
+                        Your event is now live! {venueLocation ? "And we found the venue on the map! 📍" : ""}
                     </p>
 
-                    <div className="bg-nust-orange/10 rounded-lg p-4 mb-6 border border-nust-orange">
-                        <p className="font-display text-sm text-nust-blue">
-                            <span className="font-bold">Status:</span> <span className="text-nust-orange">⏳ Pending Review</span>
-                        </p>
-                    </div>
-
                     <div className="flex flex-col gap-3">
-                        <Link href="/" className="btn btn-primary w-full justify-center">
-                            Back to Home
+                        <Link href="/events" className="btn btn-primary w-full justify-center">
+                            View Events Feed
                         </Link>
-                        <Link href="/profile" className="btn btn-outline w-full justify-center">
-                            View My Events
+                        <Link href="/post-event" onClick={() => window.location.reload()} className="btn btn-outline w-full justify-center">
+                            Post Another
                         </Link>
                     </div>
                 </div>
@@ -118,10 +205,10 @@ export default function PostEventPage() {
                                 <button
                                     onClick={() => s < step && setStep(s)}
                                     className={`w-10 h-10 rounded-full flex items-center justify-center font-heading text-lg transition-all ${s === step
-                                            ? "bg-nust-blue text-white shadow-[2px_2px_0px_var(--nust-orange)]"
-                                            : s < step
-                                                ? "bg-nust-orange text-nust-blue"
-                                                : "bg-gray-200 text-gray-500"
+                                        ? "bg-nust-blue text-white shadow-[2px_2px_0px_var(--nust-orange)]"
+                                        : s < step
+                                            ? "bg-nust-orange text-nust-blue"
+                                            : "bg-gray-200 text-gray-500"
                                         }`}
                                 >
                                     {s < step ? "✓" : s}
@@ -131,17 +218,6 @@ export default function PostEventPage() {
                                 )}
                             </div>
                         ))}
-                    </div>
-                    <div className="flex justify-center gap-8 mt-2">
-                        <span className={`font-display text-xs uppercase ${step >= 1 ? "text-nust-blue" : "text-gray-400"}`}>
-                            Basic Info
-                        </span>
-                        <span className={`font-display text-xs uppercase ${step >= 2 ? "text-nust-blue" : "text-gray-400"}`}>
-                            Details
-                        </span>
-                        <span className={`font-display text-xs uppercase ${step >= 3 ? "text-nust-blue" : "text-gray-400"}`}>
-                            Media
-                        </span>
                     </div>
                 </div>
             </div>
@@ -212,10 +288,20 @@ export default function PostEventPage() {
                                                 name="venue"
                                                 value={formData.venue}
                                                 onChange={handleInputChange}
-                                                placeholder="e.g., SEECS Auditorium"
+                                                onBlur={handleVenueBlur} // Trigger geocoding
+                                                placeholder="e.g., SEECS Seminar Hall"
                                                 required
                                                 className="w-full px-4 py-3 rounded-lg border-2 border-nust-blue bg-white text-nust-blue placeholder:text-nust-blue/40 focus:outline-none focus:ring-2 focus:ring-nust-orange"
                                             />
+                                            {venueLocation ? (
+                                                <p className="text-sm text-green-600 mt-1 flex items-center gap-1 font-bold">
+                                                    📍 {venueLocation.name} matched!
+                                                </p>
+                                            ) : formData.venue && (
+                                                <p className="text-sm text-gray-500 mt-1">
+                                                    Type a known campus spot (e.g. "C1", "Library") to auto-map.
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
 
@@ -361,39 +447,34 @@ export default function PostEventPage() {
                                         <input
                                             type="file"
                                             accept="image/*"
-                                            multiple
                                             onChange={handleImageUpload}
                                             className="hidden"
                                             id="image-upload"
                                         />
                                         <label htmlFor="image-upload" className="cursor-pointer">
                                             <div className="text-5xl mb-4">📷</div>
-                                            <p className="font-heading text-xl text-nust-blue mb-2">UPLOAD IMAGES</p>
+                                            <p className="font-heading text-xl text-nust-blue mb-2">UPLOAD POSTER</p>
                                             <p className="font-display text-sm text-nust-blue/60">
-                                                Drag and drop or click to select (max 5 images)
+                                                Click to select a high-quality event poster (Max 2MB)
                                             </p>
                                         </label>
                                     </div>
 
                                     {/* Preview */}
                                     {images.length > 0 && (
-                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                            {images.map((file, index) => (
-                                                <div key={index} className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden border-2 border-nust-blue">
-                                                    <img
-                                                        src={URL.createObjectURL(file)}
-                                                        alt={`Upload ${index + 1}`}
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => removeImage(index)}
-                                                        className="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
-                                                    >
-                                                        ✕
-                                                    </button>
-                                                </div>
-                                            ))}
+                                        <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden border-2 border-nust-blue">
+                                            <img
+                                                src={URL.createObjectURL(images[0])}
+                                                alt="Event Poster Preview"
+                                                className="w-full h-full object-cover"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setImages([])}
+                                                className="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
+                                            >
+                                                ✕
+                                            </button>
                                         </div>
                                     )}
                                 </div>
@@ -403,14 +484,16 @@ export default function PostEventPage() {
                                         type="button"
                                         onClick={() => setStep(2)}
                                         className="btn btn-outline flex-1"
+                                        disabled={uploading}
                                     >
                                         Back
                                     </button>
                                     <button
                                         type="submit"
                                         className="btn btn-primary flex-1"
+                                        disabled={uploading}
                                     >
-                                        Submit Event
+                                        {uploading ? "Uploading..." : "Submit Event"}
                                     </button>
                                 </div>
                             </div>
@@ -421,3 +504,4 @@ export default function PostEventPage() {
         </div>
     );
 }
+

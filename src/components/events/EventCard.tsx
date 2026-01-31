@@ -12,6 +12,7 @@ interface Event {
     rsvp_count: number;
     checkin_count: number;
     sentiment: "pos" | "neu" | "neg" | null;
+    poster_url?: string | null;
 }
 
 interface EventCardProps {
@@ -36,11 +37,27 @@ export function EventCard({ event }: EventCardProps) {
         >
             <div className="card h-full flex flex-col bg-white border-2 border-nust-blue shadow-[4px_4px_0px_var(--nust-blue)] hover:shadow-[8px_8px_0px_var(--nust-blue)] hover:-translate-y-1 transition-all duration-200 relative overflow-hidden group">
 
-                {/* Top Tape 'Sticker' detail (Purely decorative) */}
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-12 h-6 bg-nust-orange/20 rotate-1 z-0"></div>
+                {/* Poster Image (if available) */}
+                {event.poster_url && (
+                    <div className="h-48 w-full overflow-hidden border-b-2 border-nust-blue relative">
+                        <img
+                            src={event.poster_url}
+                            alt={event.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        {/* Top Tape 'Sticker' detail (Moved here if image exists) */}
+                        <div className="absolute top-2 left-1/2 -translate-x-1/2 w-12 h-6 bg-nust-orange/80 rotate-1 z-10 shadow-sm"></div>
+                    </div>
+                )}
+
+
+                {/* Top Tape 'Sticker' detail (Fallback if no image) */}
+                {!event.poster_url && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-12 h-6 bg-nust-orange/20 rotate-1 z-0"></div>
+                )}
 
                 {/* Date & Badge Row */}
-                <div className="flex justify-between items-start mb-4 relative z-10">
+                <div className={`flex justify-between items-start mb-4 relative z-10 ${event.poster_url ? 'p-4 pb-0' : 'p-4'}`}>
                     <div className="bg-nust-blue text-white rounded-lg p-2 text-center shadow-sm border border-nust-blue min-w-[60px]">
                         <span className="block font-heading text-2xl leading-none">{day}</span>
                         <span className="block font-display text-xs font-bold uppercase">{month}</span>
@@ -52,8 +69,8 @@ export function EventCard({ event }: EventCardProps) {
                 </div>
 
                 {/* Content */}
-                <div className="flex-1">
-                    <h3 className="font-heading text-2xl text-nust-blue mb-2 leading-none group-hover:text-nust-orange transition-colors">
+                <div className={`flex-1 ${event.poster_url ? 'px-4' : 'px-4'}`}>
+                    <h3 className="font-heading text-2xl text-nust-blue mb-2 leading-tight group-hover:text-nust-orange transition-colors">
                         {event.title}
                     </h3>
 
@@ -73,7 +90,7 @@ export function EventCard({ event }: EventCardProps) {
                 </div>
 
                 {/* Footer actions */}
-                <div className="mt-4 pt-3 border-t-2 border-dashed border-gray-200 flex items-center justify-between">
+                <div className="mt-4 mx-4 mb-4 pt-3 border-t-2 border-dashed border-gray-200 flex items-center justify-between">
                     <div className="flex items-center gap-1 text-sm font-bold text-nust-blue">
                         <span>👥 {event.rsvp_count} going</span>
                     </div>
@@ -87,3 +104,4 @@ export function EventCard({ event }: EventCardProps) {
         </Link>
     );
 }
+
