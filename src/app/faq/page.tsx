@@ -86,14 +86,21 @@ export default function FAQPage() {
     };
 
     return (
-        <div className="min-h-screen bg-cream">
+        <div
+            className="min-h-screen"
+            style={{
+                backgroundColor: "var(--cream)",
+                backgroundImage: `linear-gradient(var(--nust-blue) 1px, transparent 1px), linear-gradient(90deg, var(--nust-blue) 1px, transparent 1px)`,
+                backgroundSize: "100px 100px",
+            }}
+        >
             {/* Hero */}
-            <section className="py-12 bg-nust-orange">
+            <section className="py-12 bg-nust-blue">
                 <div className="container">
-                    <h1 className="text-4xl md:text-6xl text-nust-blue drop-shadow-[4px_4px_0px_rgba(255,255,255,0.3)]">
+                    <h1 className="text-4xl md:text-6xl text-white drop-shadow-[4px_4px_0px_var(--nust-orange)]">
                         FREQUENTLY ASKED
                     </h1>
-                    <p className="font-display text-nust-blue/80 text-lg mt-2">
+                    <p className="font-display text-white/70 text-lg mt-2">
                         Got questions? We&apos;ve got answers.
                     </p>
                 </div>

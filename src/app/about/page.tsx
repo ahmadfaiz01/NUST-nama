@@ -2,23 +2,23 @@ import Link from "next/link";
 
 export default function AboutPage() {
     return (
-        <div className="min-h-screen bg-cream">
+        <div
+            className="min-h-screen"
+            style={{
+                backgroundColor: "var(--cream)",
+                backgroundImage: `linear-gradient(var(--nust-blue) 1px, transparent 1px), linear-gradient(90deg, var(--nust-blue) 1px, transparent 1px)`,
+                backgroundSize: "100px 100px",
+            }}
+        >
             {/* Hero */}
-            <section
-                className="py-20 relative"
-                style={{
-                    backgroundColor: "var(--nust-blue)",
-                    backgroundImage: `linear-gradient(var(--nust-orange) 1px, transparent 1px), linear-gradient(90deg, var(--nust-orange) 1px, transparent 1px)`,
-                    backgroundSize: "80px 80px",
-                }}
-            >
+            <section className="py-20 bg-nust-blue">
                 <div className="container">
                     <div className="max-w-3xl">
                         <h1 className="text-5xl md:text-7xl text-white mb-6 drop-shadow-[4px_4px_0px_var(--nust-orange)]">
                             ABOUT<br />
                             <span className="text-nust-orange">WHAT&apos;S UP NUST</span>
                         </h1>
-                        <p className="text-white/80 text-xl leading-relaxed">
+                        <p className="font-display text-white/80 text-xl leading-relaxed">
                             Born out of frustration with missing events and FOMO, we built the campus intelligence platform we wished we had as students.
                         </p>
                     </div>
