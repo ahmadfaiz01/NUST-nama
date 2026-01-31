@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { EventCard } from "@/components/events/EventCard";
 
-// Mock data for development
+// Mock data
 const mockEvents = [
   {
     id: "1",
@@ -59,172 +59,148 @@ const mockEvents = [
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden py-20 md:py-32">
-        {/* Background Effects */}
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-nust-blue/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-nust-orange/10 rounded-full blur-3xl" />
-        </div>
+    <div className="min-h-screen overflow-hidden">
 
-        <div className="container">
-          <div className="max-w-4xl mx-auto text-center">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 badge badge-primary mb-6 animate-fade-in">
-              <span className="w-2 h-2 bg-nust-orange rounded-full animate-pulse" />
-              <span>Live Campus Intelligence</span>
+      {/* Hero Section */}
+      <section className="relative pt-12 pb-16 bg-cream">
+        <div className="container relative z-10">
+          <div className="max-w-5xl mx-auto text-center">
+
+            {/* Sticker Badge */}
+            <div className="absolute top-0 right-0 md:right-20 animate-float hidden md:block">
+              <div className="w-24 h-24 bg-nust-orange rounded-full border-2 border-nust-blue flex items-center justify-center -rotate-12 shadow-[4px_4px_0px_var(--nust-blue)]">
+                <span className="font-heading text-nust-blue text-center leading-none text-sm">Gen Z<br />Approved</span>
+              </div>
             </div>
 
             {/* Headline */}
-            <h1 className="mb-6 animate-slide-up" style={{ animationDelay: "0.1s" }}>
-              <span className="block text-foreground">WHAT&apos;S</span>
-              <span className="block">
-                <span className="text-foreground">HAPPENING AT </span>
-                <span className="gradient-text">NUST</span>
-                <span className="text-nust-orange">?</span>
-              </span>
+            <h1 className="text-6xl md:text-8xl lg:text-9xl text-nust-blue mb-6 leading-[0.85] drop-shadow-[4px_4px_0px_rgba(229,149,0,0.5)]">
+              YOUR CAMPUS<br />
+              <span className="text-stroke" style={{ WebkitTextStroke: "2px var(--nust-blue)", color: "transparent" }}>INTELLIGENCE</span><br />
+              PLATFORM
             </h1>
 
             {/* Subheadline */}
-            <p
-              className="text-lg md:text-xl text-foreground-muted max-w-2xl mx-auto mb-8 animate-slide-up"
-              style={{ animationDelay: "0.2s" }}
-            >
-              Discover events, feel the crowd vibe, and never miss out on campus life.
-              Your real-time guide to everything NUST.
+            <p className="text-xl md:text-2xl text-nust-blue/80 max-w-2xl mx-auto mb-10 font-medium">
+              Real-time events, crowd sentiment, and social vibes. <br />
+              <span className="bg-nust-orange/20 px-2 rounded-lg -rotate-1 inline-block border border-nust-orange/50 mt-2">
+                All in one place.
+              </span>
             </p>
 
             {/* CTA Buttons */}
-            <div
-              className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up"
-              style={{ animationDelay: "0.3s" }}
-            >
-              <Link href="/events" className="btn btn-primary text-base px-8 py-3">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+              <Link href="/events" className="btn btn-primary text-xl px-10 py-4 shadow-[6px_6px_0px_var(--nust-orange)] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px] transition-all">
                 Explore Events
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
-                </svg>
               </Link>
-              <Link href="/auth?mode=signup" className="btn btn-outline text-base px-8 py-3">
+              <Link href="/auth?mode=signup" className="btn btn-outline text-xl px-10 py-4 hover:bg-nust-blue hover:text-white transition-all">
                 Join the Vibe
               </Link>
             </div>
 
-            {/* Stats */}
-            <div
-              className="grid grid-cols-3 gap-8 mt-16 max-w-md mx-auto animate-fade-in"
-              style={{ animationDelay: "0.5s" }}
-            >
-              <div className="text-center">
-                <div className="font-heading text-3xl md:text-4xl text-nust-orange">50+</div>
-                <div className="text-sm text-foreground-muted">Events/Month</div>
-              </div>
-              <div className="text-center">
-                <div className="font-heading text-3xl md:text-4xl text-nust-blue">2.5K</div>
-                <div className="text-sm text-foreground-muted">Active Users</div>
-              </div>
-              <div className="text-center">
-                <div className="font-heading text-3xl md:text-4xl text-nust-orange">Live</div>
-                <div className="text-sm text-foreground-muted">Crowd Vibes</div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* Events Section */}
-      <section className="py-16 bg-background-secondary">
-        <div className="container">
-          {/* Section Header */}
-          <div className="flex items-end justify-between mb-8">
+      {/* News Ticker / Tape */}
+      <div className="bg-nust-blue py-3 border-y-4 border-nust-orange overflow-hidden relative">
+        <div className="animate-marquee flex gap-16 whitespace-nowrap">
+          <span className="font-heading text-xl text-white tracking-widest flex items-center gap-4">
+            <span className="text-nust-orange">📢</span> MESS CHALLAN IS UP
+            <span className="text-nust-orange">•</span> LIBRARY EXTENDED HOURS THIS WEEK
+            <span className="text-nust-orange">•</span> SEECS TECH FEST REGISTRATIONS OPEN
+            <span className="text-nust-orange">•</span> SEMESTER RESULTS ANNOUNCED
+            <span className="text-nust-orange">•</span> SPORTS WEEK STARTING MONDAY
+          </span>
+          <span className="font-heading text-xl text-white tracking-widest flex items-center gap-4">
+            <span className="text-nust-orange">📢</span> MESS CHALLAN IS UP
+            <span className="text-nust-orange">•</span> LIBRARY EXTENDED HOURS THIS WEEK
+            <span className="text-nust-orange">•</span> SEECS TECH FEST REGISTRATIONS OPEN
+            <span className="text-nust-orange">•</span> SEMESTER RESULTS ANNOUNCED
+            <span className="text-nust-orange">•</span> SPORTS WEEK STARTING MONDAY
+          </span>
+        </div>
+      </div>
+
+      {/* Popular Events (Dark Blue Background with Orange Grid) */}
+      <section
+        className="py-20 relative"
+        style={{
+          backgroundColor: "var(--nust-blue)",
+          backgroundImage: `linear-gradient(var(--nust-orange) 1px, transparent 1px), linear-gradient(90deg, var(--nust-orange) 1px, transparent 1px)`,
+          backgroundSize: "80px 80px",
+          backgroundPosition: "center top",
+        }}
+      >
+        <div className="container relative z-10">
+
+          <div className="flex flex-col md:flex-row items-end justify-between mb-12 gap-4">
             <div>
-              <h2 className="text-foreground">UPCOMING EVENTS</h2>
-              <p className="text-foreground-muted mt-1">What&apos;s buzzing on campus</p>
+              <h2 className="text-5xl md:text-6xl text-white mb-2 drop-shadow-[2px_2px_0px_var(--nust-orange)]">Popular Events</h2>
+              <p className="font-display text-lg text-white/70 uppercase tracking-widest">Check out where the crowd is headed</p>
             </div>
-            <Link
-              href="/events"
-              className="hidden sm:inline-flex items-center gap-2 text-primary hover:text-accent transition-colors font-display font-medium"
-            >
+            <Link href="/events" className="btn bg-nust-orange text-nust-blue font-bold text-sm py-2 px-6 shadow-[4px_4px_0px_rgba(0,0,0,0.3)]">
               View All
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
             </Link>
           </div>
 
-          {/* Event Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {mockEvents.map((event, index) => (
-              <EventCard key={event.id} event={event} index={index} />
+              <div key={event.id} className={`transform ${index % 2 === 0 ? 'rotate-1' : '-rotate-1'} hover:rotate-0 transition-transform duration-300`}>
+                <EventCard event={event} index={index} />
+              </div>
             ))}
           </div>
 
-          {/* Mobile View All */}
-          <div className="mt-8 text-center sm:hidden">
-            <Link href="/events" className="btn btn-outline">
-              View All Events
-            </Link>
-          </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20">
+      <section className="py-20 bg-cream">
         <div className="container">
           <div className="text-center mb-12">
-            <h2 className="text-foreground mb-4">WHY WHAT&apos;S UP NUST?</h2>
-            <p className="text-foreground-muted max-w-2xl mx-auto">
-              More than just an event app. It&apos;s your campus companion.
+            <h2 className="text-5xl md:text-6xl text-nust-blue mb-4">WHY WHAT&apos;S UP NUST?</h2>
+            <p className="text-nust-blue/60 font-display uppercase tracking-widest">
+              More than just an event app
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Feature 1 */}
-            <div className="card text-center group">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-nust-blue to-ceramic flex items-center justify-center group-hover:scale-110 transition-transform">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="card bg-white border-2 border-nust-blue shadow-[4px_4px_0px_var(--nust-blue)] text-center p-8 hover:shadow-[8px_8px_0px_var(--nust-blue)] hover:-translate-y-2 transition-all">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-nust-blue flex items-center justify-center shadow-[4px_4px_0px_var(--nust-orange)]">
+                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
-              <h4 className="text-foreground mb-2">All Events, One Place</h4>
-              <p className="text-foreground-muted text-sm">
+              <h3 className="font-heading text-2xl text-nust-blue mb-3">All Events, One Place</h3>
+              <p className="text-nust-blue/70">
                 Official announcements, society events, and spontaneous hangouts — all synced automatically.
               </p>
             </div>
 
             {/* Feature 2 */}
-            <div className="card text-center group">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-nust-orange to-nust-orange-light flex items-center justify-center group-hover:scale-110 transition-transform">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="card bg-white border-2 border-nust-blue shadow-[4px_4px_0px_var(--nust-blue)] text-center p-8 hover:shadow-[8px_8px_0px_var(--nust-blue)] hover:-translate-y-2 transition-all">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-nust-orange flex items-center justify-center shadow-[4px_4px_0px_var(--nust-blue)]">
+                <svg className="w-10 h-10 text-nust-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h4 className="text-foreground mb-2">Live Crowd Vibes</h4>
-              <p className="text-foreground-muted text-sm">
+              <h3 className="font-heading text-2xl text-nust-blue mb-3">Live Crowd Vibes</h3>
+              <p className="text-nust-blue/70">
                 See real-time sentiment from people who are actually there. No more FOMO guessing games.
               </p>
             </div>
 
             {/* Feature 3 */}
-            <div className="card text-center group">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-ceramic to-nust-blue-light flex items-center justify-center group-hover:scale-110 transition-transform">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            <div className="card bg-white border-2 border-nust-blue shadow-[4px_4px_0px_var(--nust-blue)] text-center p-8 hover:shadow-[8px_8px_0px_var(--nust-blue)] hover:-translate-y-2 transition-all">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-nust-blue flex items-center justify-center shadow-[4px_4px_0px_var(--nust-orange)]">
+                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
               </div>
-              <h4 className="text-foreground mb-2">Squad Up</h4>
-              <p className="text-foreground-muted text-sm">
+              <h3 className="font-heading text-2xl text-nust-blue mb-3">Squad Up</h3>
+              <p className="text-nust-blue/70">
                 RSVP, see who&apos;s going, and coordinate with friends. Never attend alone again.
               </p>
             </div>
@@ -233,38 +209,38 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-nust-blue to-nust-blue-dark">
+      <section className="py-20 bg-nust-orange">
         <div className="container text-center">
-          <h2 className="text-white mb-4">READY TO VIBE?</h2>
-          <p className="text-white/80 max-w-xl mx-auto mb-8">
+          <h2 className="text-5xl md:text-6xl text-nust-blue mb-4 drop-shadow-[2px_2px_0px_rgba(255,255,255,0.5)]">READY TO VIBE?</h2>
+          <p className="text-nust-blue/80 max-w-xl mx-auto mb-8 text-lg">
             Join thousands of NUST students who never miss what&apos;s happening on campus.
           </p>
-          <Link href="/auth?mode=signup" className="btn btn-accent text-base px-8 py-3">
+          <Link href="/auth?mode=signup" className="btn bg-nust-blue text-white text-xl px-10 py-4 shadow-[6px_6px_0px_rgba(0,0,0,0.2)] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px] transition-all">
             Create Free Account
           </Link>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-8 border-t border-border">
+      <footer className="py-8 bg-nust-blue border-t-4 border-nust-orange">
         <div className="container">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-nust-blue to-ceramic flex items-center justify-center">
-                <span className="font-heading text-sm text-white">W</span>
+              <div className="w-8 h-8 rounded-full bg-cream flex items-center justify-center border-2 border-nust-orange">
+                <span className="font-heading text-sm text-nust-blue">W</span>
               </div>
-              <span className="font-display text-sm text-foreground-muted">
+              <span className="font-display text-sm text-white/70">
                 © 2026 What&apos;s Up NUST. Made with 💙 by students, for students.
               </span>
             </div>
             <div className="flex items-center gap-6">
-              <Link href="/about" className="text-sm text-foreground-muted hover:text-primary transition-colors">
+              <Link href="/about" className="text-sm text-white/70 hover:text-nust-orange transition-colors">
                 About
               </Link>
-              <Link href="/privacy" className="text-sm text-foreground-muted hover:text-primary transition-colors">
+              <Link href="/privacy" className="text-sm text-white/70 hover:text-nust-orange transition-colors">
                 Privacy
               </Link>
-              <Link href="/contact" className="text-sm text-foreground-muted hover:text-primary transition-colors">
+              <Link href="/contact" className="text-sm text-white/70 hover:text-nust-orange transition-colors">
                 Contact
               </Link>
             </div>

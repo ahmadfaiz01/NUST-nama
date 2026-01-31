@@ -81,11 +81,10 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${bebasNeue.variable} ${spaceGrotesk.variable} ${inter.variable}`}
-      data-theme="dark"
     >
-      <body className="min-h-screen bg-background text-foreground antialiased">
+      <body className="min-h-screen bg-cream text-foreground antialiased relative selection:bg-nust-orange selection:text-white">
         <NavBar />
-        <main className="pt-16">{children}</main>
+        <main className="pt-24">{children}</main>
       </body>
     </html>
   );

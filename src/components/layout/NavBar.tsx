@@ -1,19 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export function NavBar() {
-    const [scrolled, setScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-    useEffect(() => {
-        const handleScroll = () => {
-            setScrolled(window.scrollY > 20);
-        };
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
 
     const navLinks = [
         { href: "/events", label: "Events" },
@@ -22,26 +13,20 @@ export function NavBar() {
     ];
 
     return (
-        <header
-            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
-                    ? "glass shadow-lg"
-                    : "bg-transparent"
-                }`}
-        >
+        <header className="fixed top-0 left-0 right-0 z-50 bg-nust-blue border-b-2 border-nust-orange py-2">
             <nav className="container flex items-center justify-between h-16">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-2 group">
-                    <div className="relative">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-nust-blue to-ceramic flex items-center justify-center">
-                            <span className="font-heading text-xl text-white">W</span>
+                <Link href="/" className="flex items-center gap-1 group">
+                    <div className="relative transform group-hover:rotate-12 transition-transform">
+                        <div className="w-10 h-10 bg-cream rounded-full border-2 border-nust-orange flex items-center justify-center shadow-[2px_2px_0px_var(--nust-orange)]">
+                            <span className="font-heading text-xl text-nust-blue">W</span>
                         </div>
-                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-nust-orange rounded-full animate-pulse-glow" />
                     </div>
-                    <div className="hidden sm:block">
-                        <span className="font-heading text-xl text-foreground group-hover:text-primary transition-colors">
+                    <div className="flex flex-col leading-none ml-1">
+                        <span className="font-heading text-2xl text-white tracking-wider">
                             WHAT&apos;S UP
                         </span>
-                        <span className="font-heading text-xl text-nust-orange ml-1">
+                        <span className="font-display text-xs font-bold text-nust-orange tracking-widest uppercase">
                             NUST
                         </span>
                     </div>
@@ -53,10 +38,9 @@ export function NavBar() {
                         <Link
                             key={link.href}
                             href={link.href}
-                            className="font-display text-sm font-medium text-foreground-muted hover:text-primary uppercase tracking-wide transition-colors relative group"
+                            className="font-heading text-lg text-white/80 hover:text-nust-orange transition-colors uppercase tracking-wide"
                         >
                             {link.label}
-                            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-nust-orange transition-all duration-300 group-hover:w-full" />
                         </Link>
                     ))}
                 </div>
@@ -64,14 +48,17 @@ export function NavBar() {
                 {/* Auth Buttons */}
                 <div className="hidden md:flex items-center gap-3">
                     <Link
-                        href="/auth"
-                        className="btn btn-outline text-sm py-2 px-4"
+                        href="/auth/login"
+                        className="w-10 h-10 flex items-center justify-center rounded-full border-2 border-white/50 text-white hover:bg-white hover:text-nust-blue transition-all"
+                        aria-label="Login"
                     >
-                        Sign In
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
                     </Link>
                     <Link
                         href="/auth?mode=signup"
-                        className="btn btn-primary text-sm py-2 px-4"
+                        className="btn bg-nust-orange text-nust-blue font-bold text-base py-2 px-6 shadow-[4px_4px_0px_rgba(0,0,0,0.3)] hover:shadow-[2px_2px_0px_rgba(0,0,0,0.3)] hover:translate-y-[2px] transition-all"
                     >
                         Get Started
                     </Link>
@@ -80,60 +67,50 @@ export function NavBar() {
                 {/* Mobile Menu Button */}
                 <button
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                    className="md:hidden p-2 rounded-lg hover:bg-card transition-colors"
+                    className="md:hidden p-2 text-white"
                     aria-label="Toggle menu"
                 >
-                    <div className="w-6 h-5 relative flex flex-col justify-between">
-                        <span
-                            className={`w-full h-0.5 bg-foreground transition-all duration-300 ${mobileMenuOpen ? "rotate-45 translate-y-2" : ""
-                                }`}
-                        />
-                        <span
-                            className={`w-full h-0.5 bg-foreground transition-all duration-300 ${mobileMenuOpen ? "opacity-0" : ""
-                                }`}
-                        />
-                        <span
-                            className={`w-full h-0.5 bg-foreground transition-all duration-300 ${mobileMenuOpen ? "-rotate-45 -translate-y-2" : ""
-                                }`}
-                        />
+                    <div className="space-y-1.5">
+                        <span className={`block w-8 h-0.5 bg-current transition-transform ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
+                        <span className={`block w-8 h-0.5 bg-current transition-opacity ${mobileMenuOpen ? 'opacity-0' : ''}`} />
+                        <span className={`block w-8 h-0.5 bg-current transition-transform ${mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
                     </div>
                 </button>
             </nav>
 
             {/* Mobile Menu */}
-            <div
-                className={`md:hidden overflow-hidden transition-all duration-300 ${mobileMenuOpen ? "max-h-64" : "max-h-0"
-                    }`}
-            >
-                <div className="container py-4 space-y-4 glass">
-                    {navLinks.map((link) => (
-                        <Link
-                            key={link.href}
-                            href={link.href}
-                            className="block font-display text-sm font-medium text-foreground-muted hover:text-primary uppercase tracking-wide transition-colors"
-                            onClick={() => setMobileMenuOpen(false)}
-                        >
-                            {link.label}
-                        </Link>
-                    ))}
-                    <div className="flex gap-3 pt-2">
-                        <Link
-                            href="/auth"
-                            className="btn btn-outline text-sm py-2 px-4 flex-1 text-center"
-                            onClick={() => setMobileMenuOpen(false)}
-                        >
-                            Sign In
-                        </Link>
-                        <Link
-                            href="/auth?mode=signup"
-                            className="btn btn-primary text-sm py-2 px-4 flex-1 text-center"
-                            onClick={() => setMobileMenuOpen(false)}
-                        >
-                            Get Started
-                        </Link>
+            {mobileMenuOpen && (
+                <div className="absolute top-full left-0 right-0 bg-nust-blue-dark border-b-2 border-nust-orange p-4 shadow-lg md:hidden">
+                    <div className="flex flex-col gap-4">
+                        {navLinks.map((link) => (
+                            <Link
+                                key={link.href}
+                                href={link.href}
+                                className="font-heading text-xl text-white text-center py-2 hover:text-nust-orange transition-colors"
+                                onClick={() => setMobileMenuOpen(false)}
+                            >
+                                {link.label}
+                            </Link>
+                        ))}
+                        <div className="flex flex-col gap-3 mt-2">
+                            <Link
+                                href="/auth/login"
+                                className="btn border-2 border-white text-white w-full justify-center hover:bg-white hover:text-nust-blue"
+                                onClick={() => setMobileMenuOpen(false)}
+                            >
+                                Sign In
+                            </Link>
+                            <Link
+                                href="/auth?mode=signup"
+                                className="btn bg-nust-orange text-nust-blue w-full justify-center"
+                                onClick={() => setMobileMenuOpen(false)}
+                            >
+                                Get Started
+                            </Link>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
         </header>
     );
 }
