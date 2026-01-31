@@ -174,8 +174,8 @@ export default function HomePage() {
                     </div>
                 </section>
 
-                {/* Bottom Tape */}
-                <div className="absolute bottom-0 left-0 right-0 z-20 bg-nust-orange py-3 border-y-2 border-nust-blue overflow-hidden transform rotate-1 scale-110 origin-right shadow-md">
+                {/* Bottom Tape - Moved down slightly */}
+                <div className="absolute -bottom-6 left-0 right-0 z-20 bg-nust-orange py-3 border-y-2 border-nust-blue overflow-hidden transform rotate-1 scale-110 origin-right shadow-md">
                     <div className="animate-marquee flex gap-16 whitespace-nowrap">
                         <span className="font-heading text-xl text-nust-blue tracking-widest">
                             • DONT MISS OUT • JOIN THE COMMUNITY • RSVP NOW • DONT MISS OUT • JOIN THE COMMUNITY •
