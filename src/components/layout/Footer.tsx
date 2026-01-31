@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export function Footer() {
     return (
-        <footer className="bg-nust-blue border-t-4 border-nust-orange relative pt-16 pb-12 overflow-hidden">
+        <footer className="bg-nust-blue border-t-0 relative pt-24 pb-12 overflow-hidden z-0">
 
             {/* Background decoration */}
             <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none"
@@ -21,7 +21,7 @@ export function Footer() {
                         </Link>
                         <p className="font-display text-white/80 text-lg mt-3 leading-relaxed">
                             Your realtime guide to campus life. Find events, check crowd vibes, and never miss a moment.<br />
-                            <span className="text-sm opacity-60 italic">Because FOMO is real.</span>
+                            <span className="text-sm text-nust-orange italic font-bold">Because FOMO is real.</span>
                         </p>
                         <div className="mt-6 flex flex-wrap justify-center md:justify-start gap-6">
                             <Link href="/events" className="text-white font-bold hover:text-nust-orange transition-colors">

@@ -174,8 +174,8 @@ export default function HomePage() {
                     </div>
                 </section>
 
-                {/* Bottom Tape - Overlayed on top */}
-                <div className="absolute -bottom-12 left-0 right-0 z-50 bg-nust-orange py-3 border-y-2 border-nust-blue overflow-hidden transform rotate-1 scale-110 origin-right shadow-[0px_-4px_10px_rgba(0,0,0,0.1)]">
+                {/* Bottom Tape - Overlays Footer (Extreme overlap) */}
+                <div className="absolute -bottom-20 left-0 right-0 z-[60] bg-nust-orange py-3 border-y-2 border-nust-blue overflow-hidden transform rotate-1 scale-110 origin-right shadow-[0px_-4px_10px_rgba(0,0,0,0.1)] pointer-events-none">
                     <div className="animate-marquee flex gap-16 whitespace-nowrap">
                         <span className="font-heading text-xl text-nust-blue tracking-widest">
                             • DONT MISS OUT • JOIN THE COMMUNITY • RSVP NOW • DONT MISS OUT • JOIN THE COMMUNITY •
