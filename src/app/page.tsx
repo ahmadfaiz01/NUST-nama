@@ -71,12 +71,18 @@ export default function HomePage() {
                     backgroundSize: "100px 100px",
                 }}
             >
-                {/* Decorative B&W Images - Bigger & Sticker style */}
-                <div className="absolute top-0 -left-10 md:left-0 w-64 md:w-96 opacity-50 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block rotate-6 pointer-events-none mix-blend-multiply">
-                    <img src="/images/nust_building_1.png" alt="NUST H-12" className="rounded-xl border-4 border-nust-blue shadow-[8px_8px_0px_var(--nust-blue)]" />
+                {/* Decorative Hero Collage - 4 Images */}
+                <div className="absolute top-10 -left-16 md:-left-5 w-56 md:w-80 opacity-60 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block rotate-12 pointer-events-none mix-blend-multiply z-0">
+                    <img src="/images/hero_badminton.jpg" alt="Sports at NUST" className="rounded-xl border-4 border-nust-blue shadow-[8px_8px_0px_var(--nust-blue)] aspect-[3/4] object-cover" />
                 </div>
-                <div className="absolute bottom-0 -right-10 md:right-0 w-64 md:w-96 opacity-50 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block -rotate-6 pointer-events-none mix-blend-multiply">
-                    <img src="/images/nust_building_2.png" alt="NUST Aerial" className="rounded-xl border-4 border-nust-blue shadow-[8px_8px_0px_var(--nust-blue)]" />
+                <div className="absolute bottom-10 -left-10 md:left-10 w-64 md:w-96 opacity-50 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block -rotate-6 pointer-events-none mix-blend-multiply z-0">
+                    <img src="/images/hero_aerial_1.jpg" alt="Campus Aerial" className="rounded-xl border-4 border-nust-blue shadow-[8px_8px_0px_var(--nust-blue)]" />
+                </div>
+                <div className="absolute top-5 -right-16 md:-right-5 w-64 md:w-96 opacity-50 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block -rotate-3 pointer-events-none mix-blend-multiply z-0">
+                    <img src="/images/hero_concert.jpg" alt="Concert Vibes" className="rounded-xl border-4 border-nust-blue shadow-[8px_8px_0px_var(--nust-blue)]" />
+                </div>
+                <div className="absolute -bottom-5 -right-10 md:-right-10 w-56 md:w-80 opacity-60 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block rotate-6 pointer-events-none mix-blend-multiply z-0">
+                    <img src="/images/hero_aerial_2.jpg" alt="NUST Wide Shot" className="rounded-xl border-4 border-nust-blue shadow-[8px_8px_0px_var(--nust-blue)]" />
                 </div>
                 <div className="container relative z-10">
                     <div className="max-w-4xl mx-auto text-center">
