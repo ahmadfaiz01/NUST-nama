@@ -8,6 +8,7 @@ export function NavBar() {
 
     const navLinks = [
         { href: "/events", label: "Events" },
+        { href: "/calendar", label: "Calendar" },
         { href: "/news", label: "News" },
         { href: "/about", label: "About" },
     ];
@@ -33,7 +34,7 @@ export function NavBar() {
                 </Link>
 
                 {/* Desktop Navigation */}
-                <div className="hidden md:flex items-center gap-8">
+                <div className="hidden md:flex items-center gap-6">
                     {navLinks.map((link) => (
                         <Link
                             key={link.href}
@@ -43,14 +44,25 @@ export function NavBar() {
                             {link.label}
                         </Link>
                     ))}
+
+                    {/* Post Event Button */}
+                    <Link
+                        href="/post-event"
+                        className="btn bg-nust-orange text-nust-blue font-bold text-sm py-2 px-4 shadow-[2px_2px_0px_rgba(0,0,0,0.2)] hover:shadow-none hover:translate-y-[2px] transition-all flex items-center gap-2"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                        Post Event
+                    </Link>
                 </div>
 
                 {/* Auth Buttons */}
                 <div className="hidden md:flex items-center gap-3">
                     <Link
-                        href="/auth/login"
+                        href="/profile"
                         className="w-10 h-10 flex items-center justify-center rounded-full border-2 border-white/50 text-white hover:bg-white hover:text-nust-blue transition-all"
-                        aria-label="Login"
+                        aria-label="Profile"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -58,7 +70,7 @@ export function NavBar() {
                     </Link>
                     <Link
                         href="/auth?mode=signup"
-                        className="btn bg-nust-orange text-nust-blue font-bold text-base py-2 px-6 shadow-[4px_4px_0px_rgba(0,0,0,0.3)] hover:shadow-[2px_2px_0px_rgba(0,0,0,0.3)] hover:translate-y-[2px] transition-all"
+                        className="btn bg-white text-nust-blue font-bold text-base py-2 px-6 shadow-[4px_4px_0px_var(--nust-orange)] hover:shadow-[2px_2px_0px_var(--nust-orange)] hover:translate-y-[2px] transition-all"
                     >
                         Get Started
                     </Link>
@@ -92,13 +104,20 @@ export function NavBar() {
                                 {link.label}
                             </Link>
                         ))}
+                        <Link
+                            href="/post-event"
+                            className="font-heading text-xl text-nust-orange text-center py-2"
+                            onClick={() => setMobileMenuOpen(false)}
+                        >
+                            + Post Event
+                        </Link>
                         <div className="flex flex-col gap-3 mt-2">
                             <Link
-                                href="/auth/login"
+                                href="/profile"
                                 className="btn border-2 border-white text-white w-full justify-center hover:bg-white hover:text-nust-blue"
                                 onClick={() => setMobileMenuOpen(false)}
                             >
-                                Sign In
+                                My Profile
                             </Link>
                             <Link
                                 href="/auth?mode=signup"
