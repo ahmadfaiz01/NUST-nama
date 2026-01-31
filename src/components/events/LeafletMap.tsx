@@ -4,7 +4,7 @@ import { MapContainer, TileLayer, CircleMarker, Popup, Tooltip } from "react-lea
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-// Fix for default marker icons in Next.js
+// Fix for default marker icons
 // @ts-ignore
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -41,7 +41,6 @@ export default function LeafletMap() {
                 zoomControl={false}
                 className="z-0"
             >
-                {/* Grey/Minimal Map Tiles (Stamen Toner Lite / CartoDB Positron) */}
                 <TileLayer
                     attribution='&copy; <a href="https://carto.com/">CARTO</a>'
                     url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
@@ -62,7 +61,6 @@ export default function LeafletMap() {
                                 opacity: 0.8,
                             }}
                         >
-                            {/* Location Name Label */}
                             <Tooltip
                                 direction="top"
                                 offset={[0, -style.radius]}
@@ -86,7 +84,7 @@ export default function LeafletMap() {
                                     </div>
                                     <a
                                         href={`/events/${spot.id}`}
-                                        className="inline-block bg-nust-blue text-white text-xs font-bold px-4 py-2 rounded-full hover:bg-nust-blue/90 transition-colors"
+                                        className="inline-block bg-nust-blue text-white text-xs font-bold px-4 py-2 rounded-full"
                                     >
                                         View Event
                                     </a>
@@ -97,7 +95,6 @@ export default function LeafletMap() {
                 })}
             </MapContainer>
 
-            {/* Minimal Legend */}
             <div className="absolute bottom-4 left-4 z-[400] bg-white/95 backdrop-blur-sm border border-gray-200 p-3 rounded-xl shadow-sm">
                 <h4 className="font-heading text-nust-blue text-xs mb-2 uppercase tracking-wider">Activity</h4>
                 <div className="space-y-1.5">

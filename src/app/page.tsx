@@ -63,7 +63,7 @@ export default function HomePage() {
     return (
         <div className="min-h-screen overflow-hidden bg-cream">
 
-            {/* Hero Section with Grid Background */}
+            {/* Hero Section */}
             <section
                 className="relative pt-20 pb-28"
                 style={{
@@ -74,7 +74,6 @@ export default function HomePage() {
                 <div className="container relative z-10">
                     <div className="max-w-5xl mx-auto text-center">
 
-                        {/* Sticker Badge */}
                         <div className="absolute top-0 right-0 md:right-20 animate-float hidden md:block">
                             <div className="w-24 h-24 bg-nust-orange rounded-full border-2 border-nust-blue flex items-center justify-center rotate-12 shadow-[4px_4px_0px_var(--nust-blue)]">
                                 <span className="font-heading text-nust-blue text-center leading-none text-sm">Gen Z<br />Approved</span>
@@ -103,7 +102,6 @@ export default function HomePage() {
                             </Link>
                         </div>
 
-                        {/* Check out What's Hot - Arrow pointing down */}
                         <div className="animate-bounce mt-8">
                             <p className="font-heading text-lg text-nust-blue/70 mb-2">CHECK OUT WHAT&apos;S HOT</p>
                             <svg className="w-8 h-8 mx-auto text-nust-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,13 +131,9 @@ export default function HomePage() {
                 </div>
             </section>
 
-            {/* 
-        POPULAR EVENTS SECTION
-        Tapes are OVERLAYED on top of this section.
-        The section content sits below the tapes.
-      */}
+            {/* Popular Events with Overlayed Tapes */}
             <div className="relative">
-                {/* Top Tape - Overlayed */}
+                {/* Top Tape */}
                 <div className="absolute top-0 left-0 right-0 z-20 bg-nust-orange py-3 border-y-2 border-nust-blue overflow-hidden transform -rotate-1 scale-110 origin-left shadow-md">
                     <div className="animate-marquee flex gap-16 whitespace-nowrap">
                         <span className="font-heading text-xl text-nust-blue tracking-widest">
@@ -151,7 +145,6 @@ export default function HomePage() {
                     </div>
                 </div>
 
-                {/* Popular Events Content - Under the tapes */}
                 <section
                     className="pt-24 pb-24 relative"
                     style={{
@@ -181,7 +174,7 @@ export default function HomePage() {
                     </div>
                 </section>
 
-                {/* Bottom Tape - Overlayed */}
+                {/* Bottom Tape */}
                 <div className="absolute bottom-0 left-0 right-0 z-20 bg-nust-orange py-3 border-y-2 border-nust-blue overflow-hidden transform rotate-1 scale-110 origin-right shadow-md">
                     <div className="animate-marquee flex gap-16 whitespace-nowrap">
                         <span className="font-heading text-xl text-nust-blue tracking-widest">
@@ -194,7 +187,6 @@ export default function HomePage() {
                 </div>
             </div>
 
-            {/* Footer */}
             <footer className="py-12 bg-cream">
                 <div className="container text-center">
                     <p className="text-nust-blue/50 font-display text-sm">
