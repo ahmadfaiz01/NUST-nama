@@ -139,6 +139,7 @@ export default function PostEventPage() {
                 poster_url: posterUrl,
                 created_by: user.id,
                 is_official: false,
+                status: "pending", // Events require admin approval
             });
 
             if (error) throw error;
@@ -159,12 +160,20 @@ export default function PostEventPage() {
                     <div className="text-6xl mb-6">🎉</div>
                     <h1 className="font-heading text-4xl text-nust-blue mb-4">EVENT SUBMITTED!</h1>
                     <p className="font-display text-nust-blue/70 mb-6">
-                        Your event is now live! {venueLocation ? "And we found the venue on the map! 📍" : ""}
+                        Your event has been submitted for review! Our team will approve it shortly. {venueLocation ? "📍 We found the venue on the map!" : ""}
                     </p>
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                        <p className="text-yellow-700 text-sm">
+                            ⏳ <strong>Pending Approval</strong> - Your event will be visible once approved by an admin.
+                        </p>
+                    </div>
 
                     <div className="flex flex-col gap-3">
                         <Link href="/events" className="btn btn-primary w-full justify-center">
                             View Events Feed
+                        </Link>
+                        <Link href="/profile" className="btn btn-outline w-full justify-center">
+                            View My Events
                         </Link>
                         <Link href="/post-event" onClick={() => window.location.reload()} className="btn btn-outline w-full justify-center">
                             Post Another

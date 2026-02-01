@@ -24,6 +24,7 @@ export interface Database {
                     interests: string[] | null;
                     role: "student" | "admin" | "moderator";
                     push_subscription: Json | null;
+                    is_banned: boolean;
                     created_at: string;
                 };
                 Insert: {
@@ -34,6 +35,7 @@ export interface Database {
                     interests?: string[] | null;
                     role?: "student" | "admin" | "moderator";
                     push_subscription?: Json | null;
+                    is_banned?: boolean;
                     created_at?: string;
                 };
                 Update: {
@@ -44,6 +46,7 @@ export interface Database {
                     interests?: string[] | null;
                     role?: "student" | "admin" | "moderator";
                     push_subscription?: Json | null;
+                    is_banned?: boolean;
                     created_at?: string;
                 };
             };
@@ -64,6 +67,8 @@ export interface Database {
                     tags: string[] | null;
                     is_official: boolean;
                     external_id: string | null;
+                    status: "pending" | "approved" | "rejected";
+                    created_by: string | null;
                     created_at: string;
                 };
                 Insert: {
@@ -82,6 +87,8 @@ export interface Database {
                     tags?: string[] | null;
                     is_official?: boolean;
                     external_id?: string | null;
+                    status?: "pending" | "approved" | "rejected";
+                    created_by?: string | null;
                     created_at?: string;
                 };
                 Update: {
@@ -100,6 +107,8 @@ export interface Database {
                     tags?: string[] | null;
                     is_official?: boolean;
                     external_id?: string | null;
+                    status?: "pending" | "approved" | "rejected";
+                    created_by?: string | null;
                     created_at?: string;
                 };
             };
@@ -190,6 +199,84 @@ export interface Database {
                     created_at?: string;
                 };
             };
+            threads: {
+                Row: {
+                    id: string;
+                    title: string;
+                    description: string | null;
+                    emoji: string;
+                    color_theme: string;
+                    is_active: boolean;
+                    created_at: string;
+                };
+                Insert: {
+                    id?: string;
+                    title: string;
+                    description?: string | null;
+                    emoji?: string;
+                    color_theme?: string;
+                    is_active?: boolean;
+                    created_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    title?: string;
+                    description?: string | null;
+                    emoji?: string;
+                    color_theme?: string;
+                    is_active?: boolean;
+                    created_at?: string;
+                };
+            };
+            topic_requests: {
+                Row: {
+                    id: string;
+                    user_id: string;
+                    topic_title: string;
+                    reason: string | null;
+                    status: "pending" | "approved" | "rejected";
+                    created_at: string;
+                };
+                Insert: {
+                    id?: string;
+                    user_id: string;
+                    topic_title: string;
+                    reason?: string | null;
+                    status?: "pending" | "approved" | "rejected";
+                    created_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    user_id?: string;
+                    topic_title?: string;
+                    reason?: string | null;
+                    status?: "pending" | "approved" | "rejected";
+                    created_at?: string;
+                };
+            };
+            messages: {
+                Row: {
+                    id: string;
+                    thread_id: string;
+                    user_id: string;
+                    content: string;
+                    created_at: string;
+                };
+                Insert: {
+                    id?: string;
+                    thread_id: string;
+                    user_id: string;
+                    content: string;
+                    created_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    thread_id?: string;
+                    user_id?: string;
+                    content?: string;
+                    created_at?: string;
+                };
+            };
         };
         Views: {
             [_ in never]: never;
@@ -209,3 +296,6 @@ export type Event = Database["public"]["Tables"]["events"]["Row"];
 export type RSVP = Database["public"]["Tables"]["rsvps"]["Row"];
 export type Checkin = Database["public"]["Tables"]["checkins"]["Row"];
 export type NewsItem = Database["public"]["Tables"]["news_items"]["Row"];
+export type Thread = Database["public"]["Tables"]["threads"]["Row"];
+export type TopicRequest = Database["public"]["Tables"]["topic_requests"]["Row"];
+export type Message = Database["public"]["Tables"]["messages"]["Row"];

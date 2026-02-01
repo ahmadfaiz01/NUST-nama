@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export function Footer() {
     return (
-        <footer className="bg-nust-blue border-t-0 relative pt-20 pb-12 z-0">
+        <footer className="bg-nust-blue border-t-0 relative pt-28 pb-12 z-0 mt-16">
 
             {/* Top Tape - Moved from Page to Footer for fixed positioning */}
             <div className="absolute -top-6 left-0 right-0 z-[60] bg-nust-orange py-3 border-y-2 border-nust-blue overflow-hidden transform rotate-1 scale-110 origin-right shadow-md pointer-events-none">

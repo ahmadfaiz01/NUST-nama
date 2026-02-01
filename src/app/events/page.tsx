@@ -33,6 +33,7 @@ export default function EventsPage() {
                 rsvps (count),
                 checkins (count)
             `)
+            .eq("status", "approved") // Only show approved events to public
             .order("start_time", { ascending: true });
 
         // Date Filtering

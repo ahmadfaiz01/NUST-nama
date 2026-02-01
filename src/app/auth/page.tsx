@@ -25,7 +25,19 @@ function AuthForm() {
     const [password, setPassword] = useState("");
     const [school, setSchool] = useState("");
 
+    // Admin emails that bypass NUST email check
+    const ADMIN_EMAILS = [
+        "itsahmadfaiz@gmail.com",
+        "rameenarshad0121@gmail.com"
+    ];
+
+    const isAdminEmail = (email: string) => {
+        return ADMIN_EMAILS.includes(email.toLowerCase().trim());
+    };
+
     const isValidNustEmail = (email: string) => {
+        // Allow admin emails to bypass the check
+        if (isAdminEmail(email)) return true;
         return email.endsWith(".nust.edu.pk") || email.endsWith("@nust.edu.pk") || email.endsWith("@seecs.edu.pk") || email.endsWith(".seecs.edu.pk");
     };
 
@@ -73,9 +85,9 @@ function AuthForm() {
                     throw error;
                 }
 
-                // Redirect to home on successful login
-                router.push("/");
-                router.refresh();
+                // Force hard redirect to home on successful login (faster and more reliable)
+                window.location.href = "/";
+                return;
             }
         } catch (err: any) {
             setError(err.message || "An error occurred. Please try again.");
