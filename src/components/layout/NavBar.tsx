@@ -10,6 +10,7 @@ export function NavBar() {
         { href: "/events", label: "Events" },
         { href: "/calendar", label: "Calendar" },
         { href: "/news", label: "News" },
+        { href: "/chatter", label: "Gupshup" },
         { href: "/about", label: "About" },
     ];
 
