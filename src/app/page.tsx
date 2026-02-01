@@ -170,16 +170,7 @@ export default function HomePage() {
                 </section>
 
                 {/* Bottom Tape */}
-                <div className="absolute -bottom-16 left-0 right-0 z-[100] bg-nust-orange py-3 border-y-2 border-nust-blue overflow-hidden transform rotate-1 scale-110 origin-right shadow-[0px_-4px_10px_rgba(0,0,0,0.1)] pointer-events-none">
-                    <div className="animate-marquee flex gap-16 whitespace-nowrap">
-                        <span className="font-heading text-xl text-nust-blue tracking-widest">
-                            • DONT MISS OUT • JOIN THE COMMUNITY • RSVP NOW • DONT MISS OUT • JOIN THE COMMUNITY •
-                        </span>
-                        <span className="font-heading text-xl text-nust-blue tracking-widest">
-                            • DONT MISS OUT • JOIN THE COMMUNITY • RSVP NOW • DONT MISS OUT • JOIN THE COMMUNITY •
-                        </span>
-                    </div>
-                </div>
+                {/* Bottom Tape Removed (moved to Footer) */}
             </div>
 
         </div>
