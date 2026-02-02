@@ -36,7 +36,7 @@ export default function ChatterLobby() {
     return (
         <div className="min-h-screen bg-cream pb-20">
             {/* Header */}
-            <div className="bg-nust-blue text-white py-16 relative overflow-hidden">
+            <div className="bg-nust-blue text-white py-16 relative overflow-hidden shadow-md">
                 <div className="container relative z-10 text-center">
                     <h1 className="text-4xl md:text-6xl font-heading mb-2 drop-shadow-[4px_4px_0px_var(--nust-orange)]">
                         CAMPUS CHATTER
@@ -52,47 +52,48 @@ export default function ChatterLobby() {
                 </div>
             </div>
 
-            <div className="container mt-8 relative z-20">
+            {/* Main Content with Explicit Gap */}
+            <div className="container mt-12 relative z-20"> {/* Changed to mt-12 for a distinct gap */}
                 {loading ? (
                     <div className="flex justify-center py-20">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-nust-blue"></div>
                     </div>
                 ) : (
-                    <div className="max-w-3xl mx-auto bg-white rounded-2xl border-2 border-nust-blue overflow-hidden shadow-[4px_4px_0px_var(--nust-blue)]">
-                        {/* Header Row */}
+                    <div className="max-w-3xl mx-auto bg-white rounded-2xl border-2 border-nust-blue overflow-hidden shadow-[4px_4px_0px_var(--nust-blue)] animate-in slide-in-from-bottom-4 duration-500">
+                        {/* List Header */}
                         <div className="bg-nust-blue/5 p-4 border-b-2 border-nust-blue flex justify-between items-center">
-                            <span className="font-heading text-xl text-nust-blue">CHANNELS ({threads.length})</span>
+                            <span className="font-heading text-xl text-nust-blue tracking-wide">CHANNELS ({threads.length})</span>
                             <button
                                 onClick={() => setIsModalOpen(true)}
-                                className="text-xs font-bold uppercase tracking-wider text-nust-blue hover:text-nust-orange transition-colors"
+                                className="text-xs font-bold uppercase tracking-wider text-nust-blue hover:text-nust-orange transition-colors flex items-center gap-1"
                             >
-                                + Request Topic
+                                <span className="text-lg leading-none">+</span> Request Topic
                             </button>
                         </div>
 
+                        {/* Channel List */}
                         <div className="divide-y-2 divide-nust-blue/10">
                             {threads.map((thread) => (
                                 <Link href={`/chatter/${thread.id}`} key={thread.id} className="block group hover:bg-nust-blue/5 transition-colors">
                                     <div className="flex items-center gap-4 p-4">
                                         {/* Icon */}
-                                        <div className="w-10 h-10 flex items-center justify-center text-2xl bg-cream rounded-full border-2 border-transparent group-hover:border-nust-blue transition-all">
+                                        <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center text-2xl bg-cream rounded-full border-2 border-transparent group-hover:border-nust-blue transition-all shadow-sm">
                                             {thread.emoji}
                                         </div>
 
                                         {/* Text */}
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2 mb-0.5">
-                                                <h3 className="font-bold text-nust-blue truncate">#{thread.title.toLowerCase().replace(/\s+/g, '-')}</h3>
-                                                {/* Optional: Add a 'Live' indicator if needed later */}
+                                                <h3 className="font-bold text-nust-blue truncate text-lg">#{thread.title.toLowerCase().replace(/\s+/g, '-')}</h3>
                                             </div>
-                                            <p className="text-xs text-gray-500 truncate font-medium">
+                                            <p className="text-sm text-gray-500 truncate font-medium">
                                                 {thread.description}
                                             </p>
                                         </div>
 
                                         {/* Action */}
-                                        <div className="text-nust-blue/30 group-hover:text-nust-blue transition-colors">
-                                            →
+                                        <div className="text-nust-blue/30 group-hover:text-nust-blue transition-colors px-2">
+                                            ➝
                                         </div>
                                     </div>
                                 </Link>
