@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { findVenueCoordinates } from "@/lib/nust_venues";
+import { findVenueCoordinates, getVenueSuggestions } from "@/lib/nust_venues";
+import type { Venue } from "@/lib/nust_venues";
 
 export default function PostEventPage() {
     const [step, setStep] = useState(1);
@@ -23,6 +24,8 @@ export default function PostEventPage() {
 
     // New state for location & images
     const [venueLocation, setVenueLocation] = useState<{ name: string, lat: number, lng: number } | null>(null);
+    const [venueSuggestions, setVenueSuggestions] = useState<Venue[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
     const [images, setImages] = useState<File[]>([]);
     const [uploading, setUploading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
@@ -47,6 +50,33 @@ export default function PostEventPage() {
             ...prev,
             [name]: type === "checkbox" ? checked : value,
         }));
+
+        // Show suggestions if typing in venue field
+        if (name === "venue") {
+            if (value.trim().length > 0) {
+                const suggestions = getVenueSuggestions(value);
+                setVenueSuggestions(suggestions);
+                setShowSuggestions(true);
+            } else {
+                setVenueSuggestions([]);
+                setShowSuggestions(false);
+                setVenueLocation(null);
+            }
+        }
+    };
+
+    // Handle suggestion click
+    const handleSuggestionClick = (venue: Venue) => {
+        setFormData(prev => ({
+            ...prev,
+            venue: venue.name,
+        }));
+        setVenueLocation({
+            name: venue.name,
+            lat: venue.lat,
+            lng: venue.lng,
+        });
+        setShowSuggestions(false);
     };
 
     // Auto-detect venue coordinates on blur
@@ -292,25 +322,45 @@ export default function PostEventPage() {
                                             <label className="block font-display text-sm font-bold text-nust-blue mb-2 uppercase">
                                                 Venue *
                                             </label>
-                                            <input
-                                                type="text"
-                                                name="venue"
-                                                value={formData.venue}
-                                                onChange={handleInputChange}
-                                                onBlur={handleVenueBlur} // Trigger geocoding
-                                                placeholder="e.g., SEECS Seminar Hall"
-                                                required
-                                                className="w-full px-4 py-3 rounded-lg border-2 border-nust-blue bg-white text-nust-blue placeholder:text-nust-blue/40 focus:outline-none focus:ring-2 focus:ring-nust-orange"
-                                            />
-                                            {venueLocation ? (
-                                                <p className="text-sm text-green-600 mt-1 flex items-center gap-1 font-bold">
-                                                    📍 {venueLocation.name} matched!
-                                                </p>
-                                            ) : formData.venue && (
-                                                <p className="text-sm text-gray-500 mt-1">
-                                                    Type a known campus spot (e.g. "C1", "Library") to auto-map.
-                                                </p>
-                                            )}
+                                            <div className="relative">
+                                                <input
+                                                    type="text"
+                                                    name="venue"
+                                                    value={formData.venue}
+                                                    onChange={handleInputChange}
+                                                    onFocus={() => formData.venue && setShowSuggestions(true)}
+                                                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                                                    placeholder="e.g., SEECS, C1, Library..."
+                                                    required
+                                                    className="w-full px-4 py-3 rounded-lg border-2 border-nust-blue bg-white text-nust-blue placeholder:text-nust-blue/40 focus:outline-none focus:ring-2 focus:ring-nust-orange"
+                                                />
+                                                
+                                                {/* Suggestions Dropdown */}
+                                                {showSuggestions && venueSuggestions.length > 0 && (
+                                                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border-2 border-nust-blue rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
+                                                        {venueSuggestions.map((venue) => (
+                                                            <button
+                                                                key={venue.id}
+                                                                type="button"
+                                                                onClick={() => handleSuggestionClick(venue)}
+                                                                className="w-full text-left px-4 py-2 hover:bg-nust-blue/10 border-b border-nust-blue/20 last:border-b-0 transition-colors"
+                                                            >
+                                                                <p className="font-bold text-nust-blue">{venue.name}</p>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                )}
+
+                                                {venueLocation ? (
+                                                    <p className="text-sm text-green-600 mt-1 flex items-center gap-1 font-bold">
+                                                        ✓ {venueLocation.name} matched!
+                                                    </p>
+                                                ) : formData.venue && !showSuggestions && (
+                                                    <p className="text-sm text-amber-600 mt-1">
+                                                        📍 Custom location (will be saved as typed)
+                                                    </p>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
 

@@ -103,14 +103,13 @@ function AuthForm() {
             <div className="flex-1 flex items-center justify-center p-8">
                 <div className="w-full max-w-md">
                     {/* Logo */}
-                    <Link href="/" className="flex items-center gap-2 mb-8">
-                        <div className="w-12 h-12 bg-nust-blue rounded-full border-2 border-nust-orange flex items-center justify-center shadow-[2px_2px_0px_var(--nust-orange)]">
-                            <span className="font-heading text-2xl text-white">W</span>
-                        </div>
-                        <div className="flex flex-col leading-none">
-                            <span className="font-heading text-2xl text-nust-blue">WHAT&apos;S UP</span>
-                            <span className="font-display text-xs font-bold text-nust-orange tracking-widest">NUST</span>
-                        </div>
+                    <Link href="/" className="flex items-center mb-8">
+                        <img 
+                            src="/android-chrome-192x192.png" 
+                            alt="NUST Nama" 
+                            className="h-24 w-24 min-h-[96px] min-w-[96px] max-h-[128px] max-w-[128px]" 
+                            style={{ objectFit: "contain" }}
+                        />
                     </Link>
 
                     {/* Tabs */}

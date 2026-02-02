@@ -94,20 +94,13 @@ export function NavBar() {
         <header className="fixed top-0 left-0 right-0 z-50 bg-nust-blue border-b-2 border-nust-orange py-2">
             <nav className="container flex items-center justify-between h-16">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-1 group">
-                    <div className="relative transform group-hover:rotate-12 transition-transform">
-                        <div className="w-10 h-10 bg-cream rounded-full border-2 border-nust-orange flex items-center justify-center shadow-[2px_2px_0px_var(--nust-orange)]">
-                            <span className="font-heading text-xl text-nust-blue">W</span>
-                        </div>
-                    </div>
-                    <div className="flex flex-col leading-none ml-1">
-                        <span className="font-heading text-2xl text-white tracking-wider">
-                            WHAT&apos;S UP
-                        </span>
-                        <span className="font-display text-xs font-bold text-nust-orange tracking-widest uppercase">
-                            NUST
-                        </span>
-                    </div>
+                <Link href="/" className="flex items-center group">
+                    <img 
+                        src="/android-chrome-192x192.png" 
+                        alt="NUST Nama" 
+                        className="h-40 w-40 min-h-[160px] min-w-[160px] max-h-[200px] max-w-[200px] transform group-hover:scale-105 transition-transform"
+                        style={{ objectFit: "contain" }}
+                    />
                 </Link>
 
                 {/* Desktop Navigation */}

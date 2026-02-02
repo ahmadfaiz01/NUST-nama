@@ -27,11 +27,12 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "What's Up NUST | Campus Events & Live Vibes",
+  title: "NUST Nama | Campus Events & Live Vibes",
   description:
     "Discover events, feel the crowd vibe, and coordinate with friends at NUST. Your campus intelligence platform.",
   keywords: [
     "NUST",
+    "NUSTnama",
     "events",
     "campus",
     "students",
@@ -39,14 +40,24 @@ export const metadata: Metadata = {
     "university",
     "social",
   ],
-  authors: [{ name: "What's Up NUST Team" }],
-  creator: "What's Up NUST",
+  authors: [{ name: "NUST Nama Team" }],
+  creator: "NUST Nama",
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png" },
+    ],
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://whatsupnust.vercel.app",
-    siteName: "What's Up NUST",
-    title: "What's Up NUST | Campus Events & Live Vibes",
+    url: "https://nustnama.vercel.app",
+    siteName: "NUST Nama",
+    title: "NUST Nama | Campus Events & Live Vibes",
     description:
       "Discover events, feel the crowd vibe, and coordinate with friends at NUST.",
     images: [
@@ -54,16 +65,16 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "What's Up NUST",
+        alt: "NUST Nama",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "What's Up NUST",
+    title: "NUST Nama",
     description: "Your campus intelligence platform",
   },
-  manifest: "/manifest.json",
+  manifest: "/site.webmanifest",
 };
 
 export const viewport: Viewport = {

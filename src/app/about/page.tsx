@@ -14,10 +14,17 @@ export default function AboutPage() {
             <section className="py-20 bg-nust-blue">
                 <div className="container">
                     <div className="max-w-3xl">
-                        <h1 className="text-5xl md:text-7xl text-white mb-6 drop-shadow-[4px_4px_0px_var(--nust-orange)]">
-                            ABOUT<br />
-                            <span className="text-nust-orange">WHAT&apos;S UP NUST</span>
+                        <h1 className="text-5xl md:text-7xl text-white mb-3 drop-shadow-[4px_4px_0px_var(--nust-orange)]">
+                            ABOUT US
                         </h1>
+                        <div className="mb-4">
+                            <img 
+                                src="/android-chrome-192x192.png" 
+                                alt="NUST Nama" 
+                                className="h-32 w-32 md:h-48 md:w-48 mx-auto" 
+                                style={{ objectFit: "contain", boxShadow: "none", filter: "none" }}
+                            />
+                        </div>
                         <p className="font-display text-white/80 text-xl leading-relaxed">
                             Born out of frustration with missing events and FOMO, we built the campus intelligence platform we wished we had as students.
                         </p>

@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export function Footer() {
     return (
-        <footer className="bg-nust-blue border-t-0 relative pt-28 pb-12 z-0 mt-16">
+        <footer className="bg-nust-blue border-t-0 relative pt-16 pb-8 z-0 mt-8">
 
             {/* Top Tape - Moved from Page to Footer for fixed positioning */}
             <div className="absolute -top-6 left-0 right-0 z-[60] bg-nust-orange py-3 border-y-2 border-nust-blue overflow-hidden transform rotate-1 scale-110 origin-right shadow-md pointer-events-none">
@@ -26,12 +26,10 @@ export function Footer() {
 
                     {/* Brand Vibe */}
                     <div className="max-w-md">
-                        <Link href="/" className="inline-block transform hover:rotate-2 transition-transform duration-300">
-                            <h2 className="font-heading text-4xl text-white drop-shadow-[2px_2px_0px_var(--nust-orange)]">
-                                WHAT&apos;S UP NUST
-                            </h2>
+                        <Link href="/" className="inline-flex items-center transform hover:scale-105 transition-transform duration-300">
+                            <img src="/android-chrome-192x192.png" alt="NUST Nama" className="h-48 w-48 min-h-[192px] min-w-[192px] max-h-[240px] max-w-[240px]" style={{ objectFit: "contain" }} />
                         </Link>
-                        <p className="font-display text-white/80 text-lg mt-3 leading-relaxed">
+                        <p className="font-display text-white/80 text-lg mt-2 leading-relaxed">
                             Your realtime guide to campus life. Find events, check crowd vibes, and never miss a moment.<br />
                             <span className="text-sm opacity-60 italic">Because FOMO is real.</span>
                         </p>
@@ -75,7 +73,7 @@ export function Footer() {
 
                 {/* Bottom Bar */}
                 <div className="mt-12 pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-display text-white/40">
-                    <p>© 2026 What&apos;s Up NUST. Open source & proud.</p>
+                    <p>© 2026 NUST Nama. Open source & proud.</p>
                     <p>Made with ☕ at H-12 Islamabad</p>
                 </div>
             </div>

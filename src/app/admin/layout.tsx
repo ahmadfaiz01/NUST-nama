@@ -117,9 +117,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             {/* Sidebar */}
             <aside className={`
                 fixed left-0 top-24 bottom-0 bg-nust-blue text-white z-40
-                transform transition-all duration-300 ease-in-out
+                transform transition-all duration-300 ease-in-out overflow-hidden
                 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-                ${sidebarCollapsed ? 'lg:w-0 lg:-translate-x-full' : 'lg:w-64 lg:translate-x-0'}
+                ${sidebarCollapsed ? 'lg:w-0 lg:opacity-0 lg:pointer-events-none' : 'lg:w-64 lg:translate-x-0 lg:opacity-100'}
                 w-64
             `}>
                 {/* Admin Header */}
