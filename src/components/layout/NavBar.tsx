@@ -15,7 +15,7 @@ export function NavBar() {
         try {
             const supabase = createClient();
             const { data: { user }, error } = await supabase.auth.getUser();
-            
+
             if (error || !user) {
                 setIsLoggedIn(false);
                 setIsAdmin(false);
@@ -24,14 +24,14 @@ export function NavBar() {
             }
 
             setIsLoggedIn(true);
-            
+
             // Check admin status
             const { data: profile } = await supabase
                 .from("profiles")
                 .select("role")
                 .eq("id", user.id)
                 .single();
-            
+
             if (profile && ["admin", "moderator"].includes(profile.role)) {
                 setIsAdmin(true);
             } else {
@@ -48,7 +48,7 @@ export function NavBar() {
 
     useEffect(() => {
         const supabase = createClient();
-        
+
         // Check initial status
         checkUserStatus();
 
@@ -95,11 +95,10 @@ export function NavBar() {
             <nav className="container flex items-center justify-between h-16">
                 {/* Logo */}
                 <Link href="/" className="flex items-center">
-                    <img 
-                        src="/android-chrome-192x192.png" 
-                        alt="NUST Nama" 
-                        className="h-16 w-16 min-h-[64px] min-w-[64px]"
-                        style={{ objectFit: "contain", pointerEvents: "auto" }}
+                    <img
+                        src="/android-chrome-192x192.png"
+                        alt="NUST Nama"
+                        className="h-28 w-28 min-h-[112px] min-w-[112px] object-contain pointer-events-auto"
                     />
                 </Link>
 

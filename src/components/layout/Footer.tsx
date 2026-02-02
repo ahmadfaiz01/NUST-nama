@@ -30,10 +30,8 @@ export function Footer() {
                             {/* Drastically reduced logo size from h-48 to h-24/32 */}
                             <img src="/android-chrome-192x192.png" alt="NUST Nama" className="h-28 w-28 rounded-xl object-contain" />
                         </Link>
-                        <p className="font-display text-white/80 text-sm mt-3 leading-relaxed max-w-xs mx-auto md:mx-0">
-                            Your realtime guide to campus life. Find events, check crowd vibes, and never miss a moment.<br />
-                            <span className="text-xs opacity-60 italic">Because FOMO is real.</span>
-                        </p>
+                        Your realtime guide to campus life. Find events, check crowd vibes, and never miss a moment.<br />
+                        <span className="text-xs text-nust-orange font-bold italic">Because FOMO is real.</span>
                         <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-4 text-sm">
                             <Link href="/events" className="text-white font-bold hover:text-nust-orange transition-colors">
                                 Events
@@ -73,10 +71,7 @@ export function Footer() {
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="mt-8 pt-4 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-3 text-[10px] font-display text-white/40">
-                    <p>© 2026 NUST Nama. Open source & proud.</p>
-                    <p>Made with ☕ at H-12 Islamabad</p>
-                </div>
+                {/* Bottom Bar Removed */}
             </div>
         </footer>
     );

@@ -180,9 +180,9 @@ export default function ChatRoom() {
 
     return (
         // Height adjusted for Navbar (approx 64px-80px depending on screen). 
-        // Using calc(100vh - 80px) ensures it fits exactly without double scrollbars.
+        // Using calc(100dvh - 80px) ensures it fits exactly without double scrollbars on mobile.
         // Also added pt-2 to separate from Navbar slightly.
-        <div className="h-[calc(100vh-80px)] bg-cream flex flex-col items-center mb-10"> {/* Added mb-10 for Footer Tape clearance */}
+        <div className="h-[calc(100dvh-80px)] bg-cream flex flex-col items-center mb-10"> {/* Added mb-10 for Footer Tape clearance */}
             {/* Main Chat Container - Compact & Discord Style */}
             <div className="w-full max-w-2xl h-full flex flex-col bg-white border-x-2 border-nust-blue/10 shadow-xl overflow-hidden rounded-t-xl mx-auto">
 
