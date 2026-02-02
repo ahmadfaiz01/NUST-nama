@@ -90,14 +90,15 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* Mobile Menu Button - only visible when sidebar is closed on mobile */}
-            {!sidebarOpen && (
+            {/* Desktop Collapse Button - visible on sidebar */}
+            {!sidebarCollapsed && (
                 <button
-                    onClick={() => setSidebarOpen(true)}
-                    className="lg:hidden fixed top-28 left-4 z-50 bg-nust-blue text-white p-2 rounded-lg shadow-lg"
+                    onClick={() => setSidebarCollapsed(true)}
+                    className="hidden lg:flex fixed left-60 top-8 z-40 bg-nust-orange text-white p-2 rounded-lg shadow-lg hover:bg-nust-orange/90 transition-colors"
+                    title="Collapse sidebar"
                 >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
                 </button>
             )}
@@ -106,63 +107,80 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             {sidebarCollapsed && (
                 <button
                     onClick={() => setSidebarCollapsed(false)}
-                    className="hidden lg:flex fixed top-28 left-4 z-50 bg-nust-blue text-white p-2 rounded-lg shadow-lg"
+                    className="hidden lg:flex fixed top-4 left-4 z-50 bg-nust-orange text-white p-2 rounded-lg shadow-lg hover:bg-nust-orange/90 transition-colors"
+                    title="Expand sidebar"
                 >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                 </button>
             )}
 
             {/* Sidebar */}
             <aside className={`
-                fixed left-0 top-24 bottom-0 bg-nust-blue text-white z-40
-                transform transition-all duration-300 ease-in-out overflow-hidden
+                fixed left-0 top-0 bottom-0 bg-nust-blue text-white z-40
+                transform transition-all duration-300 ease-in-out overflow-auto flex flex-col
                 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
                 ${sidebarCollapsed ? 'lg:w-0 lg:opacity-0 lg:pointer-events-none' : 'lg:w-64 lg:translate-x-0 lg:opacity-100'}
                 w-64
             `}>
-                {/* Admin Header */}
-                <div className="p-6 border-b border-white/10">
-                    <div className="flex items-center justify-between">
+                {/* Header Section - ALWAYS VISIBLE */}
+                <div className="w-full bg-nust-blue pt-6 pb-4 px-4 flex-shrink-0">
+                    {/* Top row: Logo and title */}
+                    <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-nust-orange rounded-lg flex items-center justify-center">
-                                <span className="text-xl">👮</span>
+                                <span>👮</span>
                             </div>
                             <div>
-                                <h2 className="font-heading text-xl">ADMIN</h2>
-                                <p className="text-white/60 text-xs">Control Panel</p>
+                                <h2 className="font-heading text-lg font-bold text-white">ADMIN</h2>
+                                <p className="text-white/70 text-xs">Control Panel</p>
                             </div>
                         </div>
-                        {/* Notifications & Close/Collapse buttons */}
-                        <div className="flex items-center gap-1">
-                            {/* Notifications Bell */}
+                    </div>
+
+                    {/* Bottom row: Buttons */}
+                    <div className="flex gap-2 justify-end">
+                        {/* Notification Bell */}
+                        <div className="flex-shrink-0">
                             <AdminNotifications />
-                            {/* Mobile close button */}
-                            <button
-                                onClick={() => setSidebarOpen(false)}
-                                className="lg:hidden p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
-                            >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                            {/* Desktop collapse button */}
-                            <button
-                                onClick={() => setSidebarCollapsed(true)}
-                                className="hidden lg:flex p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
-                                title="Collapse sidebar"
-                            >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7" />
-                                </svg>
-                            </button>
                         </div>
+                        
+                        {/* Collapse Button - Desktop only */}
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setSidebarCollapsed(true);
+                            }}
+                            className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded transition-colors hidden lg:block"
+                            title="Collapse sidebar"
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+
+                        {/* Close Button - Mobile only */}
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setSidebarOpen(false);
+                            }}
+                            className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded lg:hidden transition-colors"
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
 
                 {/* Navigation */}
-                <nav className="p-4 space-y-2">
+                <nav className="p-4 space-y-2 flex-1 overflow-y-auto">
                     {sidebarLinks.map((link) => {
                         const isActive = pathname === link.href || 
                             (link.href !== "/admin" && pathname.startsWith(link.href));
@@ -173,17 +191,17 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                                 href={link.href}
                                 onClick={() => setSidebarOpen(false)}
                                 className={`
-                                    flex items-center gap-3 px-4 py-3 rounded-lg transition-all
+                                    flex items-center gap-3 px-4 py-3 rounded-lg transition-all whitespace-nowrap
                                     ${isActive 
                                         ? 'bg-white text-nust-blue font-bold shadow-md' 
                                         : 'text-white/80 hover:bg-white/10 hover:text-white'
                                     }
                                 `}
                             >
-                                <span className="text-xl">{link.icon}</span>
+                                <span className="text-xl flex-shrink-0">{link.icon}</span>
                                 <span className="font-display">{link.label}</span>
                                 {isActive && (
-                                    <span className="ml-auto w-2 h-2 bg-nust-orange rounded-full"></span>
+                                    <span className="ml-auto w-2 h-2 bg-nust-orange rounded-full flex-shrink-0"></span>
                                 )}
                             </Link>
                         );
