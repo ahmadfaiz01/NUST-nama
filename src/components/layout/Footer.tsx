@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export function Footer() {
     return (
-        <footer className="bg-nust-blue border-t-0 relative pt-8 pb-6 z-0 mt-8">
+        <footer className="bg-nust-blue border-t-0 relative pt-12 pb-6 z-0 mt-8">
 
             {/* Top Tape - Moved from Page to Footer for fixed positioning */}
             <div className="absolute -top-5 left-0 right-0 z-[60] bg-nust-orange py-2 border-y-2 border-nust-blue overflow-hidden transform rotate-1 scale-110 origin-right shadow-md pointer-events-none">
@@ -22,13 +22,13 @@ export function Footer() {
             </div>
 
             <div className="container relative z-10">
-                <div className="flex flex-col md:flex-row items-start justify-between text-center md:text-left gap-6 pt-4"> {/* Changed items-center to items-start, added pt-4 to push down from tape slightly but keeping overall tight */}
+                <div className="flex flex-col md:flex-row items-center justify-between text-center md:text-left gap-6">
 
                     {/* Brand Vibe */}
                     <div className="max-w-md">
                         <Link href="/" className="inline-flex items-center transform hover:scale-105 transition-transform duration-300">
                             {/* Drastically reduced logo size from h-48 to h-24/32 */}
-                            <img src="/android-chrome-192x192.png" alt="NUST Nama" className="h-24 w-24 rounded-xl object-contain" />
+                            <img src="/android-chrome-192x192.png" alt="NUST Nama" className="h-28 w-28 rounded-xl object-contain" />
                         </Link>
                         <p className="font-display text-white/80 text-sm mt-3 leading-relaxed max-w-xs mx-auto md:mx-0">
                             Your realtime guide to campus life. Find events, check crowd vibes, and never miss a moment.<br />
@@ -48,7 +48,7 @@ export function Footer() {
                     </div>
 
                     {/* Social / Credits Vibe */}
-                    <div className="flex flex-col items-center md:items-end gap-3 mt-4 md:mt-0"> {/* Added md:mt-0 to ensure top alignment */}
+                    <div className="flex flex-col items-center md:items-end gap-3">
                         <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 rounded-xl p-3 rotate-1 hover:rotate-0 transition-transform cursor-default shadow-lg">
                             <p className="font-heading text-white text-lg tracking-wide">
                                 BUILT BY STUDENTS 💙

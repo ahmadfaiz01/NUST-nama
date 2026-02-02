@@ -180,9 +180,9 @@ export default function ChatRoom() {
 
     return (
         // Height adjusted for Navbar (approx 64px-80px depending on screen). 
-        // Using calc(100vh - 64px) ensures it fits exactly without double scrollbars.
+        // Using calc(100vh - 80px) ensures it fits exactly without double scrollbars.
         // Also added pt-2 to separate from Navbar slightly.
-        <div className="h-[calc(100vh-80px)] bg-cream flex flex-col items-center">
+        <div className="h-[calc(100vh-80px)] bg-cream flex flex-col items-center mb-10"> {/* Added mb-10 for Footer Tape clearance */}
             {/* Main Chat Container - Compact & Discord Style */}
             <div className="w-full max-w-2xl h-full flex flex-col bg-white border-x-2 border-nust-blue/10 shadow-xl overflow-hidden rounded-t-xl mx-auto">
 
@@ -252,10 +252,10 @@ export default function ChatRoom() {
 
                                         {/* Bubble */}
                                         <div className={`relative px-3 py-2 text-[14px] shadow-sm rounded-2xl leading-relaxed break-words ${isAdmin
-                                                ? "bg-nust-orange/10 border border-nust-orange/30 text-gray-800 rounded-tl-none"
-                                                : isMe
-                                                    ? "bg-nust-blue text-white rounded-tr-none"
-                                                    : "bg-white text-gray-800 border border-gray-200 rounded-tl-none"
+                                            ? "bg-nust-orange/10 border border-nust-orange/30 text-gray-800 rounded-tl-none"
+                                            : isMe
+                                                ? "bg-nust-blue text-white rounded-tr-none"
+                                                : "bg-white text-gray-800 border border-gray-200 rounded-tl-none"
                                             }`}>
                                             {msg.content}
                                         </div>
