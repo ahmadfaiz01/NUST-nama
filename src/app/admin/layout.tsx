@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import AdminNotifications from "@/components/admin/AdminNotifications";
 
 interface AdminLayoutProps {
     children: React.ReactNode;
@@ -133,8 +134,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                                 <p className="text-white/60 text-xs">Control Panel</p>
                             </div>
                         </div>
-                        {/* Close/Collapse buttons inside sidebar */}
+                        {/* Notifications & Close/Collapse buttons */}
                         <div className="flex items-center gap-1">
+                            {/* Notifications Bell */}
+                            <AdminNotifications />
                             {/* Mobile close button */}
                             <button
                                 onClick={() => setSidebarOpen(false)}

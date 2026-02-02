@@ -20,6 +20,7 @@ export interface Database {
                     id: string;
                     name: string | null;
                     avatar_url: string | null;
+                    school: string | null;
                     faculty: string | null;
                     interests: string[] | null;
                     role: "student" | "admin" | "moderator";
@@ -31,6 +32,7 @@ export interface Database {
                     id: string;
                     name?: string | null;
                     avatar_url?: string | null;
+                    school?: string | null;
                     faculty?: string | null;
                     interests?: string[] | null;
                     role?: "student" | "admin" | "moderator";
@@ -42,6 +44,7 @@ export interface Database {
                     id?: string;
                     name?: string | null;
                     avatar_url?: string | null;
+                    school?: string | null;
                     faculty?: string | null;
                     interests?: string[] | null;
                     role?: "student" | "admin" | "moderator";
@@ -178,6 +181,9 @@ export interface Database {
                     summary: string | null;
                     url: string | null;
                     published_at: string | null;
+                    status: "pending" | "approved" | "rejected";
+                    source_url: string | null;
+                    external_id: string | null;
                     created_at: string;
                 };
                 Insert: {
@@ -187,6 +193,9 @@ export interface Database {
                     summary?: string | null;
                     url?: string | null;
                     published_at?: string | null;
+                    status?: "pending" | "approved" | "rejected";
+                    source_url?: string | null;
+                    external_id?: string | null;
                     created_at?: string;
                 };
                 Update: {
@@ -196,6 +205,44 @@ export interface Database {
                     summary?: string | null;
                     url?: string | null;
                     published_at?: string | null;
+                    status?: "pending" | "approved" | "rejected";
+                    source_url?: string | null;
+                    external_id?: string | null;
+                    created_at?: string;
+                };
+            };
+            admin_notifications: {
+                Row: {
+                    id: string;
+                    type: "event_request" | "news_request" | "topic_request" | "user_report" | "system";
+                    title: string;
+                    message: string | null;
+                    reference_id: string | null;
+                    reference_type: string | null;
+                    is_read: boolean;
+                    created_by: string | null;
+                    created_at: string;
+                };
+                Insert: {
+                    id?: string;
+                    type: "event_request" | "news_request" | "topic_request" | "user_report" | "system";
+                    title: string;
+                    message?: string | null;
+                    reference_id?: string | null;
+                    reference_type?: string | null;
+                    is_read?: boolean;
+                    created_by?: string | null;
+                    created_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    type?: "event_request" | "news_request" | "topic_request" | "user_report" | "system";
+                    title?: string;
+                    message?: string | null;
+                    reference_id?: string | null;
+                    reference_type?: string | null;
+                    is_read?: boolean;
+                    created_by?: string | null;
                     created_at?: string;
                 };
             };
@@ -299,3 +346,4 @@ export type NewsItem = Database["public"]["Tables"]["news_items"]["Row"];
 export type Thread = Database["public"]["Tables"]["threads"]["Row"];
 export type TopicRequest = Database["public"]["Tables"]["topic_requests"]["Row"];
 export type Message = Database["public"]["Tables"]["messages"]["Row"];
+export type AdminNotification = Database["public"]["Tables"]["admin_notifications"]["Row"];
