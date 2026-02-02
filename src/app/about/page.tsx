@@ -18,10 +18,10 @@ export default function AboutPage() {
                             ABOUT US
                         </h1>
                         <div className="mb-4">
-                            <img 
-                                src="/android-chrome-192x192.png" 
-                                alt="NUST Nama" 
-                                className="h-32 w-32 md:h-48 md:w-48 mx-auto" 
+                            <img
+                                src="/android-chrome-192x192.png"
+                                alt="NUST Nama"
+                                className="h-32 w-32 md:h-48 md:w-48 mx-auto"
                                 style={{ objectFit: "contain", boxShadow: "none", filter: "none" }}
                             />
                         </div>
@@ -129,23 +129,7 @@ export default function AboutPage() {
                 </div>
             </section>
 
-            {/* Contact CTA */}
-            <section className="py-16 bg-nust-orange">
-                <div className="container text-center">
-                    <h2 className="text-4xl md:text-5xl text-nust-blue mb-4">WANT TO CONTRIBUTE?</h2>
-                    <p className="text-nust-blue/80 mb-8 max-w-xl mx-auto">
-                        We&apos;re always looking for passionate students to help improve the platform. Whether you&apos;re a developer, designer, or just have great ideas — reach out!
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Link href="mailto:hello@whatsupnust.com" className="btn bg-nust-blue text-white text-lg px-8 py-4 shadow-[4px_4px_0px_rgba(0,0,0,0.2)]">
-                            Contact Us
-                        </Link>
-                        <Link href="https://github.com" className="btn border-2 border-nust-blue text-nust-blue text-lg px-8 py-4 bg-white hover:bg-nust-blue hover:text-white transition-all">
-                            GitHub
-                        </Link>
-                    </div>
-                </div>
-            </section>
+
         </div>
     );
 }
