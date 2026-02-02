@@ -149,8 +149,10 @@ export default function AdminNotifications({ className = "" }: AdminNotification
         <div ref={dropdownRef} className={`relative ${className}`}>
             {/* Notification Bell Button */}
             <button
+                type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className="relative p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                className="relative p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+                title="View Notifications"
             >
                 <svg 
                     className="w-6 h-6" 
@@ -176,13 +178,20 @@ export default function AdminNotifications({ className = "" }: AdminNotification
 
             {/* Dropdown */}
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
+                <div 
+                    className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                >
                     {/* Header */}
                     <div className="px-4 py-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
                         <h3 className="font-heading text-nust-blue">NOTIFICATIONS</h3>
                         {unreadCount > 0 && (
                             <button
-                                onClick={markAllAsRead}
+                                type="button"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    markAllAsRead();
+                                }}
                                 className="text-xs text-nust-blue hover:text-nust-orange transition-colors"
                             >
                                 Mark all read
