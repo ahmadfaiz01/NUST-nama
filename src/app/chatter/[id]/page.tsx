@@ -13,6 +13,7 @@ interface Message {
     profiles?: {
         name: string;
         avatar_url: string;
+        role?: string; // Added role
     };
 }
 
@@ -29,6 +30,7 @@ export default function ChatRoom() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState("");
     const [userId, setUserId] = useState<string | null>(null);
+    const [userRole, setUserRole] = useState<string | null>(null); // Track current user role
     const [loading, setLoading] = useState(true);
 
     // Auto-scroll ref
@@ -48,9 +50,18 @@ export default function ChatRoom() {
         if (!id) return;
 
         const fetchData = async () => {
-            // 1. Get User
-            const { data: { user } } = await supabase.auth.getUser();
+            // 1. Get User & Role
+            const { data: { user } = {} } = await supabase.auth.getUser(); // Destructure with default empty object
             setUserId(user?.id || null);
+
+            if (user) {
+                const { data: profile } = await supabase
+                    .from("profiles")
+                    .select("role")
+                    .eq("id", user.id)
+                    .single();
+                setUserRole(profile?.role || null);
+            }
 
             // 2. Get Thread Info
             const { data: threadData } = await supabase
@@ -64,7 +75,7 @@ export default function ChatRoom() {
             // 3. Get Messages
             const { data: msgs } = await supabase
                 .from("messages")
-                .select("*, profiles:user_id(name, avatar_url)")
+                .select("*, profiles:user_id(name, avatar_url, role)") // Fetch role
                 .eq("thread_id", id)
                 .order("created_at", { ascending: true });
 
@@ -86,7 +97,7 @@ export default function ChatRoom() {
                     // Fetch profile for the new message author
                     const { data: profile } = await supabase
                         .from("profiles")
-                        .select("name, avatar_url")
+                        .select("name, avatar_url, role")
                         .eq("id", newMsg.user_id)
                         .single();
 
@@ -96,6 +107,13 @@ export default function ChatRoom() {
                     };
 
                     setMessages((prev) => [...prev, msgWithProfile]);
+                }
+            )
+            .on(
+                'postgres_changes',
+                { event: 'DELETE', schema: 'public', table: 'messages', filter: `thread_id=eq.${id}` },
+                (payload) => {
+                    setMessages((prev) => prev.filter(msg => msg.id !== payload.old.id));
                 }
             )
             .subscribe();
@@ -134,6 +152,12 @@ export default function ChatRoom() {
             alert("Failed to send: " + error.message);
             setNewMessage(content); // Restore message on error
         }
+    };
+
+    const handleDelete = async (messageId: string) => {
+        if (!confirm("Delete this message?")) return;
+        const { error } = await supabase.from("messages").delete().eq("id", messageId);
+        if (error) alert("Failed to delete: " + error.message);
     };
 
     if (loading) return (
@@ -177,33 +201,60 @@ export default function ChatRoom() {
                 ) : (
                     messages.map((msg) => {
                         const isMe = msg.user_id === userId;
+                        const isAdmin = msg.profiles?.role === 'admin';
+
                         return (
-                            <div key={msg.id} className={`flex gap-2 ${isMe ? "flex-row-reverse" : "flex-row"}`}>
+                            <div key={msg.id} className={`flex gap-2 group ${isMe ? "flex-row-reverse" : "flex-row"}`}>
                                 {/* Avatar */}
                                 <div className="flex-shrink-0">
                                     {msg.profiles?.avatar_url ? (
                                         <img src={msg.profiles.avatar_url} className="w-8 h-8 rounded-full border border-gray-200 object-cover" alt="avatar" />
                                     ) : (
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border ${isMe ? "bg-nust-blue text-white border-nust-blue" : "bg-white text-nust-blue border-gray-200"}`}>
-                                            {msg.profiles?.name?.[0] || "?"}
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border ${isAdmin ? "bg-nust-orange text-white border-nust-orange" : isMe ? "bg-nust-blue text-white border-nust-blue" : "bg-white text-nust-blue border-gray-200"}`}>
+                                            {isAdmin ? "🛡️" : (msg.profiles?.name?.[0] || "?")}
                                         </div>
                                     )}
                                 </div>
 
-                                {/* Bubble */}
-                                <div className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm ${isMe
-                                    ? "bg-nust-blue text-white rounded-tr-none"
-                                    : "bg-white text-gray-800 border border-gray-100 rounded-tl-none"
-                                    }`}>
+                                {/* Bubble Container */}
+                                <div className={`flex flex-col ${isMe ? "items-end" : "items-start"} max-w-[80%]`}>
+                                    {/* Name / Role Label */}
                                     {!isMe && (
-                                        <p className="text-[10px] font-bold opacity-50 mb-0.5 uppercase tracking-wide">
-                                            {msg.profiles?.name || "Anon"}
-                                        </p>
+                                        <div className="flex items-center gap-2 mb-0.5">
+                                            {isAdmin ? (
+                                                <span className="bg-nust-orange text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm">
+                                                    ADMIN
+                                                </span>
+                                            ) : (
+                                                <span className="text-[10px] font-bold opacity-50 uppercase tracking-wide">
+                                                    {msg.profiles?.name || "Anon"}
+                                                </span>
+                                            )}
+                                        </div>
                                     )}
-                                    <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                                    <p className={`text-[9px] mt-1 text-right ${isMe ? "text-white/50" : "text-gray-400"}`}>
-                                        {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </p>
+
+                                    {/* Bubble */}
+                                    <div className={`relative px-4 py-2 text-sm shadow-sm rounded-2xl ${isAdmin
+                                            ? "bg-nust-orange/10 border-2 border-nust-orange text-nust-blue rounded-tl-none"
+                                            : isMe
+                                                ? "bg-nust-blue text-white rounded-tr-none"
+                                                : "bg-white text-gray-800 border border-gray-100 rounded-tl-none"
+                                        }`}>
+                                        <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                                        <p className={`text-[9px] mt-1 text-right ${isMe ? "text-white/50" : "text-gray-400"}`}>
+                                            {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </p>
+                                    </div>
+
+                                    {/* Admin Controls */}
+                                    {userRole === 'admin' && (
+                                        <button
+                                            onClick={() => handleDelete(msg.id)}
+                                            className="text-[10px] text-red-400 hover:text-red-600 font-bold mt-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                            [DELETE]
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         );
