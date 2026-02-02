@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { findVenueCoordinates, getVenueSuggestions } from "@/lib/nust_venues";
+import { findVenueCoordinates, getVenueSuggestions, NUST_VENUES } from "@/lib/nust_venues";
 import type { Venue } from "@/lib/nust_venues";
 
 export default function PostEventPage() {
@@ -323,38 +323,33 @@ export default function PostEventPage() {
                                                 Venue *
                                             </label>
                                             <div className="relative">
-                                                <input
-                                                    type="text"
+                                                <select
                                                     name="venue"
                                                     value={formData.venue}
-                                                    onChange={handleInputChange}
-                                                    onFocus={() => formData.venue && setShowSuggestions(true)}
-                                                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                                                    placeholder="e.g., SEECS, C1, Library..."
+                                                    onChange={(e) => {
+                                                        handleInputChange(e);
+                                                        // Manually trigger location update since we don't have blur anymore
+                                                        const found = NUST_VENUES.find(v => v.name === e.target.value);
+                                                        if (found) {
+                                                            setVenueLocation({ name: found.name, lat: found.lat, lng: found.lng });
+                                                        }
+                                                    }}
                                                     required
-                                                    className="w-full px-4 py-3 rounded-lg border-2 border-nust-blue bg-white text-nust-blue placeholder:text-nust-blue/40 focus:outline-none focus:ring-2 focus:ring-nust-orange"
-                                                />
-                                                
-                                                {/* Suggestions Dropdown */}
-                                                {showSuggestions && venueSuggestions.length > 0 && (
-                                                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border-2 border-nust-blue rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
-                                                        {venueSuggestions.map((venue) => (
-                                                            <button
-                                                                key={venue.id}
-                                                                type="button"
-                                                                onMouseDown={(e) => {
-                                                                    e.preventDefault();
-                                                                    handleSuggestionClick(venue);
-                                                                }}
-                                                                className="w-full text-left px-4 py-2 hover:bg-nust-blue/10 border-b border-nust-blue/20 last:border-b-0 transition-colors"
-                                                            >
-                                                                <p className="font-bold text-nust-blue">{venue.name}</p>
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                )}
+                                                    className="w-full px-4 py-3 rounded-lg border-2 border-nust-blue bg-white text-nust-blue focus:outline-none focus:ring-2 focus:ring-nust-orange appearance-none cursor-pointer"
+                                                    style={{ backgroundImage: 'none' }} // Remove default arrow to use custom if needed, or stick to browser default
+                                                >
+                                                    <option value="" disabled className="text-gray-400">Select a location...</option>
+                                                    {NUST_VENUES.map((v) => (
+                                                        <option key={v.id} value={v.name}>{v.name}</option>
+                                                    ))}
+                                                </select>
 
-                                                
+                                                {/* Custom Chevron Arrow */}
+                                                <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-nust-blue">
+                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                    </svg>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
