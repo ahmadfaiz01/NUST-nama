@@ -151,7 +151,11 @@ export default function AdminNotifications({ className = "" }: AdminNotification
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className="relative p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+                className={`relative p-2 rounded-lg transition-colors cursor-pointer ${
+                    unreadCount > 0 
+                        ? "text-red-500 hover:bg-red-50" 
+                        : "text-white/80 hover:text-white hover:bg-white/10"
+                }`}
                 title="View Notifications"
             >
                 <svg 
@@ -171,19 +175,28 @@ export default function AdminNotifications({ className = "" }: AdminNotification
                 {/* Unread Badge */}
                 {unreadCount > 0 && (
                     <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
-                        {unreadCount > 9 ? "9+" : unreadCount}
+                        {unreadCount > 99 ? "99+" : unreadCount}
                     </span>
                 )}
             </button>
 
-            {/* Dropdown */}
+            {/* Dropdown - Fixed positioning to appear on top of everything */}
             {isOpen && (
                 <div 
-                    className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                    className="fixed bg-white rounded-xl shadow-2xl border border-gray-200 overflow-visible z-[9999]"
+                    style={{ 
+                        top: "100px",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        width: "240px",
+                        maxHeight: "calc(100vh - 150px)",
+                        display: "flex",
+                        flexDirection: "column"
+                    }}
                 >
                     {/* Header */}
-                    <div className="px-4 py-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
-                        <h3 className="font-heading text-nust-blue">NOTIFICATIONS</h3>
+                    <div className="px-3 py-2 bg-gradient-to-r from-nust-blue to-nust-blue/90 border-b border-nust-blue/20 flex items-center justify-between flex-shrink-0 rounded-t-xl">
+                        <h3 className="font-heading text-sm font-bold text-white">NOTIFICATIONS</h3>
                         {unreadCount > 0 && (
                             <button
                                 type="button"
@@ -192,15 +205,15 @@ export default function AdminNotifications({ className = "" }: AdminNotification
                                     e.stopPropagation();
                                     markAllAsRead();
                                 }}
-                                className="text-xs text-nust-blue hover:text-nust-orange transition-colors"
+                                className="text-xs text-nust-orange hover:text-white transition-colors font-semibold"
                             >
-                                Mark all read
+                                Mark all
                             </button>
                         )}
                     </div>
 
                     {/* Notifications List */}
-                    <div className="max-h-96 overflow-y-auto">
+                    <div className="overflow-y-auto flex-1">
                         {loading ? (
                             <div className="p-4 text-center">
                                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-nust-blue mx-auto"></div>
@@ -219,30 +232,36 @@ export default function AdminNotifications({ className = "" }: AdminNotification
                                         if (!notification.is_read) markAsRead(notification.id);
                                         setIsOpen(false);
                                     }}
-                                    className={`block px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors ${
-                                        !notification.is_read ? "bg-blue-50/50" : ""
+                                    className={`block px-2 py-2 border-b border-gray-100 hover:bg-nust-blue/5 transition-colors ${
+                                        !notification.is_read ? "bg-nust-orange/10 border-l-4 border-l-nust-orange" : ""
                                     }`}
                                 >
-                                    <div className="flex gap-3">
-                                        <span className="text-xl flex-shrink-0">
-                                            {getNotificationIcon(notification.type)}
-                                        </span>
-                                        <div className="flex-1 min-w-0">
-                                            <p className={`text-sm truncate ${!notification.is_read ? "font-semibold text-gray-900" : "text-gray-700"}`}>
-                                                {notification.title}
+                                    <div className="space-y-0.5">
+                                        {/* Type Label */}
+                                        <p className={`text-xs font-bold uppercase tracking-wider ${!notification.is_read ? "text-nust-orange" : "text-gray-500"}`}>
+                                            {notification.type === "event_request" && "Event Request:"}
+                                            {notification.type === "news_request" && "News Request:"}
+                                            {notification.type === "topic_request" && "Topic Request:"}
+                                            {notification.type === "user_report" && "User Report:"}
+                                            {notification.type === "system" && "System:"}
+                                        </p>
+                                        
+                                        {/* Event Name */}
+                                        <p className={`text-xs font-semibold truncate ${!notification.is_read ? "text-nust-blue" : "text-gray-700"}`}>
+                                            {notification.title}
+                                        </p>
+                                        
+                                        {/* Who Requested */}
+                                        {notification.message && (
+                                            <p className="text-xs text-gray-600 truncate">
+                                                {notification.message}
                                             </p>
-                                            {notification.message && (
-                                                <p className="text-xs text-gray-500 truncate mt-0.5">
-                                                    {notification.message}
-                                                </p>
-                                            )}
-                                            <p className="text-xs text-gray-400 mt-1">
-                                                {formatTime(notification.created_at)}
-                                            </p>
-                                        </div>
-                                        {!notification.is_read && (
-                                            <span className="w-2 h-2 bg-nust-blue rounded-full flex-shrink-0 mt-2"></span>
                                         )}
+                                        
+                                        {/* Time */}
+                                        <p className="text-xs text-gray-400">
+                                            {formatTime(notification.created_at)}
+                                        </p>
                                     </div>
                                 </Link>
                             ))
@@ -254,7 +273,7 @@ export default function AdminNotifications({ className = "" }: AdminNotification
                         <Link
                             href="/admin"
                             onClick={() => setIsOpen(false)}
-                            className="block px-4 py-3 text-center text-sm text-nust-blue hover:bg-gray-50 border-t border-gray-100"
+                            className="px-3 py-2 text-center text-xs font-bold text-nust-orange hover:bg-nust-blue hover:text-white border-t border-gray-100 transition-colors rounded-b-xl"
                         >
                             View Dashboard →
                         </Link>
