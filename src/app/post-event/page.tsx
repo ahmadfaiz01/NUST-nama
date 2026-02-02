@@ -312,6 +312,7 @@ export default function PostEventPage() {
                                             <input
                                                 type="date"
                                                 name="date"
+                                                min={new Date().toISOString().split("T")[0]}
                                                 value={formData.date}
                                                 onChange={handleInputChange}
                                                 required
