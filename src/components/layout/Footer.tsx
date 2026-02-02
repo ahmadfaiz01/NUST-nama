@@ -2,15 +2,15 @@ import Link from "next/link";
 
 export function Footer() {
     return (
-        <footer className="bg-nust-blue border-t-0 relative pt-16 pb-8 z-0 mt-8">
+        <footer className="bg-nust-blue border-t-0 relative pt-8 pb-6 z-0 mt-8">
 
             {/* Top Tape - Moved from Page to Footer for fixed positioning */}
-            <div className="absolute -top-6 left-0 right-0 z-[60] bg-nust-orange py-3 border-y-2 border-nust-blue overflow-hidden transform rotate-1 scale-110 origin-right shadow-md pointer-events-none">
-                <div className="animate-marquee flex gap-16 whitespace-nowrap">
-                    <span className="font-heading text-xl text-nust-blue tracking-widest">
+            <div className="absolute -top-5 left-0 right-0 z-[60] bg-nust-orange py-2 border-y-2 border-nust-blue overflow-hidden transform rotate-1 scale-110 origin-right shadow-md pointer-events-none">
+                <div className="animate-marquee flex gap-12 whitespace-nowrap">
+                    <span className="font-heading text-lg text-nust-blue tracking-widest">
                         • DONT MISS OUT • JOIN THE COMMUNITY • RSVP NOW • DONT MISS OUT • JOIN THE COMMUNITY •
                     </span>
-                    <span className="font-heading text-xl text-nust-blue tracking-widest">
+                    <span className="font-heading text-lg text-nust-blue tracking-widest">
                         • DONT MISS OUT • JOIN THE COMMUNITY • RSVP NOW • DONT MISS OUT • JOIN THE COMMUNITY •
                     </span>
                 </div>
@@ -22,18 +22,19 @@ export function Footer() {
             </div>
 
             <div className="container relative z-10">
-                <div className="flex flex-col md:flex-row items-center justify-between text-center md:text-left gap-8">
+                <div className="flex flex-col md:flex-row items-start justify-between text-center md:text-left gap-6 pt-4"> {/* Changed items-center to items-start, added pt-4 to push down from tape slightly but keeping overall tight */}
 
                     {/* Brand Vibe */}
                     <div className="max-w-md">
                         <Link href="/" className="inline-flex items-center transform hover:scale-105 transition-transform duration-300">
-                            <img src="/android-chrome-192x192.png" alt="NUST Nama" className="h-48 w-48 min-h-[192px] min-w-[192px] max-h-[240px] max-w-[240px]" style={{ objectFit: "contain" }} />
+                            {/* Drastically reduced logo size from h-48 to h-24/32 */}
+                            <img src="/android-chrome-192x192.png" alt="NUST Nama" className="h-24 w-24 rounded-xl object-contain" />
                         </Link>
-                        <p className="font-display text-white/80 text-lg mt-2 leading-relaxed">
+                        <p className="font-display text-white/80 text-sm mt-3 leading-relaxed max-w-xs mx-auto md:mx-0">
                             Your realtime guide to campus life. Find events, check crowd vibes, and never miss a moment.<br />
-                            <span className="text-sm opacity-60 italic">Because FOMO is real.</span>
+                            <span className="text-xs opacity-60 italic">Because FOMO is real.</span>
                         </p>
-                        <div className="mt-6 flex flex-wrap justify-center md:justify-start gap-6">
+                        <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-4 text-sm">
                             <Link href="/events" className="text-white font-bold hover:text-nust-orange transition-colors">
                                 Events
                             </Link>
@@ -47,24 +48,24 @@ export function Footer() {
                     </div>
 
                     {/* Social / Credits Vibe */}
-                    <div className="flex flex-col items-center md:items-end gap-4">
-                        <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 rounded-xl p-4 rotate-1 hover:rotate-0 transition-transform cursor-default shadow-lg">
-                            <p className="font-heading text-white text-xl tracking-wide">
+                    <div className="flex flex-col items-center md:items-end gap-3 mt-4 md:mt-0"> {/* Added md:mt-0 to ensure top alignment */}
+                        <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 rounded-xl p-3 rotate-1 hover:rotate-0 transition-transform cursor-default shadow-lg">
+                            <p className="font-heading text-white text-lg tracking-wide">
                                 BUILT BY STUDENTS 💙
                             </p>
-                            <p className="font-display text-xs text-white/70 text-center mt-1">
+                            <p className="font-display text-[10px] text-white/70 text-center mt-0.5">
                                 For the NUST Community
                             </p>
                         </div>
 
-                        <div className="flex gap-4">
-                            <a href="#" className="w-10 h-10 rounded-full bg-white text-nust-blue flex items-center justify-center hover:-translate-y-1 transition-transform shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">
+                        <div className="flex gap-3">
+                            <a href="#" className="w-8 h-8 rounded-full bg-white text-nust-blue flex items-center justify-center hover:-translate-y-1 transition-transform shadow-[2px_2px_0px_rgba(0,0,0,0.2)] text-xs">
                                 📸
                             </a>
-                            <a href="#" className="w-10 h-10 rounded-full bg-white text-nust-blue flex items-center justify-center hover:-translate-y-1 transition-transform shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">
+                            <a href="#" className="w-8 h-8 rounded-full bg-white text-nust-blue flex items-center justify-center hover:-translate-y-1 transition-transform shadow-[2px_2px_0px_rgba(0,0,0,0.2)] text-xs">
                                 ✖️
                             </a>
-                            <a href="#" className="w-10 h-10 rounded-full bg-white text-nust-blue flex items-center justify-center hover:-translate-y-1 transition-transform shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">
+                            <a href="#" className="w-8 h-8 rounded-full bg-white text-nust-blue flex items-center justify-center hover:-translate-y-1 transition-transform shadow-[2px_2px_0px_rgba(0,0,0,0.2)] text-xs">
                                 💬
                             </a>
                         </div>
@@ -72,7 +73,7 @@ export function Footer() {
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="mt-12 pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-display text-white/40">
+                <div className="mt-8 pt-4 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-3 text-[10px] font-display text-white/40">
                     <p>© 2026 NUST Nama. Open source & proud.</p>
                     <p>Made with ☕ at H-12 Islamabad</p>
                 </div>

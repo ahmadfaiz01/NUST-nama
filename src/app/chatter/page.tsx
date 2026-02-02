@@ -34,7 +34,7 @@ export default function ChatterLobby() {
     }, []);
 
     return (
-        <div className="min-h-screen bg-cream flex flex-col gap-12 pb-20"> {/* Changed to gap-12 */}
+        <div className="min-h-screen bg-cream flex flex-col gap-12 pb-32"> {/* Increased bottom padding to prevent overlapping */}
             {/* Header */}
             <div className="bg-nust-blue text-white py-16 relative overflow-hidden shadow-md shrink-0">
                 <div className="container relative z-10 text-center">
