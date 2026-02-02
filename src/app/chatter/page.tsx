@@ -52,59 +52,57 @@ export default function ChatterLobby() {
                 </div>
             </div>
 
-            <div className="container -mt-8 relative z-20 py-8"> {/* Added py-8 for extra spacing if needed, but -mt-8 pulls it up. User wanted a GAP. changing -mt-8 to mt-4 might be better if they want a gap, or just adding padding to the top of this container. Let's remove the negative margin to create a distinct gap as 'no gap' was the complaint. */}
-                {/* Reseting to positive margin to create a clear gap */}
-                <div className="container mt-8 relative z-20">
-                    {loading ? (
-                        <div className="flex justify-center py-20">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-nust-blue"></div>
+            <div className="container mt-8 relative z-20">
+                {loading ? (
+                    <div className="flex justify-center py-20">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-nust-blue"></div>
+                    </div>
+                ) : (
+                    <div className="max-w-3xl mx-auto bg-white rounded-2xl border-2 border-nust-blue overflow-hidden shadow-[4px_4px_0px_var(--nust-blue)]">
+                        {/* Header Row */}
+                        <div className="bg-nust-blue/5 p-4 border-b-2 border-nust-blue flex justify-between items-center">
+                            <span className="font-heading text-xl text-nust-blue">CHANNELS ({threads.length})</span>
+                            <button
+                                onClick={() => setIsModalOpen(true)}
+                                className="text-xs font-bold uppercase tracking-wider text-nust-blue hover:text-nust-orange transition-colors"
+                            >
+                                + Request Topic
+                            </button>
                         </div>
-                    ) : (
-                        <div className="max-w-3xl mx-auto bg-white rounded-2xl border-2 border-nust-blue overflow-hidden shadow-[4px_4px_0px_var(--nust-blue)]">
-                            {/* Header Row */}
-                            <div className="bg-nust-blue/5 p-4 border-b-2 border-nust-blue flex justify-between items-center">
-                                <span className="font-heading text-xl text-nust-blue">CHANNELS ({threads.length})</span>
-                                <button
-                                    onClick={() => setIsModalOpen(true)}
-                                    className="text-xs font-bold uppercase tracking-wider text-nust-blue hover:text-nust-orange transition-colors"
-                                >
-                                    + Request Topic
-                                </button>
-                            </div>
 
-                            <div className="divide-y-2 divide-nust-blue/10">
-                                {threads.map((thread) => (
-                                    <Link href={`/chatter/${thread.id}`} key={thread.id} className="block group hover:bg-nust-blue/5 transition-colors">
-                                        <div className="flex items-center gap-4 p-4">
-                                            {/* Icon */}
-                                            <div className="w-10 h-10 flex items-center justify-center text-2xl bg-cream rounded-full border-2 border-transparent group-hover:border-nust-blue transition-all">
-                                                {thread.emoji}
-                                            </div>
-
-                                            {/* Text */}
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center gap-2 mb-0.5">
-                                                    <h3 className="font-bold text-nust-blue truncate">#{thread.title.toLowerCase().replace(/\s+/g, '-')}</h3>
-                                                    {/* Optional: Add a 'Live' indicator if needed later */}
-                                                </div>
-                                                <p className="text-xs text-gray-500 truncate font-medium">
-                                                    {thread.description}
-                                                </p>
-                                            </div>
-
-                                            {/* Action */}
-                                            <div className="text-nust-blue/30 group-hover:text-nust-blue transition-colors">
-                                                →
-                                            </div>
+                        <div className="divide-y-2 divide-nust-blue/10">
+                            {threads.map((thread) => (
+                                <Link href={`/chatter/${thread.id}`} key={thread.id} className="block group hover:bg-nust-blue/5 transition-colors">
+                                    <div className="flex items-center gap-4 p-4">
+                                        {/* Icon */}
+                                        <div className="w-10 h-10 flex items-center justify-center text-2xl bg-cream rounded-full border-2 border-transparent group-hover:border-nust-blue transition-all">
+                                            {thread.emoji}
                                         </div>
-                                    </Link>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </div>
 
-                <TopicRequestModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+                                        {/* Text */}
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 mb-0.5">
+                                                <h3 className="font-bold text-nust-blue truncate">#{thread.title.toLowerCase().replace(/\s+/g, '-')}</h3>
+                                                {/* Optional: Add a 'Live' indicator if needed later */}
+                                            </div>
+                                            <p className="text-xs text-gray-500 truncate font-medium">
+                                                {thread.description}
+                                            </p>
+                                        </div>
+
+                                        {/* Action */}
+                                        <div className="text-nust-blue/30 group-hover:text-nust-blue transition-colors">
+                                            →
+                                        </div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
-            );
+
+            <TopicRequestModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+        </div>
+    );
 }
