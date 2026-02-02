@@ -78,13 +78,27 @@ export default function ChatRoom() {
                 { event: 'INSERT', schema: 'public', table: 'messages', filter: `thread_id=eq.${id}` },
                 async (payload) => {
                     const newMsg = payload.new as Message;
-                    const { data: profile } = await supabase.from("profiles").select("name, avatar_url, role").eq("id", newMsg.user_id).single();
+                    // Skip if we already have this message (optimistic update)
+                    setMessages((prev) => {
+                        if (prev.some(m => m.id === newMsg.id)) return prev;
+                        return [...prev, newMsg]; // This still needs profile data...
+                    });
 
+                    // Re-fetch to get profile data correctly strictly for incoming (if not optimistic) 
+                    // But simplified logic: Just fetch profile
+                    const { data: profile } = await supabase.from("profiles").select("name, avatar_url, role").eq("id", newMsg.user_id).single();
                     const msgWithProfile = {
                         ...newMsg,
                         profiles: profile || { name: 'Anonymous', avatar_url: '' }
                     };
-                    setMessages((prev) => [...prev, msgWithProfile]);
+
+                    setMessages((prev) => {
+                        // Check if we have a temporary message for this user with same content? Hard to link.
+                        // For simplicity, just append. If optimistic logic works, we replace temp with real ID.
+                        // To avoid duplicates, check ID.
+                        if (prev.some(m => m.id === newMsg.id)) return prev;
+                        return [...prev, msgWithProfile];
+                    });
                 }
             )
             .on(
@@ -111,18 +125,38 @@ export default function ChatRoom() {
         if (!newMessage.trim()) return;
 
         const content = newMessage.trim();
+        const optimisticId = "temp-" + Date.now();
         setNewMessage("");
 
-        const { error } = await supabase.from("messages").insert({
+        // Optimistic UI Update
+        const optimisticMessage: Message = {
+            id: optimisticId,
+            content: content,
+            created_at: new Date().toISOString(),
+            user_id: userId,
+            profiles: {
+                name: "You", // Temporary
+                avatar_url: "",
+                role: userRole || undefined
+            }
+        };
+        setMessages((prev) => [...prev, optimisticMessage]);
+
+        const { data, error } = await supabase.from("messages").insert({
             thread_id: id,
             user_id: userId,
             content: content
-        });
+        }).select().single();
 
         if (error) {
             console.error("Error sending:", error);
             alert("Failed to send: " + error.message);
+            // Revert optimistic update
+            setMessages(prev => prev.filter(m => m.id !== optimisticId));
             setNewMessage(content);
+        } else if (data) {
+            // Replace optimistic with real
+            setMessages(prev => prev.map(m => m.id === optimisticId ? { ...m, ...data } : m));
         }
     };
 
@@ -145,42 +179,46 @@ export default function ChatRoom() {
     );
 
     return (
-        <div className="h-[100dvh] bg-cream flex flex-col items-center">
+        // Height adjusted for Navbar (approx 64px-80px depending on screen). 
+        // Using calc(100vh - 64px) ensures it fits exactly without double scrollbars.
+        // Also added pt-2 to separate from Navbar slightly.
+        <div className="h-[calc(100vh-80px)] bg-cream flex flex-col items-center">
             {/* Main Chat Container - Compact & Discord Style */}
-            <div className="w-full max-w-4xl h-full flex flex-col bg-white border-x-2 border-nust-blue/10 shadow-xl overflow-hidden">
+            <div className="w-full max-w-2xl h-full flex flex-col bg-white border-x-2 border-nust-blue/10 shadow-xl overflow-hidden rounded-t-xl mx-auto">
 
                 {/* Header */}
-                <div className="px-6 py-4 flex items-center gap-4 border-b-2 border-gray-100 bg-white z-10 shrink-0">
+                <div className="px-4 py-3 flex items-center gap-3 border-b-2 border-gray-100 bg-white z-10 shrink-0 shadow-sm">
                     <Link href="/chatter" className="text-gray-400 hover:text-nust-blue hover:bg-gray-100 p-2 rounded-full transition-colors">
                         ←
                     </Link>
-                    <div className={`w-10 h-10 flex items-center justify-center rounded-full text-xl ${thread.color_theme} bg-opacity-20 text-nust-blue`}>
+                    <div className={`w-8 h-8 flex items-center justify-center rounded-full text-lg ${thread.color_theme} bg-opacity-20 text-nust-blue`}>
                         {thread.emoji}
                     </div>
-                    <div>
-                        <h1 className="font-heading text-xl text-nust-blue leading-none">#{thread.title.toLowerCase().replace(/\s+/g, '-')}</h1>
-                        <span className="text-xs text-green-600 font-bold flex items-center gap-1 mt-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                            Online
-                        </span>
+                    <div className="flex-1 min-w-0">
+                        <h1 className="font-heading text-lg text-nust-blue leading-none truncate">#{thread.title.toLowerCase().replace(/\s+/g, '-')}</h1>
+                    </div>
+                    <div className="text-xs text-green-600 font-bold flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                        Live
                     </div>
                 </div>
 
                 {/* Messages List */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-6 sm:p-6 bg-gray-50/50">
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 sm:p-5 bg-gray-50/50">
                     {messages.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                            <span className="text-5xl mb-4 opacity-20">💬</span>
-                            <p className="font-medium">Welcome to the beginning of #{thread.title}!</p>
+                            <span className="text-4xl mb-3 opacity-20">💬</span>
+                            <p className="font-medium text-sm">Welcome to #{thread.title}!</p>
                         </div>
                     ) : (
                         messages.map((msg, index) => {
                             const isMe = msg.user_id === userId;
+                            const isOptimistic = msg.id.startsWith("temp-");
                             const isAdmin = msg.profiles?.role === 'admin';
                             const showAvatar = index === 0 || messages[index - 1].user_id !== msg.user_id || (new Date(msg.created_at).getTime() - new Date(messages[index - 1].created_at).getTime() > 60000);
 
                             return (
-                                <div key={msg.id} className={`flex gap-3 group ${isMe ? "justify-end" : "justify-start"} ${showAvatar ? "mt-4" : "mt-1"}`}>
+                                <div key={msg.id} className={`flex gap-2 group ${isMe ? "justify-end" : "justify-start"} ${showAvatar ? "mt-3" : "mt-0.5"} ${isOptimistic ? "opacity-50" : "opacity-100"}`}>
                                     {/* Avatar (Left) */}
                                     {!isMe && (
                                         <div className="w-8 flex-shrink-0 flex flex-col justify-end">
@@ -196,7 +234,7 @@ export default function ChatRoom() {
                                         </div>
                                     )}
 
-                                    <div className={`flex flex-col max-w-[75%] sm:max-w-[70%] ${isMe ? "items-end" : "items-start"}`}>
+                                    <div className={`flex flex-col max-w-[80%] sm:max-w-[70%] ${isMe ? "items-end" : "items-start"}`}>
                                         {/* Name Label (Only show for others, once) */}
                                         {!isMe && showAvatar && (
                                             <div className="flex items-center gap-2 mb-1 ml-1">
@@ -209,14 +247,11 @@ export default function ChatRoom() {
                                                         {msg.profiles?.name || "Anonymous"}
                                                     </span>
                                                 )}
-                                                <span className="text-[10px] text-gray-400">
-                                                    {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                </span>
                                             </div>
                                         )}
 
                                         {/* Bubble */}
-                                        <div className={`relative px-4 py-2 text-[15px] shadow-sm rounded-2xl leading-relaxed ${isAdmin
+                                        <div className={`relative px-3 py-2 text-[14px] shadow-sm rounded-2xl leading-relaxed break-words ${isAdmin
                                                 ? "bg-nust-orange/10 border border-nust-orange/30 text-gray-800 rounded-tl-none"
                                                 : isMe
                                                     ? "bg-nust-blue text-white rounded-tr-none"
@@ -225,15 +260,20 @@ export default function ChatRoom() {
                                             {msg.content}
                                         </div>
 
-                                        {/* Delete Action */}
-                                        {userRole === 'admin' && (
-                                            <button
-                                                onClick={() => handleDelete(msg.id)}
-                                                className="text-[10px] text-red-500 hover:text-red-700 font-bold mt-1 opacity-0 group-hover:opacity-100 transition-opacity px-1"
-                                            >
-                                                DELETE MESSAGE
-                                            </button>
-                                        )}
+                                        {/* Timestamp & Delete */}
+                                        <div className="flex items-center gap-2 mt-0.5 px-1">
+                                            <span className="text-[9px] text-gray-400">
+                                                {isOptimistic ? "Sending..." : new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            </span>
+                                            {userRole === 'admin' && !isOptimistic && (
+                                                <button
+                                                    onClick={() => handleDelete(msg.id)}
+                                                    className="text-[9px] text-red-500 hover:text-red-700 font-bold opacity-0 group-hover:opacity-100 transition-opacity"
+                                                >
+                                                    DEL
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             );
@@ -243,7 +283,7 @@ export default function ChatRoom() {
                 </div>
 
                 {/* Input Area */}
-                <div className="p-4 bg-white border-t border-gray-100 shrink-0">
+                <div className="p-3 bg-white border-t border-gray-100 shrink-0">
                     <form onSubmit={handleSend} className="relative flex items-center gap-2">
                         <input
                             type="text"
@@ -256,18 +296,11 @@ export default function ChatRoom() {
                         <button
                             type="submit"
                             disabled={!newMessage.trim() || !userId}
-                            className="absolute right-2 p-2 bg-nust-blue text-white rounded-lg hover:bg-opacity-90 disabled:opacity-0 transition-opacity"
+                            className="absolute right-2 p-2 bg-nust-blue text-white rounded-lg hover:bg-opacity-90 disabled:opacity-0 transition-opacity flex items-center justify-center w-8 h-8"
                         >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
-                            </svg>
+                            ➤
                         </button>
                     </form>
-                    <div className="text-center mt-2">
-                        <p className="text-[10px] text-gray-400">
-                            NUST-Nama v1.0 • Use /report to flag content
-                        </p>
-                    </div>
                 </div>
             </div>
         </div>

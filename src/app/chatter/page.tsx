@@ -34,9 +34,9 @@ export default function ChatterLobby() {
     }, []);
 
     return (
-        <div className="min-h-screen bg-cream pb-20">
+        <div className="min-h-screen bg-cream flex flex-col gap-12 pb-20"> {/* Changed to gap-12 */}
             {/* Header */}
-            <div className="bg-nust-blue text-white py-16 relative overflow-hidden shadow-md">
+            <div className="bg-nust-blue text-white py-16 relative overflow-hidden shadow-md shrink-0">
                 <div className="container relative z-10 text-center">
                     <h1 className="text-4xl md:text-6xl font-heading mb-2 drop-shadow-[4px_4px_0px_var(--nust-orange)]">
                         CAMPUS CHATTER
@@ -52,14 +52,14 @@ export default function ChatterLobby() {
                 </div>
             </div>
 
-            {/* Main Content with Explicit Gap */}
-            <div className="container mt-12 relative z-20"> {/* Changed to mt-12 for a distinct gap */}
+            {/* Main Content */}
+            <div className="container relative z-20">
                 {loading ? (
                     <div className="flex justify-center py-20">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-nust-blue"></div>
                     </div>
                 ) : (
-                    <div className="max-w-3xl mx-auto bg-white rounded-2xl border-2 border-nust-blue overflow-hidden shadow-[4px_4px_0px_var(--nust-blue)] animate-in slide-in-from-bottom-4 duration-500">
+                    <div className="max-w-2xl mx-auto bg-white rounded-2xl border-2 border-nust-blue overflow-hidden shadow-[4px_4px_0px_var(--nust-blue)] animate-in slide-in-from-bottom-4 duration-500">
                         {/* List Header */}
                         <div className="bg-nust-blue/5 p-4 border-b-2 border-nust-blue flex justify-between items-center">
                             <span className="font-heading text-xl text-nust-blue tracking-wide">CHANNELS ({threads.length})</span>
