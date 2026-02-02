@@ -108,7 +108,15 @@ export default function ChatRoom() {
 
     const handleSend = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newMessage.trim() || !userId) return;
+
+        if (!userId) {
+            alert("🔒 Please Log In to chat!");
+            // Optional: Redirect to login
+            // window.location.href = "/auth?mode=login&next=" + window.location.pathname;
+            return;
+        }
+
+        if (!newMessage.trim()) return;
 
         const content = newMessage.trim();
         setNewMessage(""); // Optimistic clear
@@ -121,7 +129,11 @@ export default function ChatRoom() {
                 content: content
             });
 
-        if (error) console.error("Error sending:", error);
+        if (error) {
+            console.error("Error sending:", error);
+            alert("Failed to send: " + error.message);
+            setNewMessage(content); // Restore message on error
+        }
     };
 
     if (loading) return (
@@ -137,9 +149,9 @@ export default function ChatRoom() {
     );
 
     return (
-        <div className="flex flex-col h-screen bg-cream overflow-hidden">
+        <div className="flex flex-col h-[100dvh] bg-cream overflow-hidden">
             {/* Header */}
-            <div className={`px-4 py-3 flex items-center gap-3 border-b-2 border-nust-blue/10 bg-white shadow-sm z-10`}>
+            <div className={`px-4 py-3 flex items-center gap-3 border-b-2 border-nust-blue/10 bg-white shadow-sm z-10 shrink-0`}>
                 <Link href="/chatter" className="text-nust-blue hover:bg-nust-blue/10 p-2 rounded-full transition-colors">
                     ←
                 </Link>
@@ -147,7 +159,7 @@ export default function ChatRoom() {
                     {thread.emoji}
                 </div>
                 <div>
-                    <h1 className="font-heading text-xl text-nust-blue leading-none">{thread.title}</h1>
+                    <h1 className="font-heading text-xl text-nust-blue leading-none">#{thread.title.toLowerCase().replace(/\s+/g, '-')}</h1>
                     <span className="text-xs text-green-600 font-bold flex items-center gap-1">
                         <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
                         Live
@@ -170,7 +182,7 @@ export default function ChatRoom() {
                                 {/* Avatar */}
                                 <div className="flex-shrink-0">
                                     {msg.profiles?.avatar_url ? (
-                                        <img src={msg.profiles.avatar_url} className="w-8 h-8 rounded-full border border-gray-200" alt="avatar" />
+                                        <img src={msg.profiles.avatar_url} className="w-8 h-8 rounded-full border border-gray-200 object-cover" alt="avatar" />
                                     ) : (
                                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border ${isMe ? "bg-nust-blue text-white border-nust-blue" : "bg-white text-nust-blue border-gray-200"}`}>
                                             {msg.profiles?.name?.[0] || "?"}
@@ -180,8 +192,8 @@ export default function ChatRoom() {
 
                                 {/* Bubble */}
                                 <div className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm ${isMe
-                                        ? "bg-nust-blue text-white rounded-tr-none"
-                                        : "bg-white text-gray-800 border border-gray-100 rounded-tl-none"
+                                    ? "bg-nust-blue text-white rounded-tr-none"
+                                    : "bg-white text-gray-800 border border-gray-100 rounded-tl-none"
                                     }`}>
                                     {!isMe && (
                                         <p className="text-[10px] font-bold opacity-50 mb-0.5 uppercase tracking-wide">
@@ -202,18 +214,19 @@ export default function ChatRoom() {
             </div>
 
             {/* Input Area */}
-            <div className="p-4 bg-white border-t border-gray-100">
+            <div className="p-4 bg-white border-t border-gray-100 shrink-0">
                 <form onSubmit={handleSend} className="flex gap-2 max-w-4xl mx-auto">
                     <input
                         type="text"
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
-                        placeholder={`Message in ${thread.title}...`}
-                        className="flex-1 bg-gray-100 border-transparent focus:bg-white focus:border-nust-blue border-2 rounded-xl px-4 py-3 outline-none transition-all"
+                        placeholder={userId ? `Message #${thread.title.toLowerCase().replace(/\s+/g, '-')}...` : "🔒 Log in to chat..."}
+                        disabled={!userId}
+                        className="flex-1 bg-gray-100 border-transparent focus:bg-white focus:border-nust-blue border-2 rounded-xl px-4 py-3 outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                     <button
                         type="submit"
-                        disabled={!newMessage.trim()}
+                        disabled={!newMessage.trim() || !userId}
                         className="bg-nust-blue text-white p-3 rounded-xl hover:bg-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all aspect-square flex items-center justify-center"
                     >
                         ➤
