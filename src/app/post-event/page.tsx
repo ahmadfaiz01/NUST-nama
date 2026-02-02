@@ -342,7 +342,10 @@ export default function PostEventPage() {
                                                             <button
                                                                 key={venue.id}
                                                                 type="button"
-                                                                onClick={() => handleSuggestionClick(venue)}
+                                                                onMouseDown={(e) => {
+                                                                    e.preventDefault();
+                                                                    handleSuggestionClick(venue);
+                                                                }}
                                                                 className="w-full text-left px-4 py-2 hover:bg-nust-blue/10 border-b border-nust-blue/20 last:border-b-0 transition-colors"
                                                             >
                                                                 <p className="font-bold text-nust-blue">{venue.name}</p>
@@ -351,15 +354,7 @@ export default function PostEventPage() {
                                                     </div>
                                                 )}
 
-                                                {venueLocation ? (
-                                                    <p className="text-sm text-green-600 mt-1 flex items-center gap-1 font-bold">
-                                                        ✓ {venueLocation.name} matched!
-                                                    </p>
-                                                ) : formData.venue && !showSuggestions && (
-                                                    <p className="text-sm text-amber-600 mt-1">
-                                                        📍 Custom location (will be saved as typed)
-                                                    </p>
-                                                )}
+                                                
                                             </div>
                                         </div>
                                     </div>
