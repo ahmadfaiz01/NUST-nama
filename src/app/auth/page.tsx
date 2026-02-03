@@ -11,13 +11,16 @@ function AuthForm() {
     const router = useRouter();
     const isSignup = searchParams.get("mode") === "signup";
     const errorParam = searchParams.get("error");
+    const verifiedParam = searchParams.get("verified");
 
     const [mode, setMode] = useState<"login" | "signup">(isSignup ? "signup" : "login");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(
         errorParam ? decodeURIComponent(errorParam) : null
     );
-    const [success, setSuccess] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(
+        verifiedParam === "true" ? "✅ Email verified successfully! You can now sign in with your credentials." : null
+    );
 
     // Form fields
     const [name, setName] = useState("");

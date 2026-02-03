@@ -1,60 +1,15 @@
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
 
-// Mock news data
-const newsItems = [
+// Fallback mock data (shown if no news in database)
+const mockNewsItems = [
     {
         id: "1",
         source: "NUST Official",
-        title: "Semester Fee Challan Released for Spring 2026",
-        summary: "The fee challan for Spring 2026 semester is now available on QALAM. Deadline for payment is February 28th.",
+        title: "Welcome to What's Up NUST!",
+        summary: "Stay tuned for the latest news and announcements from NUST. We're fetching fresh content for you!",
         url: "#",
-        published_at: "2026-01-30T10:00:00",
-        category: "Announcements",
-    },
-    {
-        id: "2",
-        source: "Library",
-        title: "Extended Library Hours During Midterms",
-        summary: "The library will remain open until 2 AM during the midterm examination period from Feb 5-15.",
-        url: "#",
-        published_at: "2026-01-29T14:00:00",
-        category: "Facilities",
-    },
-    {
-        id: "3",
-        source: "SEECS",
-        title: "Tech Fest 2026 Registrations Now Open",
-        summary: "Register for Pakistan's largest student-run tech festival. Early bird discounts available until Feb 5th.",
-        url: "#",
-        published_at: "2026-01-28T09:00:00",
-        category: "Events",
-    },
-    {
-        id: "4",
-        source: "Sports Complex",
-        title: "Inter-School Sports Week Starting Monday",
-        summary: "Annual sports week featuring cricket, football, basketball, and athletics. Come support your school!",
-        url: "#",
-        published_at: "2026-01-27T16:00:00",
-        category: "Sports",
-    },
-    {
-        id: "5",
-        source: "Placement Office",
-        title: "Google Hiring Event on Campus",
-        summary: "Google will be conducting on-campus interviews for SWE internships. Register through the placement portal.",
-        url: "#",
-        published_at: "2026-01-26T11:00:00",
-        category: "Career",
-    },
-    {
-        id: "6",
-        source: "Student Affairs",
-        title: "New Bus Route Added for H-13 Sector",
-        summary: "A new point bus service has been added covering H-13, with stops at major landmarks.",
-        url: "#",
-        published_at: "2026-01-25T08:00:00",
-        category: "Transport",
+        published_at: new Date().toISOString(),
     },
 ];
 
@@ -63,19 +18,32 @@ function formatDate(dateStr: string) {
     return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-function getCategoryColor(category: string) {
+function getSourceColor(source: string) {
     const colors: Record<string, string> = {
-        Announcements: "bg-red-500",
-        Facilities: "bg-green-500",
-        Events: "bg-purple-500",
-        Sports: "bg-blue-500",
-        Career: "bg-yellow-500",
-        Transport: "bg-teal-500",
+        "NUST Official": "bg-red-500",
+        "SEECS": "bg-purple-500",
+        "Library": "bg-green-500",
+        "Sports Complex": "bg-blue-500",
+        "Placement Office": "bg-yellow-500",
+        "Student Affairs": "bg-teal-500",
     };
-    return colors[category] || "bg-gray-500";
+    return colors[source] || "bg-nust-orange";
 }
 
-export default function NewsPage() {
+export default async function NewsPage() {
+    const supabase = await createClient();
+    
+    // Fetch approved news from Supabase, ordered by newest first
+    const { data: newsItems, error } = await supabase
+        .from("news_items")
+        .select("*")
+        .eq("status", "approved")
+        .order("published_at", { ascending: false })
+        .limit(20);
+
+    // Use mock data if no news found or error
+    const displayItems = (newsItems && newsItems.length > 0) ? newsItems : mockNewsItems;
+
     return (
         <div className="min-h-screen bg-cream">
             {/* Hero */}
@@ -94,23 +62,22 @@ export default function NewsPage() {
             <section className="py-12">
                 <div className="container">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        {newsItems.map((item, index) => (
+                        {displayItems.map((item, index) => (
                             <Link
                                 key={item.id}
-                                href={item.url}
+                                href={item.url || "#"}
+                                target={item.url && item.url !== "#" ? "_blank" : undefined}
+                                rel={item.url && item.url !== "#" ? "noopener noreferrer" : undefined}
                                 className={`block bg-white border-2 border-nust-blue rounded-lg overflow-hidden shadow-[4px_4px_0px_var(--nust-blue)] hover:shadow-[8px_8px_0px_var(--nust-blue)] hover:-translate-y-1 transition-all ${index === 0 ? "lg:col-span-2" : ""
                                     }`}
                             >
                                 <div className="p-6">
                                     <div className="flex items-center gap-3 mb-4">
-                                        <span className={`px-3 py-1 rounded-full text-white text-xs font-bold uppercase ${getCategoryColor(item.category)}`}>
-                                            {item.category}
+                                        <span className={`px-3 py-1 rounded-full text-white text-xs font-bold uppercase ${getSourceColor(item.source || "NUST Official")}`}>
+                                            {item.source || "NUST"}
                                         </span>
                                         <span className="text-nust-blue/50 text-sm font-medium">
-                                            {formatDate(item.published_at)}
-                                        </span>
-                                        <span className="text-nust-blue/50 text-sm">
-                                            via {item.source}
+                                            {item.published_at ? formatDate(item.published_at) : "Recent"}
                                         </span>
                                     </div>
 
@@ -119,7 +86,7 @@ export default function NewsPage() {
                                     </h3>
 
                                     <p className="text-nust-blue/70 line-clamp-2">
-                                        {item.summary}
+                                        {item.summary || "Click to read the full article."}
                                     </p>
 
                                     <div className="mt-4 flex items-center gap-2 text-nust-orange font-bold">
