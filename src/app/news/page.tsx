@@ -33,15 +33,32 @@ function getSourceColor(source: string) {
 export default async function NewsPage() {
     const supabase = await createClient();
     
-    // Fetch approved news from Supabase, ordered by newest first
-    const { data: newsItems, error } = await supabase
+    // Calculate date 7 days ago
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    
+    // First, try to fetch approved news from last 7 days
+    let { data: newsItems } = await supabase
         .from("news_items")
         .select("*")
         .eq("status", "approved")
+        .gte("published_at", oneWeekAgo.toISOString())
         .order("published_at", { ascending: false })
         .limit(20);
 
-    // Use mock data if no news found or error
+    // If no recent news, fetch older news (no date filter)
+    if (!newsItems || newsItems.length === 0) {
+        const { data: olderNews } = await supabase
+            .from("news_items")
+            .select("*")
+            .eq("status", "approved")
+            .order("published_at", { ascending: false })
+            .limit(20);
+        
+        newsItems = olderNews;
+    }
+
+    // Use mock data only if no news at all
     const displayItems = (newsItems && newsItems.length > 0) ? newsItems : mockNewsItems;
 
     return (
