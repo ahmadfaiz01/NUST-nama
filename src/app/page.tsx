@@ -5,10 +5,12 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { CampusHeatmap } from "@/components/events/CampusHeatmap";
 import { EventCard } from "@/components/events/EventCard";
+import { usePostHog } from "posthog-js/react";
 
 export default function HomePage() {
     const [featuredEvents, setFeaturedEvents] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const posthog = usePostHog();
 
     useEffect(() => {
         const fetchFeatured = async () => {
@@ -28,6 +30,9 @@ export default function HomePage() {
             setLoading(false);
         };
         fetchFeatured();
+
+        // Track that the vibe heatmap section was visible to this user
+        posthog?.capture('homepage_vibe_heatmap_viewed');
     }, []);
 
     return (
@@ -76,10 +81,18 @@ export default function HomePage() {
                         </p>
 
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16">
-                            <Link href="/events" className="btn btn-primary text-xl px-12 py-5 shadow-[8px_8px_0px_var(--nust-orange)] hover:shadow-none hover:translate-x-[8px] hover:translate-y-[8px] transition-all font-heading tracking-wider border-2 border-nust-blue">
+                            <Link
+                                href="/events"
+                                className="btn btn-primary text-xl px-12 py-5 shadow-[8px_8px_0px_var(--nust-orange)] hover:shadow-none hover:translate-x-[8px] hover:translate-y-[8px] transition-all font-heading tracking-wider border-2 border-nust-blue"
+                                onClick={() => posthog?.capture('cta_clicked', { cta: 'find_the_vibe' })}
+                            >
                                 FIND THE VIBE
                             </Link>
-                            <Link href="/auth?mode=signup" className="btn btn-outline text-xl px-12 py-5 hover:text-white transition-all font-heading tracking-wider border-2 border-nust-blue bg-white shadow-[8px_8px_0px_rgba(0,0,0,0.1)] hover:-translate-y-[2px] hover:shadow-[4px_4px_0px_var(--nust-blue)] hover:bg-nust-blue">
+                            <Link
+                                href="/auth?mode=signup"
+                                className="btn btn-outline text-xl px-12 py-5 hover:text-white transition-all font-heading tracking-wider border-2 border-nust-blue bg-white shadow-[8px_8px_0px_rgba(0,0,0,0.1)] hover:-translate-y-[2px] hover:shadow-[4px_4px_0px_var(--nust-blue)] hover:bg-nust-blue"
+                                onClick={() => posthog?.capture('cta_clicked', { cta: 'join_the_squad' })}
+                            >
                                 JOIN THE SQUAD
                             </Link>
                         </div>

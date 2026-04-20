@@ -2,17 +2,20 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { usePostHog } from "posthog-js/react";
 
 interface RSVPButtonProps {
     eventId: string;
-    initialCount?: number; // Optional initial count from server
+    eventTitle?: string;
+    initialCount?: number;
 }
 
-export default function RSVPButton({ eventId, initialCount = 0 }: RSVPButtonProps) {
+export default function RSVPButton({ eventId, eventTitle, initialCount = 0 }: RSVPButtonProps) {
     const [isGoing, setIsGoing] = useState(false);
     const [count, setCount] = useState(initialCount);
     const [loading, setLoading] = useState(true);
     const [userId, setUserId] = useState<string | null>(null);
+    const posthog = usePostHog();
 
     const supabase = createClient();
 
@@ -70,6 +73,7 @@ export default function RSVPButton({ eventId, initialCount = 0 }: RSVPButtonProp
 
         try {
             if (prevIsGoing) {
+                posthog?.capture('event_unrsvp', { event_id: eventId, event_title: eventTitle });
                 // Delete (Un-RSVP)
                 const { error } = await supabase
                     .from("rsvps")
@@ -78,6 +82,7 @@ export default function RSVPButton({ eventId, initialCount = 0 }: RSVPButtonProp
                     .eq("user_id", userId);
                 if (error) throw error;
             } else {
+                posthog?.capture('event_rsvp', { event_id: eventId, event_title: eventTitle });
                 // Insert (RSVP)
                 const { error } = await supabase
                     .from("rsvps")

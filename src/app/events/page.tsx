@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { EventCard } from "@/components/events/EventCard";
+import { usePostHog } from "posthog-js/react";
 
 const categories = ["All", "Tech", "Cultural", "Sports", "Career", "Entertainment", "Academic", "Workshop", "Other"];
 
@@ -12,15 +13,38 @@ export default function EventsPage() {
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [searchQuery, setSearchQuery] = useState("");
-    const [dateFilter, setDateFilter] = useState("all"); // 'all', 'today', 'tomorrow', 'week'
+    const [dateFilter, setDateFilter] = useState("all");
+    const posthog = usePostHog();
 
-    // Debounce search
+    // Debounce search and fire analytics
     useEffect(() => {
         const timer = setTimeout(() => {
             fetchEvents();
+            if (searchQuery.trim().length > 1) {
+                posthog?.capture('events_searched', { query: searchQuery.trim() });
+            }
         }, 500);
         return () => clearTimeout(timer);
-    }, [searchQuery, selectedCategory, dateFilter]);
+    }, [searchQuery]);
+
+    // Fire analytics immediately when category or date filter changes
+    useEffect(() => {
+        if (selectedCategory !== "All") {
+            posthog?.capture('events_filtered', { filter_type: 'category', value: selectedCategory });
+        }
+    }, [selectedCategory]);
+
+    useEffect(() => {
+        if (dateFilter !== "all") {
+            posthog?.capture('events_filtered', { filter_type: 'date', value: dateFilter });
+        }
+    }, [dateFilter]);
+
+    // Original debounced data fetch for all filter changes
+    useEffect(() => {
+        const timer = setTimeout(() => { fetchEvents(); }, 300);
+        return () => clearTimeout(timer);
+    }, [selectedCategory, dateFilter]);
 
     const fetchEvents = async () => {
         setLoading(true);
