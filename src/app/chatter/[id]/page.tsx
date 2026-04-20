@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import posthog from "posthog-js";
 
 interface Message {
     id: string;
@@ -141,6 +142,8 @@ export default function ChatRoom() {
             }
         };
         setMessages((prev) => [...prev, optimisticMessage]);
+        
+        posthog.capture("message_sent", { thread_id: id }); // Track in PostHog
 
         const { data, error } = await supabase.from("messages").insert({
             thread_id: id,

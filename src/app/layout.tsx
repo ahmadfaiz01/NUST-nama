@@ -84,6 +84,8 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
+import { PostHogProvider } from "@/components/providers/PostHogProvider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -95,9 +97,11 @@ export default function RootLayout({
       className={`${bebasNeue.variable} ${spaceGrotesk.variable} ${inter.variable}`}
     >
       <body className="min-h-screen bg-cream text-foreground antialiased relative selection:bg-nust-orange selection:text-white">
-        <NavBar />
-        <main className="pt-24">{children}</main>
-        <Footer />
+        <PostHogProvider>
+          <NavBar />
+          <main className="pt-24">{children}</main>
+          <Footer />
+        </PostHogProvider>
       </body>
     </html>
   );

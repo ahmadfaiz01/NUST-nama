@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 
+import posthog from "posthog-js";
+
 export function NavBar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
@@ -20,6 +22,7 @@ export function NavBar() {
                 setIsLoggedIn(false);
                 setIsAdmin(false);
                 setIsLoading(false);
+                posthog.reset(); // Clear memory on missing login
                 return;
             }
 
@@ -31,6 +34,12 @@ export function NavBar() {
                 .select("role")
                 .eq("id", user.id)
                 .single();
+
+            // Tell PostHog who exactly this user is
+            posthog.identify(user.id, {
+                email: user.email,
+                role: profile?.role || "user"
+            });
 
             if (profile && ["admin", "moderator"].includes(profile.role)) {
                 setIsAdmin(true);

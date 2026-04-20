@@ -5,6 +5,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { findVenueCoordinates, getVenueSuggestions, NUST_VENUES } from "@/lib/nust_venues";
 import type { Venue } from "@/lib/nust_venues";
+import posthog from "posthog-js";
 
 export default function PostEventPage() {
     const [step, setStep] = useState(1);
@@ -174,6 +175,7 @@ export default function PostEventPage() {
 
             if (error) throw error;
 
+            posthog.capture("event_posted", { venue: formData.venue, category: formData.category });
             setSubmitted(true);
         } catch (err: any) {
             console.error("Error posting event:", err);
