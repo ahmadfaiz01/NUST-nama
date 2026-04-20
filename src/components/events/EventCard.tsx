@@ -3,11 +3,11 @@ import Link from "next/link";
 interface Event {
     id: string;
     title: string;
-    description: string;
+    description: string | null;
     start_time: string;
-    end_time: string;
-    venue_name: string;
-    tags: string[];
+    end_time: string | null;
+    venue_name: string | null;
+    tags: string[] | null;
     is_official: boolean;
     rsvp_count: number;
     checkin_count: number;

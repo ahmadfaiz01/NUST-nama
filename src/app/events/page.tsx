@@ -1,108 +1,66 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { useRef, useCallback, useEffect, useState } from "react";
 import { EventCard } from "@/components/events/EventCard";
+import { useInfiniteEvents } from "@/hooks/useInfiniteEvents";
 import { usePostHog } from "posthog-js/react";
 
 const categories = ["All", "Tech", "Cultural", "Sports", "Career", "Entertainment", "Academic", "Workshop", "Other"];
 
+// ─── Sentinel component for IntersectionObserver ──────────────────────────────
+// When this div scrolls into view, it triggers loadMore()
+function InfiniteScrollSentinel({ onIntersect, disabled }: { onIntersect: () => void; disabled: boolean }) {
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (disabled) return;
+        const observer = new IntersectionObserver(
+            (entries) => { if (entries[0].isIntersecting) onIntersect(); },
+            { rootMargin: "300px" } // Start loading 300px before the bottom
+        );
+        if (ref.current) observer.observe(ref.current);
+        return () => observer.disconnect();
+    }, [onIntersect, disabled]);
+
+    return <div ref={ref} aria-hidden />;
+}
+
+// ─── Events Page ──────────────────────────────────────────────────────────────
 export default function EventsPage() {
-    const [events, setEvents] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [searchQuery, setSearchQuery] = useState("");
-    const [dateFilter, setDateFilter] = useState("all");
+    const [dateFilter, setDateFilter] = useState<"all" | "today" | "tomorrow" | "week">("all");
     const posthog = usePostHog();
 
-    // Debounce search and fire analytics
+    // Debounced search value — only passed to the hook after 500ms
+    const [debouncedSearch, setDebouncedSearch] = useState("");
     useEffect(() => {
-        const timer = setTimeout(() => {
-            fetchEvents();
+        const t = setTimeout(() => {
+            setDebouncedSearch(searchQuery);
             if (searchQuery.trim().length > 1) {
-                posthog?.capture('events_searched', { query: searchQuery.trim() });
+                posthog?.capture("events_searched", { query: searchQuery.trim() });
             }
         }, 500);
-        return () => clearTimeout(timer);
-    }, [searchQuery]);
+        return () => clearTimeout(t);
+    }, [searchQuery, posthog]);
 
-    // Fire analytics immediately when category or date filter changes
+    // PostHog: fire when category/date filter changes
     useEffect(() => {
-        if (selectedCategory !== "All") {
-            posthog?.capture('events_filtered', { filter_type: 'category', value: selectedCategory });
-        }
-    }, [selectedCategory]);
-
+        if (selectedCategory !== "All") posthog?.capture("events_filtered", { filter_type: "category", value: selectedCategory });
+    }, [selectedCategory, posthog]);
     useEffect(() => {
-        if (dateFilter !== "all") {
-            posthog?.capture('events_filtered', { filter_type: 'date', value: dateFilter });
-        }
-    }, [dateFilter]);
+        if (dateFilter !== "all") posthog?.capture("events_filtered", { filter_type: "date", value: dateFilter });
+    }, [dateFilter, posthog]);
 
-    // Original debounced data fetch for all filter changes
-    useEffect(() => {
-        const timer = setTimeout(() => { fetchEvents(); }, 300);
-        return () => clearTimeout(timer);
-    }, [selectedCategory, dateFilter]);
+    // ── Paginated data fetching via the new hook ──────────────────────────────
+    const { events, isLoading, isLoadingMore, hasMore, loadMore } = useInfiniteEvents({
+        category: selectedCategory,
+        search: debouncedSearch,
+        dateFilter,
+    });
 
-    const fetchEvents = async () => {
-        setLoading(true);
-        const supabase = createClient();
-
-        let query = supabase
-            .from("events")
-            .select(`
-                *,
-                rsvps (count),
-                checkins (count)
-            `)
-            .eq("status", "approved") // Only show approved events to public
-            .order("start_time", { ascending: true });
-
-        // Date Filtering
-        const now = new Date();
-        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // 00:00 today
-
-        if (dateFilter === "today") {
-            const endOfToday = new Date(startOfToday);
-            endOfToday.setDate(endOfToday.getDate() + 1);
-            query = query.gte("start_time", startOfToday.toISOString()).lt("start_time", endOfToday.toISOString());
-        } else if (dateFilter === "tomorrow") {
-            const startOfTomorrow = new Date(startOfToday);
-            startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
-            const endOfTomorrow = new Date(startOfTomorrow);
-            endOfTomorrow.setDate(endOfTomorrow.getDate() + 1);
-            query = query.gte("start_time", startOfTomorrow.toISOString()).lt("start_time", endOfTomorrow.toISOString());
-        } else if (dateFilter === "week") {
-            const endOfWeek = new Date(startOfToday);
-            endOfWeek.setDate(endOfWeek.getDate() + 7);
-            query = query.gte("start_time", startOfToday.toISOString()).lt("start_time", endOfWeek.toISOString());
-        } else {
-            // Default: All future events from now
-            query = query.gte("start_time", new Date().toISOString());
-        }
-
-        // Category Filtering
-        if (selectedCategory !== "All") {
-            query = query.contains("tags", [selectedCategory]);
-        }
-
-        // Text Search
-        if (searchQuery.trim()) {
-            query = query.ilike("title", `%${searchQuery.trim()}%`);
-            // Note: simple OR queries can be tricky with other filters in basic Supabase client, keeping it simple to Title for now.
-        }
-
-        const { data, error } = await query;
-
-        if (error) {
-            console.error("Error fetching events:", error);
-        } else {
-            setEvents(data || []);
-        }
-        setLoading(false);
-    };
+    const handleLoadMore = useCallback(() => loadMore(), [loadMore]);
 
     return (
         <div
@@ -128,7 +86,6 @@ export default function EventsPage() {
             {/* Filters Section (Sticky) */}
             <section className="py-4 border-b-2 border-nust-blue bg-white sticky top-20 z-40 shadow-sm">
                 <div className="container space-y-4">
-
                     {/* Top Row: Search & Date */}
                     <div className="flex flex-col md:flex-row gap-4 justify-between">
                         {/* Search Bar */}
@@ -153,11 +110,11 @@ export default function EventsPage() {
                             ].map((filter) => (
                                 <button
                                     key={filter.id}
-                                    onClick={() => setDateFilter(filter.id)}
+                                    onClick={() => setDateFilter(filter.id as any)}
                                     className={`px-4 py-2 rounded-full font-bold text-sm transition-all ${dateFilter === filter.id
-                                            ? "bg-white text-nust-blue shadow-sm border border-gray-200"
-                                            : "text-gray-500 hover:text-nust-blue"
-                                        }`}
+                                        ? "bg-white text-nust-blue shadow-sm border border-gray-200"
+                                        : "text-gray-500 hover:text-nust-blue"
+                                    }`}
                                 >
                                     {filter.label}
                                 </button>
@@ -172,15 +129,14 @@ export default function EventsPage() {
                                 key={cat}
                                 onClick={() => setSelectedCategory(cat)}
                                 className={`px-5 py-2 rounded-full font-heading text-lg border-2 transition-all whitespace-nowrap ${selectedCategory === cat
-                                        ? "bg-nust-blue text-white border-nust-blue"
-                                        : "bg-white text-nust-blue border-nust-blue hover:bg-nust-blue hover:text-white"
-                                    }`}
+                                    ? "bg-nust-blue text-white border-nust-blue"
+                                    : "bg-white text-nust-blue border-nust-blue hover:bg-nust-blue hover:text-white"
+                                }`}
                             >
                                 {cat}
                             </button>
                         ))}
                     </div>
-
                 </div>
             </section>
 
@@ -189,20 +145,22 @@ export default function EventsPage() {
                 <div className="container">
                     <div className="flex items-center justify-between mb-8">
                         <p className="text-nust-blue/60 font-display uppercase tracking-widest font-bold">
-                            Showing {events.length} events
+                            Showing {events.length} events{hasMore ? "+" : ""}
                         </p>
                     </div>
 
-                    {loading ? (
+                    {/* Initial load spinner */}
+                    {isLoading && events.length === 0 ? (
                         <div className="flex items-center justify-center py-20">
                             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-nust-blue"></div>
                         </div>
-                    ) : events.length === 0 ? (
+                    ) : events.length === 0 && !isLoading ? (
+                        /* Empty State */
                         <div className="text-center py-20 bg-white/50 rounded-xl border-2 border-dashed border-nust-blue/20">
                             <div className="text-6xl mb-4 opacity-50">🕵️‍♂️</div>
                             <h3 className="text-2xl font-heading text-nust-blue mb-2">NO EVENTS FOUND</h3>
                             <p className="text-nust-blue/60 max-w-md mx-auto mb-8">
-                                We couldn't find any events matching your filters. Try adjusting your search or category.
+                                We couldn&apos;t find any events matching your filters. Try adjusting your search or category.
                             </p>
                             <div className="flex gap-4 justify-center">
                                 <button
@@ -217,20 +175,35 @@ export default function EventsPage() {
                             </div>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                            {events.map((event, index) => (
-                                <div key={event.id} className={`transform transition-all hover:-translate-y-2 duration-300`}>
-                                    <EventCard
-                                        event={{
-                                            ...event,
-                                            rsvp_count: event.rsvps?.[0]?.count || 0,
-                                            checkin_count: event.checkins?.[0]?.count || 0,
-                                        }}
-                                        index={index}
-                                    />
+                        <>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                                {events.map((event, index) => (
+                                    <div key={event.id} className="transform transition-all hover:-translate-y-2 duration-300">
+                                        <EventCard event={event} index={index} />
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Infinite scroll sentinel — triggers loadMore when scrolled into view */}
+                            <InfiniteScrollSentinel
+                                onIntersect={handleLoadMore}
+                                disabled={!hasMore || isLoadingMore}
+                            />
+
+                            {/* Loading more spinner */}
+                            {isLoadingMore && (
+                                <div className="flex justify-center py-10">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-nust-blue"></div>
                                 </div>
-                            ))}
-                        </div>
+                            )}
+
+                            {/* End of results */}
+                            {!hasMore && events.length > 0 && (
+                                <div className="text-center py-10 text-nust-blue/40 font-display text-sm uppercase tracking-widest">
+                                    — You&apos;ve seen all {events.length} events —
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </section>
