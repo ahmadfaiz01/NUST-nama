@@ -37,10 +37,8 @@ function AuthForm() {
             options: {
                 redirectTo: `${window.location.origin}/auth/callback`,
                 queryParams: {
-                    // Prompt to always show account picker, so users can switch accounts
+                    // Show the account picker every time (don't auto-select)
                     prompt: "select_account",
-                    // Restrict to NUST domain in the Google picker (additional hint, real enforcement is in callback)
-                    hd: "nust.edu.pk",
                 },
             },
         });
