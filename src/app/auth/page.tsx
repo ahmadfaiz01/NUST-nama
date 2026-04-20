@@ -22,10 +22,25 @@ function AuthForm() {
     const searchParams = useSearchParams();
     const errorParam = searchParams.get("error");
 
+    // Map raw error codes/messages to friendly display type and text
+    const getErrorDisplay = (raw: string | null) => {
+        if (!raw) return null;
+        const msg = decodeURIComponent(raw).toLowerCase();
+        if (msg.includes("access denied") || msg.includes("only @nust") || msg.includes("nust.edu.pk")) {
+            return { type: "info" as const, text: "Only official NUST emails (@nust.edu.pk, @seecs.edu.pk, etc.) can sign in. Please use your NUST Google account." };
+        }
+        if (msg.includes("invalid_callback") || msg.includes("invalid callback")) {
+            return { type: "info" as const, text: "Sign-in was cancelled or didn't complete. Please try again with your NUST Google account." };
+        }
+        return { type: "error" as const, text: decodeURIComponent(raw) };
+    };
+
+    const errorDisplay = getErrorDisplay(errorParam);
+
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(
-        errorParam ? decodeURIComponent(errorParam) : null
-    );
+    const [runtimeError, setRuntimeError] = useState<string | null>(null);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const setError = setRuntimeError; // kept for compat
 
     const handleGoogleSignIn = async () => {
         setLoading(true);
@@ -44,7 +59,7 @@ function AuthForm() {
         });
 
         if (error) {
-            setError(error.message);
+            setRuntimeError(error.message);
             setLoading(false);
         }
         // On success, Google redirects the browser — no need to handle here
@@ -72,10 +87,18 @@ function AuthForm() {
                         Sign in with your official NUST Google account to continue.
                     </p>
 
-                    {/* Error Message */}
-                    {error && (
-                        <div className="mb-6 p-4 bg-red-50 border-2 border-red-400 rounded-xl text-red-700 text-sm font-display">
-                            ❌ {error}
+                    {/* Access denied / cancelled — friendly instruction box */}
+                    {errorDisplay?.type === "info" && (
+                        <div className="mb-6 p-4 bg-nust-orange/10 border-2 border-nust-orange rounded-xl text-nust-blue text-sm font-display">
+                            🎓 <strong>NUST accounts only.</strong><br />
+                            {errorDisplay.text}
+                        </div>
+                    )}
+
+                    {/* Unexpected technical error */}
+                    {(errorDisplay?.type === "error" || runtimeError) && (
+                        <div className="mb-6 p-3 bg-red-50 border-2 border-red-300 rounded-xl text-red-600 text-xs font-display">
+                            ❌ {runtimeError ?? errorDisplay?.text}
                         </div>
                     )}
 
