@@ -27,10 +27,10 @@ function AuthForm() {
         if (!raw) return null;
         const msg = decodeURIComponent(raw).toLowerCase();
         if (msg.includes("access denied") || msg.includes("only @nust") || msg.includes("nust.edu.pk")) {
-            return { type: "info" as const, text: "Only official NUST emails (@nust.edu.pk, @seecs.edu.pk, etc.) can sign in. Please use your NUST Google account." };
+            return { type: "info" as const, text: "NUST/School emails (@nust.edu.pk, @seecs.edu.pk, etc.) only." };
         }
         if (msg.includes("invalid_callback") || msg.includes("invalid callback")) {
-            return { type: "info" as const, text: "Sign-in was cancelled or didn't complete. Please try again with your NUST Google account." };
+            return { type: "info" as const, text: "NUST/School emails (@nust.edu.pk, @seecs.edu.pk, etc.) only." };
         }
         return { type: "error" as const, text: decodeURIComponent(raw) };
     };
@@ -90,8 +90,7 @@ function AuthForm() {
                     {/* Access denied / cancelled — friendly instruction box */}
                     {errorDisplay?.type === "info" && (
                         <div className="mb-6 p-4 bg-nust-orange/10 border-2 border-nust-orange rounded-xl text-nust-blue text-sm font-display">
-                            🎓 <strong>NUST accounts only.</strong><br />
-                            {errorDisplay.text}
+                            🎓 <strong>NUST accounts only.</strong> {errorDisplay.text}
                         </div>
                     )}
 
