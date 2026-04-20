@@ -2,102 +2,54 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/client";
 
+// ─── Google icon SVG ─────────────────────────────────────────────────────────
+function GoogleIcon() {
+    return (
+        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" />
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+        </svg>
+    );
+}
+
 function AuthForm() {
     const searchParams = useSearchParams();
-    const router = useRouter();
-    const isSignup = searchParams.get("mode") === "signup";
     const errorParam = searchParams.get("error");
-    const verifiedParam = searchParams.get("verified");
 
-    const [mode, setMode] = useState<"login" | "signup">(isSignup ? "signup" : "login");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(
         errorParam ? decodeURIComponent(errorParam) : null
     );
-    const [success, setSuccess] = useState<string | null>(
-        verifiedParam === "true" ? "✅ Email verified successfully! You can now sign in with your credentials." : null
-    );
 
-    // Form fields
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [school, setSchool] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
-
-    // Admin emails that bypass NUST email check
-    const ADMIN_EMAILS = [
-        "itsahmadfaiz@gmail.com",
-        "rameenarshad0121@gmail.com"
-    ];
-
-    const isAdminEmail = (email: string) => {
-        return ADMIN_EMAILS.includes(email.toLowerCase().trim());
-    };
-
-    const isValidNustEmail = (email: string) => {
-        // Allow admin emails to bypass the check
-        if (isAdminEmail(email)) return true;
-        return email.endsWith(".nust.edu.pk") || email.endsWith("@nust.edu.pk") || email.endsWith("@seecs.edu.pk") || email.endsWith(".seecs.edu.pk");
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError(null);
-        setSuccess(null);
-
-        // Validate NUST email
-        if (mode === "signup" && !isValidNustEmail(email)) {
-            setError("Please use your official NUST or SEECS email (e.g., xyz.bscs23seecs@seecs.edu.pk)");
-            return;
-        }
-
+    const handleGoogleSignIn = async () => {
         setLoading(true);
+        setError(null);
         const supabase = createClient();
 
-        try {
-            if (mode === "signup") {
-                const { error } = await supabase.auth.signUp({
-                    email,
-                    password,
-                    options: {
-                        data: {
-                            full_name: name,
-                            school: school,
-                        },
-                        emailRedirectTo: `${window.location.origin}/auth/callback`,
-                    },
-                });
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider: "google",
+            options: {
+                redirectTo: `${window.location.origin}/auth/callback`,
+                queryParams: {
+                    // Prompt to always show account picker, so users can switch accounts
+                    prompt: "select_account",
+                    // Restrict to NUST domain in the Google picker (additional hint, real enforcement is in callback)
+                    hd: "nust.edu.pk",
+                },
+            },
+        });
 
-                if (error) throw error;
-
-                setSuccess("🎉 Check your email! We've sent a confirmation link to verify your account.");
-            } else {
-                const { error } = await supabase.auth.signInWithPassword({
-                    email,
-                    password,
-                });
-
-                if (error) {
-                    if (error.message.includes("Email not confirmed")) {
-                        throw new Error("Please verify your email first. Check your inbox for the confirmation link.");
-                    }
-                    throw error;
-                }
-
-                // Force hard redirect to home on successful login (faster and more reliable)
-                window.location.href = "/";
-                return;
-            }
-        } catch (err: any) {
-            setError(err.message || "An error occurred. Please try again.");
-        } finally {
+        if (error) {
+            setError(error.message);
             setLoading(false);
         }
+        // On success, Google redirects the browser — no need to handle here
     };
 
     return (
@@ -106,206 +58,77 @@ function AuthForm() {
             <div className="flex-1 flex items-center justify-center p-8">
                 <div className="w-full max-w-md">
                     {/* Logo */}
-                    <Link href="/" className="flex items-center mb-8">
-                        <img 
-                            src="/android-chrome-192x192.png" 
-                            alt="NUST Nama" 
-                            className="h-24 w-24 min-h-[96px] min-w-[96px] max-h-[128px] max-w-[128px]" 
+                    <Link href="/" className="flex items-center mb-10">
+                        <img
+                            src="/android-chrome-192x192.png"
+                            alt="NUST Nama"
+                            className="h-24 w-24"
                             style={{ objectFit: "contain" }}
                         />
                     </Link>
 
-                    {/* Tabs */}
-                    <div className="flex gap-2 mb-8">
-                        <button
-                            onClick={() => { setMode("login"); setError(null); setSuccess(null); }}
-                            className={`flex-1 py-3 font-heading text-xl rounded-full border-2 transition-all ${mode === "login"
-                                ? "bg-nust-blue text-white border-nust-blue"
-                                : "bg-white text-nust-blue border-nust-blue hover:bg-nust-blue/5"
-                                }`}
-                        >
-                            Sign In
-                        </button>
-                        <button
-                            onClick={() => { setMode("signup"); setError(null); setSuccess(null); }}
-                            className={`flex-1 py-3 font-heading text-xl rounded-full border-2 transition-all ${mode === "signup"
-                                ? "bg-nust-blue text-white border-nust-blue"
-                                : "bg-white text-nust-blue border-nust-blue hover:bg-nust-blue/5"
-                                }`}
-                        >
-                            Sign Up
-                        </button>
-                    </div>
+                    <h1 className="font-heading text-4xl text-nust-blue mb-2">
+                        WELCOME BACK
+                    </h1>
+                    <p className="font-display text-nust-blue/60 mb-10">
+                        Sign in with your official NUST Google account to continue.
+                    </p>
 
                     {/* Error Message */}
                     {error && (
-                        <div className="mb-4 p-3 bg-red-100 border-2 border-red-400 rounded-lg text-red-700 text-sm">
+                        <div className="mb-6 p-4 bg-red-50 border-2 border-red-400 rounded-xl text-red-700 text-sm font-display">
                             ❌ {error}
                         </div>
                     )}
 
-                    {/* Success Message */}
-                    {success && (
-                        <div className="mb-4 p-3 bg-green-100 border-2 border-green-400 rounded-lg text-green-700 text-sm">
-                            {success}
-                        </div>
-                    )}
-
-                    {/* Form */}
-                    <form className="space-y-4" onSubmit={handleSubmit}>
-                        {mode === "signup" && (
-                            <div>
-                                <label className="block font-display text-sm font-bold text-nust-blue mb-2 uppercase tracking-wide">
-                                    Full Name
-                                </label>
-                                <input
-                                    type="text"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    placeholder="Ahmed Khan"
-                                    required
-                                    className="w-full px-4 py-3 rounded-lg border-2 border-nust-blue bg-white text-nust-blue placeholder:text-nust-blue/40 focus:outline-none focus:ring-2 focus:ring-nust-orange"
-                                />
-                            </div>
+                    {/* Google Sign In Button */}
+                    <button
+                        onClick={handleGoogleSignIn}
+                        disabled={loading}
+                        className="w-full flex items-center justify-center gap-4 py-4 px-6 rounded-xl border-2 border-nust-blue bg-white hover:bg-nust-blue/5 transition-all shadow-[4px_4px_0px_var(--nust-blue)] hover:shadow-[2px_2px_0px_var(--nust-blue)] hover:translate-x-[2px] hover:translate-y-[2px] disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {loading ? (
+                            <div className="w-5 h-5 border-2 border-nust-blue/30 border-t-nust-blue rounded-full animate-spin" />
+                        ) : (
+                            <GoogleIcon />
                         )}
+                        <span className="font-heading text-lg text-nust-blue tracking-wide">
+                            {loading ? "Redirecting..." : "Continue with Google"}
+                        </span>
+                    </button>
 
-                        <div>
-                            <label className="block font-display text-sm font-bold text-nust-blue mb-2 uppercase tracking-wide">
-                                NUST Email
-                            </label>
-                            <input
-                                name="email"
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="xyz.bscs23seecs@seecs.edu.pk"
-                                required
-                                className="w-full px-4 py-3 rounded-lg border-2 border-nust-blue bg-white text-nust-blue placeholder:text-nust-blue/40 focus:outline-none focus:ring-2 focus:ring-nust-orange"
-                            />
-                            {mode === "signup" && (
-                                <p className="text-xs text-nust-blue/60 mt-1">
-                                    Only <strong>@*.nust.edu.pk</strong> and <strong>@seecs.edu.pk</strong> allowed.
-                                </p>
-                            )}
-                        </div>
-
-                        <div>
-                            <label className="block font-display text-sm font-bold text-nust-blue mb-2 uppercase tracking-wide">
-                                Password
-                            </label>
-                            <div className="relative">
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="••••••••"
-                                    required
-                                    minLength={6}
-                                    className="w-full px-4 py-3 pr-12 rounded-lg border-2 border-nust-blue bg-white text-nust-blue placeholder:text-nust-blue/40 focus:outline-none focus:ring-2 focus:ring-nust-orange"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-nust-blue/60 hover:text-nust-blue transition-colors"
-                                    aria-label={showPassword ? "Hide password" : "Show password"}
-                                >
-                                    {showPassword ? (
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                                        </svg>
-                                    ) : (
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                    )}
-                                </button>
-                            </div>
-                        </div>
-
-                        {mode === "signup" && (
-                            <div>
-                                <label className="block font-display text-sm font-bold text-nust-blue mb-2 uppercase tracking-wide">
-                                    School/Department
-                                </label>
-                                <select
-                                    value={school}
-                                    onChange={(e) => setSchool(e.target.value)}
-                                    required
-                                    className="w-full px-4 py-3 rounded-lg border-2 border-nust-blue bg-white text-nust-blue focus:outline-none focus:ring-2 focus:ring-nust-orange"
-                                >
-                                    <option value="">Select your school</option>
-                                    <option value="SEECS">SEECS</option>
-                                    <option value="SMME">SMME</option>
-                                    <option value="SCME">SCME</option>
-                                    <option value="SADA">SADA</option>
-                                    <option value="NBS">NBS</option>
-                                    <option value="S3H">S3H</option>
-                                    <option value="NICE">NICE</option>
-                                    <option value="RCMS">RCMS</option>
-                                    <option value="ASAB">ASAB</option>
-                                    <option value="SNS">SNS</option>
-                                    <option value="OTHER">Other</option>
-                                </select>
-                            </div>
-                        )}
-
-                        {mode === "login" && (
-                            <div className="flex items-center justify-between">
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" className="w-4 h-4 rounded border-nust-blue" />
-                                    <span className="text-sm text-nust-blue/70">Remember me</span>
-                                </label>
-                                <Link href="/auth/forgot" className="text-sm text-nust-orange hover:underline">
-                                    Forgot password?
-                                </Link>
-                            </div>
-                        )}
-
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full btn bg-nust-blue text-white text-lg py-4 shadow-[4px_4px_0px_var(--nust-orange)] hover:shadow-[2px_2px_0px_var(--nust-orange)] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {loading ? "Please wait..." : mode === "login" ? "Sign In" : "Create Account"}
-                        </button>
-                    </form>
-
-                    {/* Email confirmation notice */}
-                    {mode === "signup" && !success && (
-                        <div className="mt-6 p-4 bg-nust-orange/10 border-2 border-nust-orange rounded-lg">
-                            <p className="text-sm text-nust-blue text-center">
-                                📧 <strong>You&apos;ll receive a confirmation email</strong> to verify your NUST address before logging in.
-                            </p>
-                        </div>
-                    )}
+                    {/* Domain restriction notice */}
+                    <div className="mt-6 p-4 bg-nust-orange/10 border-2 border-nust-orange/40 rounded-xl">
+                        <p className="text-sm text-nust-blue/70 font-display text-center leading-relaxed">
+                            🔒 Only <strong>@nust.edu.pk</strong> and NUST school emails<br />
+                            (e.g. <strong>@seecs.edu.pk</strong>) are allowed.
+                        </p>
+                    </div>
 
                     {/* Terms */}
-                    {mode === "signup" && (
-                        <p className="text-center text-nust-blue/50 text-sm mt-6">
-                            By creating an account, you agree to our{" "}
-                            <Link href="/terms" className="text-nust-orange hover:underline">Terms</Link>
-                            {" "}and{" "}
-                            <Link href="/privacy" className="text-nust-orange hover:underline">Privacy Policy</Link>
-                        </p>
-                    )}
+                    <p className="text-center text-nust-blue/40 text-xs mt-8 font-display">
+                        By signing in, you agree to our{" "}
+                        <Link href="/terms" className="text-nust-orange hover:underline">Terms</Link>
+                        {" "}and{" "}
+                        <Link href="/privacy" className="text-nust-orange hover:underline">Privacy Policy</Link>.
+                    </p>
                 </div>
             </div>
 
             {/* Right Panel - Visual (Hidden on mobile) */}
             <div
-                className="hidden lg:flex flex-1 items-center justify-center relative"
+                className="hidden lg:flex flex-1 items-center justify-center relative overflow-hidden"
                 style={{
                     backgroundColor: "var(--nust-blue)",
                     backgroundImage: `linear-gradient(var(--nust-orange) 1px, transparent 1px), linear-gradient(90deg, var(--nust-orange) 1px, transparent 1px)`,
                     backgroundSize: "60px 60px",
                 }}
             >
-                <div className="text-center p-12">
+                <div className="text-center p-12 relative z-10">
                     <h2 className="text-5xl text-white mb-4 drop-shadow-[4px_4px_0px_var(--nust-orange)]">
                         NEVER MISS<br />A MOMENT
                     </h2>
-                    <p className="text-white/80 text-lg max-w-md">
+                    <p className="text-white/80 text-lg max-w-md font-display">
                         Join the community of NUST students who stay connected to everything happening on campus.
                     </p>
 
@@ -316,6 +139,9 @@ function AuthForm() {
                     <div className="absolute bottom-32 left-20 w-16 h-16 bg-white rounded-full flex items-center justify-center -rotate-6 shadow-lg animate-float" style={{ animationDelay: "0.5s" }}>
                         <span className="text-2xl">🔥</span>
                     </div>
+                    <div className="absolute top-1/2 left-10 w-12 h-12 bg-nust-orange/60 rounded-full flex items-center justify-center rotate-3 shadow-lg animate-float" style={{ animationDelay: "1s" }}>
+                        <span className="text-xl">🎓</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -324,7 +150,7 @@ function AuthForm() {
 
 export default function AuthPage() {
     return (
-        <Suspense fallback={<div className="min-h-screen bg-cream flex items-center justify-center">Loading...</div>}>
+        <Suspense fallback={<div className="min-h-screen bg-cream flex items-center justify-center font-heading text-nust-blue">Loading...</div>}>
             <AuthForm />
         </Suspense>
     );
