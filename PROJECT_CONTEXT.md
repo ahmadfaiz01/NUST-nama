@@ -1,239 +1,88 @@
-# NUST-NAMA Project Documentation
+# Architecture Notes
 
-## 📋 Overview
+Data model and workflows. Setup, stack and env live in [README.md](README.md).
 
-**NUST-NAMA** is a Next.js web application for NUST (National University of Sciences and Technology) that serves as a central hub for:
-- **Events** - Discover, RSVP, and check-in to campus events
-- **News** - Stay updated with campus announcements
-- **Chatter (Gupshup)** - Discussion forums for students
-- **Calendar** - View upcoming events in calendar format
+*Last verified against code: August 5, 2026. The Supabase project referenced in
+`.env.local` at that date no longer resolves, so none of this could be checked
+against a live database.*
 
----
-
-## 🛠️ Tech Stack
-
-| Layer | Technology |
-|-------|------------|
-| **Frontend** | Next.js 14+ (App Router), React, TypeScript |
-| **Styling** | Tailwind CSS |
-| **Backend** | Supabase (PostgreSQL + Auth + Storage + Realtime) |
-| **Automation** | n8n (planned for news ingestion) |
-| **Maps** | Leaflet.js for event locations |
-
----
-
-## 📁 Project Structure
-
-```
-NUST-nama/
-├── public/              # Static assets
-│   └── images/          # Images and icons
-├── src/
-│   ├── app/             # Next.js App Router (pages)
-│   │   ├── admin/       # Admin dashboard (protected)
-│   │   │   ├── events/  # Manage events (approve/reject)
-│   │   │   ├── users/   # User management
-│   │   │   ├── gupshup/ # Topic request management
-│   │   │   └── stats/   # Analytics
-│   │   ├── api/         # API routes
-│   │   │   └── webhooks/ingest-event/  # n8n webhook endpoint
-│   │   ├── auth/        # Login/signup with Supabase Auth
-│   │   ├── events/      # Public events listing & details
-│   │   ├── chatter/     # Discussion forums (Gupshup)
-│   │   ├── calendar/    # Calendar view of events
-│   │   ├── news/        # News feed
-│   │   ├── post-event/  # Event submission form
-│   │   └── profile/     # User profile page
-│   ├── components/      # Reusable React components
-│   │   ├── admin/       # Admin components (notifications)
-│   │   ├── chatter/     # Chat/forum components
-│   │   ├── events/      # Event cards, maps, check-in
-│   │   ├── layout/      # Navbar, Footer
-│   │   └── social/      # RSVP button
-│   ├── lib/             # Utility functions
-│   │   └── supabase/    # Supabase client setup
-│   └── types/           # TypeScript type definitions
-├── *.sql                # Database migrations & setup scripts
-└── package.json
-```
-
----
-
-## 🗄️ Database Schema (Supabase)
-
-### Core Tables
+## Tables
 
 | Table | Purpose |
-|-------|---------|
-| `profiles` | User profiles (id, name, faculty, role, etc.) |
-| `events` | All events with status (pending/approved/rejected) |
-| `rsvps` | User RSVPs to events (going/interested) |
-| `checkins` | User check-ins at events (with sentiment) |
-| `news_items` | News articles (with status for approval) |
-| `threads` | Gupshup discussion topics |
-| `messages` | Messages within threads |
-| `topic_requests` | User requests for new discussion topics |
-| `admin_notifications` | Notifications for admins |
+|---|---|
+| `profiles` | One row per auth user. `role`, `school`, avatar. Created by the `handle_new_user` trigger |
+| `events` | `status` = pending / approved / rejected. `external_id` dedupes automated imports |
+| `rsvps` | going / interested, unique per (user, event) |
+| `checkins` | Attendance + `sentiment`, drives the campus vibe heatmap |
+| `news_items` | Scraped news, `status` gates public visibility |
+| `threads` | Gupshup discussion topics, admin-created |
+| `messages` | Posts inside a thread |
+| `topic_requests` | Student requests for a new thread |
+| `admin_notifications` | Fanned out by DB triggers, read by the admin bell |
 
-### Key Relationships
-- `events.created_by` → `profiles.id`
-- `rsvps.user_id` → `profiles.id`
-- `rsvps.event_id` → `events.id`
-- `messages.thread_id` → `threads.id`
-- `messages.user_id` → `profiles.id`
+Foreign keys: `events.created_by`, `rsvps.user_id`, `checkins.user_id`,
+`messages.user_id` → `profiles.id`. `rsvps.event_id`, `checkins.event_id` →
+`events.id`. `messages.thread_id` → `threads.id`.
 
----
+## Auth
 
-## 🔐 Authentication & Authorization
+Google OAuth only. Two gates, both required:
 
-### User Roles
-| Role | Access |
-|------|--------|
-| `student` | View events, RSVP, check-in, post to chatter |
-| `moderator` | Above + view pending content, approve events |
-| `admin` | Full access to all admin features |
+1. `src/app/auth/callback/route.ts` rejects any email outside `@*.nust.edu.pk`
+   and signs the session back out.
+2. `supabase/migrations/20260421_nust_domain_trigger.sql` — the `handle_new_user`
+   trigger raises on a non-NUST address, so a direct API signup fails too.
 
-### Row Level Security (RLS)
-All tables have RLS enabled with policies:
-- **Events**: Public can only see `status = 'approved'` OR their own events
-- **News**: Public can only see approved news
-- **Messages**: Only authenticated users can view/post
-- **Admin Notifications**: Only admins/moderators can view
+The trigger is the real boundary; the callback just gives a friendly message.
+Several `legacy-sql/` files also define `handle_new_user` — this migration must be
+applied last or the domain check is silently dropped.
 
----
+## Roles and RLS
 
-## 📅 Event Workflow
+`student` → `moderator` → `admin`, stored in `profiles.role`. Helper functions
+`is_admin()` and `is_moderator_or_admin()` are used inside policies.
 
-### 1. Event Creation
+Public reads are limited to `status = 'approved'` for events and news. Authors
+always see their own rows. `admin_notifications` is admin/moderator only.
+
+## Event lifecycle
+
 ```
-User submits event via /post-event
-    ↓
-Event inserted with status = 'pending'
-    ↓
-Trigger fires → Creates admin notification
-    ↓
-Admin sees notification in dashboard
-```
-
-### 2. Event Approval
-```
-Admin views pending events in /admin/events
-    ↓
-Admin approves or rejects
-    ↓
-If approved: status = 'approved' → visible to public
-If rejected: status = 'rejected' → not visible
+student submits /post-event         n8n POSTs /api/webhooks/ingest-event
+        │                                    │  (x-api-secret header)
+        └──────────► events.status = 'pending' ◄──────── unless is_official,
+                             │                            which auto-approves
+                    trigger fires
+                             │
+                  admin_notifications row
+                             │
+              admin approves in /admin/events/[id]
+                             │
+                     status = 'approved'  → public
 ```
 
-### 3. Event Visibility
-- **Public pages** (`/events`): Only show `status = 'approved'`
-- **Admin pages** (`/admin/events`): Show all events with status filter
-- **User's own events**: Visible to creator regardless of status
+Events past their end date are removed by the `cleanup-old-events` edge function,
+scheduled by `supabase/migrations/20260421_cleanup_cron.sql`.
 
----
+## News lifecycle
 
-## 🔔 Admin Notification System
+n8n writes into `news_items` as `pending`, deduped on `external_id`. In
+`/admin/news` an admin can hit "student tone", which calls `/api/student-tone` →
+Groq, and returns a rewritten title and summary to edit before approving. That
+route is admin/moderator gated because it spends API credits.
 
-### When Notifications Are Created
-| Trigger | Notification Type |
-|---------|-------------------|
-| New event with `status = 'pending'` | `event_request` |
-| New news item with `status = 'pending'` | `news_request` |
-| New topic request | `topic_request` |
+`/news` shows the last 7 days as a grid and everything older as a compact
+archive list below it.
 
-### Notification Flow
-1. User creates event/news/topic request
-2. Database trigger fires
-3. Notification inserted into `admin_notifications`
-4. Admin layout has bell icon with real-time updates
-5. Admin clicks notification → navigates to approval page
+## Gupshup lifecycle
 
----
+Student files a topic request → trigger creates an admin notification → admin
+approves in `/admin/gupshup` → thread appears → anyone signed in can post.
+Admins can delete messages.
 
-## 📰 News System (n8n Integration)
+## Known gaps
 
-### Current Setup
-- `news_items` table stores news with status column
-- n8n can POST to `/api/webhooks/ingest-event` (or similar news endpoint)
-- News items start as `pending` until admin approves
-
-### Required for n8n
-1. Run `fix_newsitems.sql` to add status column
-2. Set up n8n workflow to POST news items
-3. Use `external_id` for deduplication
-
----
-
-## 💬 Chatter (Gupshup) System
-
-### Structure
-- **Threads**: Discussion topics (created by admins)
-- **Messages**: User posts within threads
-- **Topic Requests**: Users can request new topics
-
-### Flow
-```
-User requests new topic → status = 'pending'
-    ↓
-Admin notification created
-    ↓
-Admin approves in /admin/gupshup
-    ↓
-New thread created → Users can post messages
-```
-
----
-
-## 🚀 SQL Files to Run
-
-Run these in order in Supabase SQL Editor:
-
-| File | Purpose |
-|------|---------|
-| `COMPLETE_SETUP.sql` | Initial database setup |
-| `setup_chatter.sql` | Chatter tables (threads, messages, topic_requests) |
-| `setup_admins.sql` | Admin role setup |
-| `fix_school_column.sql` | Add school column to profiles, update trigger |
-| `fix_newsitems.sql` | Add status column to news_items |
-| `setup_admin_notifications.sql` | Admin notifications system with triggers |
-| `admin_dashboard.sql` | RLS policies for events |
-
----
-
-## 🔑 Key Features Status
-
-| Feature | Status |
-|---------|--------|
-| User Authentication | ✅ Working |
-| Event Listing | ✅ Working (approved only) |
-| Event Creation | ✅ Working (pending status) |
-| Admin Approval | ✅ Working |
-| RSVP System | ✅ Working |
-| Check-in System | ✅ Working |
-| Chatter/Gupshup | ✅ Working |
-| Admin Notifications | ✅ Just Added |
-| News Approval | ✅ Just Added |
-| n8n Integration | 🔄 Ready for setup |
-
----
-
-## 📝 Environment Variables
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-NEXT_PUBLIC_VAPID_PUBLIC_KEY=for_push_notifications (optional)
-```
-
----
-
-## 🎯 Next Steps
-
-1. Run `fix_newsitems.sql` and `setup_admin_notifications.sql` in Supabase
-2. Test event creation → check admin notifications appear
-3. Set up n8n workflow for news ingestion
-4. Test news approval flow
-
----
-
-*Last Updated: February 2, 2026*
+- No tests anywhere.
+- `profiles.push_subscription` column is unused. Web push was removed on
+  Aug 5, 2026 — the client helper was dead code and nothing ever sent a push.
+- `INGEST_API_SECRET_KEY` is a single shared secret with no rotation.

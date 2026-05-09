@@ -37,29 +37,28 @@ export default async function NewsPage() {
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
     
-    // First, try to fetch approved news from last 7 days
-    let { data: newsItems } = await supabase
-        .from("news_items")
-        .select("*")
-        .eq("status", "approved")
-        .gte("published_at", oneWeekAgo.toISOString())
-        .order("published_at", { ascending: false })
-        .limit(20);
-
-    // If no recent news, fetch older news (no date filter)
-    if (!newsItems || newsItems.length === 0) {
-        const { data: olderNews } = await supabase
+    const [{ data: recentNews }, { data: olderNews }] = await Promise.all([
+        supabase
             .from("news_items")
             .select("*")
             .eq("status", "approved")
+            .gte("published_at", oneWeekAgo.toISOString())
             .order("published_at", { ascending: false })
-            .limit(20);
-        
-        newsItems = olderNews;
-    }
+            .limit(20),
+        supabase
+            .from("news_items")
+            .select("*")
+            .eq("status", "approved")
+            .lt("published_at", oneWeekAgo.toISOString())
+            .order("published_at", { ascending: false })
+            .limit(10),
+    ]);
 
-    // Use mock data only if no news at all
-    const displayItems = (newsItems && newsItems.length > 0) ? newsItems : mockNewsItems;
+    // Headline grid: this week's news, else fall back to older, else mock
+    const hasRecent = !!recentNews?.length;
+    const displayItems = hasRecent ? recentNews : (olderNews?.length ? olderNews : mockNewsItems);
+    // Archive only when it isn't already the headline grid
+    const archiveItems = hasRecent ? (olderNews ?? []) : [];
 
     return (
         <div className="min-h-screen bg-cream">
@@ -117,23 +116,30 @@ export default async function NewsPage() {
                         ))}
                     </div>
 
-                    {/* Newsletter Signup */}
-                    <div className="mt-16 bg-nust-blue rounded-xl p-8 md:p-12 text-center shadow-[8px_8px_0px_var(--nust-orange)]">
-                        <h2 className="text-4xl text-white mb-4">NEVER MISS AN UPDATE</h2>
-                        <p className="text-white/70 mb-6 max-w-xl mx-auto">
-                            Get important announcements delivered straight to your inbox. No spam, just what matters.
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-                            <input
-                                type="email"
-                                placeholder="Enter your NUST email"
-                                className="flex-1 px-4 py-3 rounded-full border-2 border-white bg-white/10 text-white placeholder:text-white/50 focus:outline-none focus:border-nust-orange"
-                            />
-                            <button className="btn bg-nust-orange text-nust-blue font-bold px-6 py-3">
-                                Subscribe
-                            </button>
+                    {/* Archive */}
+                    {archiveItems.length > 0 && (
+                        <div className="mt-16 bg-nust-blue rounded-xl p-8 md:p-12 shadow-[8px_8px_0px_var(--nust-orange)]">
+                            <h2 className="text-4xl text-white mb-6 text-center">EARLIER ON CAMPUS</h2>
+                            <div className="max-w-3xl mx-auto divide-y divide-white/20">
+                                {archiveItems.map((item) => (
+                                    <Link
+                                        key={item.id}
+                                        href={item.url || "#"}
+                                        target={item.url && item.url !== "#" ? "_blank" : undefined}
+                                        rel={item.url && item.url !== "#" ? "noopener noreferrer" : undefined}
+                                        className="flex items-baseline gap-4 py-3 group"
+                                    >
+                                        <span className="text-white/50 text-sm font-medium shrink-0 w-16">
+                                            {item.published_at ? formatDate(item.published_at) : "—"}
+                                        </span>
+                                        <span className="text-white group-hover:text-nust-orange transition-colors">
+                                            {item.title}
+                                        </span>
+                                    </Link>
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </section>
         </div>

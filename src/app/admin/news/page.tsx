@@ -140,7 +140,7 @@ export default function AdminNewsPage() {
             setEditingItem(id);
         } catch (error) {
             console.error("Error generating student tone:", error);
-            const message = error instanceof Error ? error.message : "Failed to generate student tone. Make sure GEMINI_API_KEY is set and restart your dev server.";
+            const message = error instanceof Error ? error.message : "Failed to generate student tone. Make sure GROQ_API_KEY is set and restart your dev server.";
             alert(message);
         }
 

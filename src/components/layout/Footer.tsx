@@ -55,18 +55,6 @@ export function Footer() {
                                 For the NUST Community
                             </p>
                         </div>
-
-                        <div className="flex gap-3">
-                            <a href="#" className="w-8 h-8 rounded-full bg-white text-nust-blue flex items-center justify-center hover:-translate-y-1 transition-transform shadow-[2px_2px_0px_rgba(0,0,0,0.2)] text-xs">
-                                📸
-                            </a>
-                            <a href="#" className="w-8 h-8 rounded-full bg-white text-nust-blue flex items-center justify-center hover:-translate-y-1 transition-transform shadow-[2px_2px_0px_rgba(0,0,0,0.2)] text-xs">
-                                ✖️
-                            </a>
-                            <a href="#" className="w-8 h-8 rounded-full bg-white text-nust-blue flex items-center justify-center hover:-translate-y-1 transition-transform shadow-[2px_2px_0px_rgba(0,0,0,0.2)] text-xs">
-                                💬
-                            </a>
-                        </div>
                     </div>
                 </div>
 

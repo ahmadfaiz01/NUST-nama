@@ -1,27 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 
-export async function POST(request: NextRequest) {
-    try {
-        const { title, summary } = await request.json();
-
-        if (!title && !summary) {
-            return NextResponse.json({ error: "Title or summary is required" }, { status: 400 });
-        }
-
-        const apiKey = process.env.GEMINI_API_KEY;
-
-        console.log("API Key exists:", !!apiKey);
-        console.log("API Key length:", apiKey?.length);
-
-        if (!apiKey) {
-            console.error("GEMINI_API_KEY not found in environment variables");
-            return NextResponse.json(
-                { error: "Gemini API key not configured. Restart your dev server (Ctrl+C then npm run dev)" },
-                { status: 500 }
-            );
-        }
-
-        const prompt = `You're helping rewrite university news for Pakistani Gen-Z students.
+const SYSTEM_PROMPT = `You rewrite university news for Pakistani Gen-Z students.
 
 VIBE CHECK:
 - Keep it real and lowkey informative
@@ -31,90 +11,75 @@ VIBE CHECK:
 - Keep important info intact
 - Short and snappy - no essays
 
-Original Title: "${title || 'N/A'}"
-Original Summary: "${summary || 'N/A'}"
+Reply with JSON only: {"title": "rewritten title", "summary": "rewritten summary"}`;
 
-Return ONLY valid JSON (no markdown, no code blocks):
-{"title": "rewritten title", "summary": "rewritten summary"}`;
+export async function POST(request: NextRequest) {
+    // Admin/moderator only - this endpoint spends API credits
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-        console.log("Calling Gemini API...");
+    const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
 
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
+    if (profile?.role !== "admin" && profile?.role !== "moderator") {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const { title, summary } = await request.json();
+    if (!title && !summary) {
+        return NextResponse.json({ error: "Title or summary is required" }, { status: 400 });
+    }
+
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) {
+        return NextResponse.json({ error: "GROQ_API_KEY not configured" }, { status: 500 });
+    }
+
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+            model: "llama-3.3-70b-versatile",
+            temperature: 0.7,
+            max_tokens: 300,
+            response_format: { type: "json_object" },
+            messages: [
+                { role: "system", content: SYSTEM_PROMPT },
+                {
+                    role: "user",
+                    content: `Original Title: "${title || "N/A"}"\nOriginal Summary: "${summary || "N/A"}"`,
                 },
-                body: JSON.stringify({
-                    contents: [
-                        {
-                            parts: [{ text: prompt }],
-                        },
-                    ],
-                    generationConfig: {
-                        temperature: 0.7,
-                        maxOutputTokens: 300,
-                    },
-                }),
-            }
-        );
+            ],
+        }),
+    });
 
-        console.log("Gemini response status:", response.status);
-
-        if (!response.ok) {
-            const errorData = await response.text();
-            console.error("Gemini API error response:", errorData);
-            
-            // Parse the error to give a better message
-            try {
-                const errorJson = JSON.parse(errorData);
-                const errorMessage = errorJson.error?.message || "Unknown API error";
-                return NextResponse.json(
-                    { error: `Gemini API error: ${errorMessage}` },
-                    { status: 500 }
-                );
-            } catch {
-                return NextResponse.json(
-                    { error: `Gemini API error: ${response.status} ${response.statusText}` },
-                    { status: 500 }
-                );
-            }
-        }
-
-        const data = await response.json();
-        console.log("Gemini response data:", JSON.stringify(data).substring(0, 200));
-        
-        const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-
-        // Try to parse the JSON response
-        try {
-            // Clean up the response - remove markdown code blocks if present
-            const cleanedText = generatedText
-                .replace(/```json\n?/g, '')
-                .replace(/```\n?/g, '')
-                .trim();
-            
-            console.log("Cleaned text:", cleanedText);
-            
-            const parsed = JSON.parse(cleanedText);
-            return NextResponse.json({
-                title: parsed.title || title,
-                summary: parsed.summary || summary
-            });
-        } catch {
-            // If JSON parsing fails, return the original with the generated text as summary
-            console.error("Failed to parse Gemini response:", generatedText);
-            return NextResponse.json({
-                title: title,
-                summary: generatedText.trim() || summary
-            });
-        }
-    } catch (error) {
-        console.error("Student tone API error:", error);
+    if (!response.ok) {
+        const detail = await response.text();
+        console.error("Groq API error:", response.status, detail);
         return NextResponse.json(
-            { error: `Server error: ${error instanceof Error ? error.message : "Unknown error"}` },
-            { status: 500 }
+            { error: `Groq API error: ${response.status}` },
+            { status: 502 }
         );
+    }
+
+    const data = await response.json();
+    const raw = data.choices?.[0]?.message?.content ?? "";
+
+    try {
+        const parsed = JSON.parse(raw);
+        return NextResponse.json({
+            title: parsed.title || title,
+            summary: parsed.summary || summary,
+        });
+    } catch {
+        console.error("Groq returned non-JSON:", raw);
+        return NextResponse.json({ error: "Model returned invalid JSON" }, { status: 502 });
     }
 }

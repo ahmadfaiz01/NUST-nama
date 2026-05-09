@@ -27,6 +27,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://nustnama.vercel.app"),
   title: "NUST Nama | Campus Events & Live Vibes",
   description:
     "Discover events, feel the crowd vibe, and coordinate with friends at NUST. Your campus intelligence platform.",
@@ -60,14 +61,7 @@ export const metadata: Metadata = {
     title: "NUST Nama | Campus Events & Live Vibes",
     description:
       "Discover events, feel the crowd vibe, and coordinate with friends at NUST.",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "NUST Nama",
-      },
-    ],
+    images: [{ url: "/images/hero_aerial_1.jpg", alt: "NUST Nama" }],
   },
   twitter: {
     card: "summary_large_image",

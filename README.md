@@ -1,36 +1,88 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NUST Nama (What's Up NUST)
 
-## Getting Started
+Campus events, news and chatter for NUST students. Next.js 16 + Supabase.
 
-First, run the development server:
+Live: https://nustnama.vercel.app
+
+## Features
+
+- **Events** — browse (infinite scroll), calendar view, Leaflet map, RSVP, check-in with vibe/sentiment
+- **Post an event** — student submissions land as `pending`, admins approve
+- **News** — n8n scrapes sources into `news_items` via a webhook, admins approve, optional AI rewrite into student tone
+- **Gupshup** — threaded discussion, users request new topics
+- **Admin** — approve events/news/topics, manage users, stats, realtime notification bell
+- **Auth** — Google OAuth only, restricted to `@*.nust.edu.pk` addresses
+
+## Stack
+
+| Layer | What |
+|---|---|
+| Framework | Next.js 16 (App Router), React 19, TypeScript |
+| Styling | Tailwind CSS v4 |
+| Backend | Supabase — Postgres, Auth, Storage, Realtime, Edge Functions |
+| Maps | Leaflet / react-leaflet |
+| Analytics | PostHog |
+| AI | Groq (`llama-3.3-70b-versatile`) for news rewriting |
+| Automation | n8n → `/api/webhooks/ingest-event` |
+
+## Setup
 
 ```bash
+npm install
+cp .env.local.example .env.local   # then fill it in
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Environment
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Variable | Required | Purpose |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | yes | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | yes | Supabase anon key |
+| `SUPABASE_SERVICE_ROLE_KEY` | yes | Server-only. Used by the ingest webhook to bypass RLS |
+| `NEXT_PUBLIC_APP_URL` | yes | OAuth callback base URL |
+| `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` | no | Analytics |
+| `NEXT_PUBLIC_POSTHOG_HOST` | no | Analytics region host |
+| `GROQ_API_KEY` | no | News "student tone" rewriter in `/admin/news` |
+| `INGEST_API_SECRET_KEY` | no | Shared secret for the n8n event webhook |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Database
 
-## Learn More
+Migrations live in `supabase/migrations/`. Earlier hand-run scripts are in
+`supabase/legacy-sql/` — see the README there for the reconstructed run order
+if you ever rebuild from scratch.
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+supabase link --project-ref <ref>
+supabase db push
+supabase functions deploy cleanup-old-events
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+├── app/            routes (App Router)
+│   ├── admin/      protected dashboard
+│   ├── api/        student-tone (Groq), webhooks/ingest-event (n8n)
+│   └── auth/       Google OAuth + callback with NUST domain check
+├── components/     events, chatter, admin, layout, providers
+├── hooks/          useInfiniteEvents
+├── lib/            supabase clients, admin checks, venue list
+└── types/          generated database types
+supabase/
+├── functions/      cleanup-old-events edge function
+├── migrations/     tracked migrations
+└── legacy-sql/     historical hand-run scripts
+```
 
-## Deploy on Vercel
+## Roles
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Role | Can |
+|---|---|
+| `student` | view, RSVP, check in, post to chatter, submit events |
+| `moderator` | + approve events/news, use the news rewriter |
+| `admin` | everything, incl. user management |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+RLS is on for every table. Public sees only `status = 'approved'` events and news;
+authors always see their own.
