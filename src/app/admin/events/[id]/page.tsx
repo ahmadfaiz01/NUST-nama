@@ -15,6 +15,7 @@ interface Event {
     venue_lat: number | null;
     venue_lng: number | null;
     status: "pending" | "approved" | "rejected";
+    rejection_reason?: string | null;
     is_official: boolean;
     tags: string[] | null;
     price: string | null;
@@ -92,13 +93,17 @@ export default function AdminEventDetailPage() {
         setActionLoading(true);
         const supabase = createClient();
 
+        const patch = newStatus === "rejected"
+            ? { status: newStatus, rejection_reason: rejectReason.trim() || null }
+            : { status: newStatus, rejection_reason: null };
+
         const { error } = await supabase
             .from("events")
-            .update({ status: newStatus })
+            .update(patch)
             .eq("id", eventId);
 
         if (!error && event) {
-            setEvent({ ...event, status: newStatus });
+            setEvent({ ...event, ...patch });
         }
 
         setActionLoading(false);
