@@ -70,13 +70,14 @@ nust.edu.pk + all *.nust.edu.pk school sites
   split           into sections along the document's own headings
         |
         v
-  classify        one Groq call per document:
-        |         school, doc_type, title, valid_from_year
+  classify        heuristics first: hostname -> school, regex -> year,
+        |         keywords -> doc_type. LLM only for what's left over.
         v
   filter          junk marked indexed=false, never deleted
         |
         v
-  embed           section summary -> vector(384) -> pgvector
+  embed           heading_path + first ~200 words -> vector(384) -> pgvector
+                  no LLM call in this step
 ```
 
 A 200-page handbook becomes ~150 section rows, each keeping its heading path.
@@ -134,7 +135,7 @@ sections
   document_id  uuid references documents(id) on delete cascade
   heading_path text     -- "SEECS Handbook > 7. Academic Standing > 7.3 Repeating a Course"
   content      text     -- full section text, read verbatim by the agent
-  summary      text     -- 2 sentences, written once at ingest, this is what we embed
+  embed_text   text     -- heading_path + first ~200 words; what we embed. No LLM involved.
   page_start   int
   page_end     int
   embedding    vector(384)
@@ -168,8 +169,13 @@ Indexes: HNSW on `sections.embedding`, GIN on `sections.tsv`, btree on
 
 ### Search: embed small, read big
 
-We embed `summary`, not `content`. Search matches the small thing; the agent then
-reads the entire section. Chunk boundaries therefore never cut an answer in half.
+We embed `embed_text`, not `content`. Search matches the small thing; the agent
+then reads the entire section. Chunk boundaries therefore never cut an answer in
+half.
+
+An earlier draft had an LLM write a two-sentence summary per section to embed.
+Dropped: 50,000 sections would have cost ~43M tokens, which is 86 days on Groq's
+free tier, for negligible gain over the heading path plus opening text.
 
 Hybrid search runs vector similarity and keyword search together and merges the
 scores. Both are needed:
@@ -278,9 +284,45 @@ first, reviews after.
 
 Claude writes the plumbing: SQL schema, config, boilerplate.
 
+## Models and quota
+
+| Job | Model | Reason |
+|---|---|---|
+| Agent loop | `openai/gpt-oss-120b` | Built for tool use, 500 tok/sec, 131k context |
+| Leftover classification | `llama-3.1-8b-instant` | 500K tokens/day free vs 200K — bulk work belongs here |
+
+Fallback if `gpt-oss-120b` disappoints on tool calling: `llama-3.3-70b-versatile`,
+already used by the news rewriter. Model is a single config value; switching is one
+line.
+
+### Groq free tier is a development budget, not a production one
+
+Free tier daily token caps, which bind well before the request caps:
+
+| Model | Requests/day | Tokens/day |
+|---|---|---|
+| `llama-3.1-8b-instant` | 14,400 | 500K |
+| `openai/gpt-oss-120b` | 1,000 | 200K |
+| `llama-3.3-70b-versatile` | 1,000 | 100K |
+
+One question costs roughly 4,000 tokens across its 2–3 calls. That caps the free
+tier at **~50 questions per day across all users** — fine for building, not for
+launch. Move to Groq's Developer plan before phase 8.
+
+Required either way:
+
+- Handle HTTP 429 with the `retry-after` header. Ingestion sleeps and resumes; the
+  chat route shows "busy, try again shortly" rather than an error.
+- Groq's daily cap acts as a global spend ceiling whether or not one is
+  implemented. Per-user quota is the only guard being built; be aware the free tier
+  can stop everything mid-afternoon.
+- Cached tokens do not count toward rate limits, so a stable system prompt is worth
+  keeping byte-identical across requests.
+
 ## Open questions
 
-- Where does the crawler run on a schedule — GitHub Action, or manually? Deferred
-  until after phase 1 works locally.
-- Groq model choice for the agent loop versus the classifier. The classifier can
-  use a smaller, cheaper model. Decide when measuring phase 3 output quality.
+- Whether to move to Groq's Developer plan or another provider before launch.
+  Decide at phase 5, with measured token-per-question numbers in hand.
+- Crawler scheduling: manual during phases 1–3, GitHub Action once the crawl is
+  stable. Test from Actions early — datacenter IPs are sometimes throttled by
+  university sites.
