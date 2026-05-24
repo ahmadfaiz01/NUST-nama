@@ -145,8 +145,9 @@ create policy "sections readable by authenticated" on public.sections
   );
 ```
 
-The vector index is deliberately absent. HNSW built on an empty table performs
-badly; it gets added in Task 9 once rows exist.
+The vector index is deliberately absent. HNSW works fine on an empty table — the
+reason to defer is that maintaining the index slows the bulk insert of ~50,000
+embeddings in Task 9. Build it after the backfill, not before.
 
 Writes go through the service role, which bypasses RLS. No insert or update policy
 is needed, and not having one means a compromised anon key cannot poison the
@@ -178,7 +179,8 @@ git commit -m "feat(db): documents and sections tables for the chatbot corpus"
 ## Task 2: Python project scaffolding [CLAUDE]
 
 **Files:**
-- Create: `ingest/requirements.txt`, `ingest/config.py`, `ingest/tests/__init__.py`
+- Create: `ingest/requirements.txt`, `ingest/config.py`, `ingest/__init__.py`,
+  `ingest/tests/__init__.py`
 - Modify: `.gitignore`
 
 **Interfaces:**
@@ -998,6 +1000,7 @@ as $$
       and s.tsv @@ websearch_to_tsquery('english', query_text)
       and (filter_school   is null or d.school   = filter_school)
       and (filter_doc_type is null or d.doc_type = filter_doc_type)
+    order by ts_rank_cd(s.tsv, websearch_to_tsquery('english', query_text)) desc
     limit 50
   ),
   vec as (
