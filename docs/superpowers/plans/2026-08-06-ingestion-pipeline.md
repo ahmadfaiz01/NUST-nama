@@ -26,8 +26,13 @@ cache) are Plan B, written after this one works.
 
 - Source of truth: `docs/superpowers/specs/2026-08-06-rag-chatbot-design.md`.
 - Crawl scope is `nust.edu.pk` and any `*.nust.edu.pk` host. Nothing else, ever.
-- `robots.txt` is honoured. Rate limit 1 request/second/host. User-Agent identifies
-  the project and includes a contact address.
+- `robots.txt` is honoured. Rate limit 1 request/second/host.
+- **The User-Agent must look like a browser.** Verified 2026-08-06:
+  `nust.edu.pk` answers 403 to any non-browser UA and 200 to a Chrome one. A
+  `NustNamaBot/1.0` UA collects nothing. We identify ourselves via the `From`
+  header instead, and still obey robots.txt and the rate limit. Both values live
+  in `config.USER_AGENT` and `config.CONTACT`.
+- `robots.txt` on nust.edu.pk disallows only `/wp-admin/`. Verified 2026-08-06.
 - Embeddings are `gte-small`, 384 dimensions. The same model must produce both
   section vectors and query vectors, or search silently returns garbage.
 - No LLM calls anywhere in this plan. Classification and summarisation are Plan B
@@ -493,11 +498,35 @@ git commit -m "feat(ingest): polite fetcher with per-host rate limiting and cond
 
 ## Task 5: Discovery [YOU]
 
+**Reconnaissance already done for you.** Verified against the live site on
+2026-08-06, so you are not guessing:
+
+- `nust.edu.pk` is WordPress with Yoast. `/sitemap.xml` **301s** to
+  `/sitemap_index.xml` — start there, in `config.SITEMAP_INDEX`.
+- The index lists 36 sitemaps, and their names classify their contents. Counts
+  from the useful ones: `faq` 74, `download` 46, `announcements` 36,
+  `resources-offices` 31, `under-graduate` 23, `about` 15, `page` 14,
+  `scholarship` 12, `masters-program` 12, `fee_structure` 11, `phd-program` 11,
+  `academic` 4. That is **289 highly relevant URLs** on the main site alone.
+- The bulk of the site is `tender` (6 sitemaps), `news` (5), `event` (4),
+  `photo-gallery`, `defaulter` and the `*-category` indexes. All junk for our
+  purposes. `config.SITEMAP_SKIP_PREFIXES` excludes them.
+- **This taxonomy is free classification.** A URL from `fee_structure-sitemap.xml`
+  is a fee document, certainty 100%, no LLM required. Set `doc_type` from
+  `config.SITEMAP_DOC_TYPES` as you discover, and the spec's classification step
+  mostly disappears for the main site. `download-sitemap.xml` is almost certainly
+  where the forms live.
+- 48 `*.nust.edu.pk` subdomains are linked from the homepage, including every
+  school: `seecs`, `smme`, `scee`, `scme`, `nbs`, `s3h`, `asab`, `sns`, `sines`,
+  `sada`, `nls`, `nshs`, `igis`, `iese`, `nice`, `nit`, `mce`, `mcs`, `ceme`,
+  `cae`, `pnec`, `uspcase`. You do not hardcode these — your crawler finds them
+  exactly as this check did, by reading links off the homepage.
+
 **Concept before you write it.** Two ways to find pages, used in order.
 
-*Sitemaps.* Most sites publish `/sitemap.xml` listing every page. It's faster and
-more complete than crawling, and far gentler on the server. Sitemaps often nest —
-a sitemap index pointing at more sitemaps — so follow one level down.
+*Sitemaps.* Most sites publish a sitemap listing every page. It's faster and more
+complete than crawling, and far gentler on the server. Sitemaps often nest — an
+index pointing at more sitemaps — so follow one level down.
 
 *Breadth-first crawl.* Where no sitemap exists, start at the root, extract links,
 queue the in-scope ones, repeat. Breadth-first (a `deque`, `popleft`) rather than
@@ -535,6 +564,11 @@ Hints:
 
 - Parse sitemap XML with `xml.etree.ElementTree`. Sitemap tags carry a namespace,
   so match on `tag.endswith('loc')` rather than fighting namespace prefixes.
+- Skip any child sitemap whose filename starts with a `config.SITEMAP_SKIP_PREFIXES`
+  entry. That one check removes most of the corpus by volume before you download
+  a single byte.
+- Return the sitemap's own name alongside each URL, so `download.py` can set
+  `doc_type` from `config.SITEMAP_DOC_TYPES` without an LLM.
 - Extract links with `selectolax`:
   `HTMLParser(html).css('a[href]')`, then `node.attributes.get('href')`.
 - Resolve relative links with `urljoin(current_url, href)` before normalising.
