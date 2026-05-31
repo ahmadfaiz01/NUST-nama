@@ -521,6 +521,20 @@ git commit -m "feat(ingest): polite fetcher with per-host rate limiting and cond
   `sada`, `nls`, `nshs`, `igis`, `iese`, `nice`, `nit`, `mce`, `mcs`, `ceme`,
   `cae`, `pnec`, `uspcase`. You do not hardcode these — your crawler finds them
   exactly as this check did, by reading links off the homepage.
+- **The sitemaps contain zero PDFs.** Every `<loc>` is an HTML page; the documents
+  are linked from inside those pages. `/downloads/forms/` holds 14 PDFs,
+  `/downloads/student-handbooks/` holds 4 including
+  `Revised-Undergraduate-Handbook.pdf` — the academic policy document this whole
+  project is built to answer from. So sitemap discovery and link-following are
+  **both mandatory**: sitemaps give you the right pages, links give you the
+  documents. Sitemaps alone collect nothing.
+- `ingest/seeds.py` holds the verified document hub pages and two hostel PDFs.
+  Feed `SEED_URLS` into discovery alongside the crawl root.
+- **Do not derive the year from a URL path.** Those handbooks live under
+  `/wp-content/uploads/2020/03/` but one is named
+  `BS-HND-Student-Handbook-updated-17.4.2026.pdf`. The path is the WordPress
+  upload folder — when the file was *first* uploaded, not what it covers. Read the
+  year from the filename or the document text, never the folder.
 
 **Concept before you write it.** Two ways to find pages, used in order.
 
