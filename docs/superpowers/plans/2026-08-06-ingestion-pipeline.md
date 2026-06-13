@@ -6,6 +6,11 @@
 > **[YOU]** are written by the repo owner; Claude explains the concept first and
 > reviews after. Tasks marked **[CLAUDE]** are plumbing Claude writes and the owner
 > reads. Do not let an agent silently take over a **[YOU]** task.
+>
+> **Ownership revised 2026-08-06.** The owner completed Task 3, then chose to hand
+> the crawling and parsing work to Claude and keep the AI-facing work. So Tasks 4–8
+> are Claude's, and Tasks 9 (`ingest/embed.py`) and 11 (`ingest/search.py`) are the
+> owner's, along with all of Plan B.
 
 **Goal:** Crawl NUST's websites, split every document into sections, and make those
 sections searchable by meaning and by keyword from a terminal.
