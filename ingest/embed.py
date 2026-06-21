@@ -19,27 +19,46 @@ EMBED_URL = f"{SUPABASE_URL}/functions/v1/embed"
 BATCH = 4
 
 
-def embed_texts(texts: list[str]) -> list[list[float]]:
-    """Send up to 100 texts to the edge function, get one 384-number vector each.
+def _post(texts: list[str]) -> list[list[float]] | int:
+    """One call. Returns the vectors, or the HTTP status when it failed."""
+    try:
+        response = httpx.post(
+            EMBED_URL,
+            json={"texts": texts},
+            headers={"Authorization": f"Bearer {SERVICE_KEY}"},
+            timeout=180.0,
+        )
+        if response.status_code == 200:
+            return response.json()["embeddings"]
+        return response.status_code
+    except httpx.HTTPError:
+        return 0
 
-    Retries with exponential backoff: the first call to an idle function loads the
-    model and can time out, and losing a batch of 100 to a cold start is silly.
+
+def embed_texts(texts: list[str], _depth: int = 0) -> list[list[float]]:
+    """Embed a batch, halving it on failure until the pieces fit.
+
+    The edge function returns 546 (worker resource limit) unpredictably: gte-small
+    is large relative to the memory an edge worker gets, so identical batches
+    succeed and then fail as workers recycle. A fixed batch size cannot solve that,
+    so the batch adapts instead — split on failure, and at a single text fall back
+    to patient retries while the worker recovers.
     """
-    for attempt in range(4):
-        try:
-            response = httpx.post(
-                EMBED_URL,
-                json={"texts": texts},
-                headers={"Authorization": f"Bearer {SERVICE_KEY}"},
-                timeout=120.0,
-            )
-            if response.status_code == 200:
-                return response.json()["embeddings"]
-            print(f"  embed failed {response.status_code}, retrying")
-        except httpx.HTTPError as error:
-            print(f"  embed error {error}, retrying")
-        time.sleep(2**attempt)
-    raise RuntimeError("embedding failed after 4 attempts")
+    result = _post(texts)
+    if isinstance(result, list):
+        return result
+
+    if len(texts) > 1:
+        middle = len(texts) // 2
+        return embed_texts(texts[:middle], _depth + 1) + embed_texts(texts[middle:], _depth + 1)
+
+    # Down to one text: the batch is not the problem, the worker is. Wait it out.
+    for attempt in range(6):
+        time.sleep(min(2**attempt, 30))
+        single = _post(texts)
+        if isinstance(single, list):
+            return single
+    raise RuntimeError(f"embedding failed for a single text of {len(texts[0])} chars")
 
 
 def backfill() -> None:
