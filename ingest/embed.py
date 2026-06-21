@@ -11,7 +11,12 @@ import httpx
 from ingest.config import SERVICE_KEY, SUPABASE_URL, supabase
 
 EMBED_URL = f"{SUPABASE_URL}/functions/v1/embed"
-BATCH = 100
+
+# Measured 2026-08-06 against REAL section text (~1400 chars each), which is what
+# matters — the limit is total volume, not text count. 4 succeeds, 8 fails. Short
+# synthetic strings survive batches of 10, so do not re-measure with toy data.
+# The edge function's own guard still says 100, which it cannot deliver.
+BATCH = 4
 
 
 def embed_texts(texts: list[str]) -> list[list[float]]:
