@@ -23,5 +23,33 @@ def toc_to_ranges(toc: list[tuple[int, str, int]], page_count: int) -> list[Sect
     return ranges
 
 
+MIN_SECTION = 200
+MAX_SECTION = 40_000
+
+
+def merge_small(sections: list[dict]) -> list[dict]:
+    """Fold sections under MIN_SECTION chars into the previous kept one."""
+    out: list[dict] = []
+    for s in sections:
+        prev = out[-1] if out else None
+        # merge s into prev if either is undersized (first-undersized merges forward)
+        if prev and (len(s["content"]) < MIN_SECTION or len(prev["content"]) < MIN_SECTION):
+            merged = f"{prev['content']}\n{s['content']}"
+            if len(merged) <= MAX_SECTION:
+                # an undersized first section keeps the next section's heading
+                if len(prev["content"]) < MIN_SECTION and len(s["content"]) >= MIN_SECTION:
+                    prev["heading_path"] = s["heading_path"]
+                prev["content"] = merged
+                prev["page_end"] = s["page_end"] if s["page_end"] is not None else prev["page_end"]
+                if prev["page_start"] is None:
+                    prev["page_start"] = s["page_start"]
+                prev["embed_text"] = build_embed_text(prev["heading_path"], merged)
+                continue
+        out.append(s)
+    for i, s in enumerate(out):
+        s["ordinal"] = i
+    return out
+
+
 def build_embed_text(heading_path: str, content: str, words: int = 200) -> str:
     return f"{heading_path}\n{' '.join(content.split()[:words])}"

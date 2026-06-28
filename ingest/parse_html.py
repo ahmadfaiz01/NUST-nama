@@ -4,7 +4,7 @@ import re
 
 import trafilatura
 
-from ingest.sections import build_embed_text
+from ingest.sections import build_embed_text, merge_small
 
 MIN_CONTENT = 50
 HEADING = re.compile(r"^(#{1,6})\s+(.*)")
@@ -42,4 +42,4 @@ def sections_for(document_id: str, html: str, url: str, title: str) -> list[dict
                 "page_end": None,
             }
         )
-    return out
+    return merge_small(out)
