@@ -61,6 +61,19 @@ def embed_texts(texts: list[str], _depth: int = 0) -> list[list[float]]:
     raise RuntimeError(f"embedding failed for a single text of {len(texts[0])} chars")
 
 
+def _write(rows: list[dict], vectors: list[list[float]]) -> None:
+    """Store one vector per row.
+
+    ponytail: one UPDATE per section, roughly 100ms each. Fine for a few thousand
+    sections. Batch through an RPC taking an array if a full crawl makes the
+    backfill time hurt.
+    """
+    for row, vector in zip(rows, vectors):
+        supabase().table("sections").update({"embedding": vector}).eq(
+            "id", row["id"]
+        ).execute()
+
+
 def backfill() -> None:
     """Embed every section with no vector yet.
 
@@ -69,31 +82,38 @@ def backfill() -> None:
     the database is the state.
     """
     done = 0
+    failures = 0
     while True:
-        rows = (
-            supabase()
-            .table("sections")
-            .select("id, embed_text")
-            .is_("embedding", "null")
-            .limit(BATCH)
-            .execute()
-            .data
-        )
-        if not rows:
-            break
+        try:
+            rows = (
+                supabase()
+                .table("sections")
+                .select("id, embed_text")
+                .is_("embedding", "null")
+                .limit(BATCH)
+                .execute()
+                .data
+            )
+            if not rows:
+                break
 
-        # Order matters: the edge function returns embeddings in the order it
-        # received texts, which is why zip() below is safe.
-        vectors = embed_texts([row["embed_text"] for row in rows])
+            # Order matters: the edge function returns embeddings in the order it
+            # received texts, which is why zip() below is safe.
+            vectors = embed_texts([row["embed_text"] for row in rows])
+            _write(rows, vectors)
+        except Exception as error:
+            # Long runs drop connections — "Server disconnected" killed a run at
+            # 192 of 2049. Nothing here needs to be transactional: the
+            # `embedding is null` query re-selects whatever did not get written,
+            # so a failed batch simply comes round again.
+            failures += 1
+            if failures > 15:
+                raise
+            print(f"  batch failed ({type(error).__name__}), retrying: {error}")
+            time.sleep(min(2**failures, 30))
+            continue
 
-        # ponytail: one UPDATE per section, roughly 100ms each. Fine for a few
-        # thousand sections. Batch through an RPC taking an array if a full crawl
-        # makes the backfill time hurt.
-        for row, vector in zip(rows, vectors):
-            supabase().table("sections").update({"embedding": vector}).eq(
-                "id", row["id"]
-            ).execute()
-
+        failures = 0
         done += len(rows)
         print(f"embedded {done}")
 
