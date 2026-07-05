@@ -37,6 +37,10 @@ def search(question: str, k: int = 8) -> list[dict]:
 
 
 def main() -> None:
+    # PDFs carry Wingdings bullets and other characters the Windows console
+    # cannot encode. Replace them rather than crashing on the way to the screen.
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
     if len(sys.argv) < 2:
         print('usage: python -m ingest.search "your question"')
         raise SystemExit(1)
