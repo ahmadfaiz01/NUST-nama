@@ -3,7 +3,7 @@
 import fitz  # pymupdf imports as fitz
 
 from ingest.outline import detect_outline_positions
-from ingest.sections import build_embed_text, merge_small, toc_to_ranges
+from ingest.sections import build_embed_text, merge_small, split_clauses, toc_to_ranges
 
 MIN_CONTENT = 50
 
@@ -71,4 +71,6 @@ def sections_for(document_id: str, body: bytes, title: str) -> list[dict]:
                 "page_end": page_end,
             }
         )
+    if not embedded:
+        out = split_clauses(out)
     return merge_small(out)

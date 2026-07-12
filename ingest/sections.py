@@ -1,5 +1,6 @@
 """Turn a PDF outline into section page ranges. Pure logic — no pymupdf, no DB."""
 
+import re
 from dataclasses import dataclass
 
 
@@ -46,6 +47,50 @@ def merge_small(sections: list[dict]) -> list[dict]:
                 prev["embed_text"] = build_embed_text(prev["heading_path"], merged)
                 continue
         out.append(s)
+    for i, s in enumerate(out):
+        s["ordinal"] = i
+    return out
+
+
+MIN_SPLIT = 400
+MAX_LABEL = 60
+
+# NUST handbooks carry their actual rules in lettered/numbered sub-clauses that are
+# not visually distinct, so font-based heading detection lumps them all together.
+CLAUSE_RE = re.compile(
+    r"^[ \t]*(?:\(\d{1,2}\)\s|[a-z]\.\s+(?=[A-Z])|\d{1,2}\.\s+(?=[A-Z]))",
+    re.M,
+)
+
+
+def _clause_label(chunk: str) -> str:
+    m = CLAUSE_RE.match(chunk)
+    if not m:
+        return ""
+    rest = " ".join(chunk[m.end() :].split())[:MAX_LABEL]
+    cut = min((i for i in (rest.find("."), rest.find(":")) if i >= 0), default=len(rest))
+    return f"{m.group(0).strip()} {rest[:cut]}".strip()
+
+
+def split_clauses(sections: list[dict]) -> list[dict]:
+    """Sub-split font-detected sections on `a.` / `(1)` / `1.` clause markers."""
+    out: list[dict] = []
+    seen = {s["content"] for s in sections}
+    for s in sections:
+        starts = [m.start() for m in CLAUSE_RE.finditer(s["content"])] if len(s["content"]) >= MIN_SPLIT else []
+        if len(starts) < 2:  # a lone marker is a false positive; leave the section whole
+            out.append(s)
+            continue
+        bounds = ([0] if starts[0] > 0 else []) + starts
+        for i, start in enumerate(bounds):
+            chunk = s["content"][start : bounds[i + 1] if i + 1 < len(bounds) else len(s["content"])]
+            label = _clause_label(chunk) if start in starts else ""
+            heading = f"{s['heading_path']} > {label}" if label else s["heading_path"]
+            if chunk in seen:
+                continue
+            seen.add(chunk)
+            out.append({**s, "heading_path": heading, "content": chunk,
+                        "embed_text": build_embed_text(heading, chunk)})
     for i, s in enumerate(out):
         s["ordinal"] = i
     return out
