@@ -47,13 +47,23 @@ export function availableProviders(): Provider[] {
 /**
  * Should we give up on this provider and try the next one?
  *
- * Only for failures another provider could plausibly survive: rate limits, quota
- * exhaustion, outages. A 400 means our request is malformed — the tool schema is
- * wrong, or a message is — and it will fail identically everywhere, so falling
- * back would burn every quota we have on the same broken request.
+ * Yes for anything specific to THIS provider: rate limits (429), billing (402),
+ * outages (5xx), and bad or blocked credentials (401, 403). Gemini returns 403
+ * "project has been denied access" in unsupported countries — a permanent
+ * condition for that provider that must not take the whole request down.
+ *
+ * No for 400. That means OUR request is malformed — a bad tool schema, say — and
+ * it will fail identically everywhere, so falling back would burn every quota we
+ * have on the same broken request and report an outage that isn't happening.
  */
 export function shouldFailOver(status: number): boolean {
-  return status === 429 || status === 402 || status >= 500;
+  return (
+    status === 429 ||
+    status === 402 ||
+    status === 401 ||
+    status === 403 ||
+    status >= 500
+  );
 }
 
 export type ChatResult = {
