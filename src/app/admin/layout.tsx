@@ -14,6 +14,7 @@ const sidebarLinks = [
     { href: "/admin", label: "Dashboard", icon: "📊" },
     { href: "/admin/events", label: "Events", icon: "📅" },
     { href: "/admin/news", label: "News Desk", icon: "📰" },
+    { href: "/admin/documents", label: "Documents", icon: "📄" },
     { href: "/admin/users", label: "Users", icon: "👥" },
     { href: "/admin/gupshup", label: "Gupshup Requests", icon: "💬" },
     { href: "/admin/stats", label: "Stats", icon: "📈" },
