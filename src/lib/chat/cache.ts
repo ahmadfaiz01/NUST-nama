@@ -10,12 +10,22 @@ const supabaseAdmin = createClient(
 );
 
 /**
- * Primary key of `answer_cache`. Must stay deterministic and stable forever —
+ * Bump whenever the system prompt changes in a way that changes answers.
+ *
+ * Without this a prompt fix can never reach a question anyone has already
+ * asked: the cache answers first, and the loudest complaints come from exactly
+ * the questions that get asked twice. Every old row is orphaned by the bump and
+ * ages out on the 30-day sweep.
+ */
+const PROMPT_VERSION = "2";
+
+/**
+ * Primary key of `answer_cache`. Deterministic for a given prompt version —
  * changing the normalisation silently orphans every existing row.
  */
 export function questionHash(question: string): string {
   const normalised = question.toLowerCase().trim().replace(/\s+/g, " ");
-  return createHash("sha256").update(normalised).digest("hex");
+  return createHash("sha256").update(`v${PROMPT_VERSION}:${normalised}`).digest("hex");
 }
 
 export async function getCached(
