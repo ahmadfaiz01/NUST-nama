@@ -1,0 +1,26 @@
+/**
+ * Run: npx tsx scripts/answer-text.test.ts
+ *
+ * The answer renderer parses model output, which is the least predictable input
+ * in the app. These are the two things that break silently: a link the model
+ * pasted despite being told not to, and a step list that stops being a list.
+ */
+import assert from "assert";
+import { withoutLinks, STEP } from "../src/components/chat/AnswerText";
+
+// A line that was only a link label disappears entirely.
+assert.deepStrictEqual(
+  withoutLinks("Fill in the form.\n**Form link:** https://nust.edu.pk/a.pdf\nSubmit it."),
+  ["Fill in the form.", "Submit it."],
+);
+
+// A link inside a sentence goes; the sentence stays.
+assert.deepStrictEqual(withoutLinks("Download it at https://x.pdf today"), ["Download it at today"]);
+
+// Numbered, bracketed, dashed and bulleted steps all parse; prose does not.
+for (const line of ["1. Pay the fee", "2) Pay the fee", "- Pay the fee", "• Pay the fee"]) {
+  assert.strictEqual(line.match(STEP)?.[2], "Pay the fee", line);
+}
+assert.strictEqual("You need 75% attendance.".match(STEP), null);
+
+console.log("ok");

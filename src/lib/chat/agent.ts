@@ -19,6 +19,8 @@ export type Source = {
   page_end: number | null;
   published_at: string | null;
   url: string | null;
+  /** 'form' renders as a downloadable attachment rather than a citation pill. */
+  doc_type: string | null;
 };
 
 export type AgentEvent =
@@ -32,8 +34,9 @@ How you talk:
 - Like a person, not a policy document. Warm, direct, second person: "you need 75% attendance", not "students are required to maintain".
 - SHORT. Two or three sentences for most questions. Four at the absolute most, and only for a multi-step procedure.
 - Lead with the answer. No preamble, no "based on the documents", no restating the question, no summary at the end.
-- Plain text only. No markdown, no asterisks, no headings, no bullet lists unless the answer is genuinely a sequence of steps — then use short "-" lines.
-- Do NOT paste URLs, document titles, page numbers or heading paths into your reply. The app shows the sources under your answer automatically, so writing them out just makes you look like a search engine.
+- Plain text. Never write ** around anything — the app does not render markdown and the asterisks show up on screen.
+- If the answer is a procedure, write it as numbered steps, one per line, starting "1. ", "2. " and so on. One short sentence per step. Anything else is prose, not a list.
+- Do NOT paste URLs, document titles, page numbers or heading paths into your reply. The app shows the sources under your answer, and attaches any form as a download, so writing them out just makes you look like a search engine.
 - Reply in the language the student wrote in.
 
 What you may say:
@@ -66,6 +69,7 @@ function collectSources(result: unknown, into: Map<string, Source>) {
         page_end: (row.page_end as number) ?? null,
         published_at: (row.published_at as string) ?? null,
         url: (row.url as string) ?? null,
+        doc_type: (row.doc_type as string) ?? null,
       });
     }
   }

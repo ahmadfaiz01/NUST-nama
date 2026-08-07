@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { Citation } from "./Citation";
+import { Citation, FormCard } from "./Citation";
+import { AnswerText } from "./AnswerText";
 import type { Source } from "@/lib/chat/agent";
 
 type Turn = {
@@ -26,6 +27,23 @@ const EXAMPLES = [
     "How do I freeze a semester?",
     "What events are on this week?",
 ];
+
+/**
+ * Forms shown as attachments, one card per document — several sections of the
+ * same PDF come back as separate sources and would otherwise stack up as three
+ * identical download cards.
+ */
+function forms(turn: Turn): Source[] {
+    const byUrl = new Map<string, Source>();
+    for (const source of turn.sources) {
+        if (source.doc_type === "form" && source.url) byUrl.set(source.url, source);
+    }
+    return [...byUrl.values()];
+}
+
+function references(turn: Turn): Source[] {
+    return turn.sources.filter((source) => source.doc_type !== "form" || !source.url);
+}
 
 export function ChatPanel({ compact = false }: { compact?: boolean }) {
     const [question, setQuestion] = useState("");
@@ -141,25 +159,33 @@ export function ChatPanel({ compact = false }: { compact?: boolean }) {
                                     <p className="text-sm text-gray-500 animate-pulse">{turn.status}</p>
                                 )}
 
-                                {turn.answer && (
-                                    <p
-                                        className={`text-sm leading-relaxed whitespace-pre-wrap break-words ${turn.error ? "text-amber-700" : ""
-                                            }`}
-                                    >
-                                        {turn.answer}
-                                    </p>
+                                {turn.answer &&
+                                    (turn.error ? (
+                                        <p className="text-sm text-amber-700">{turn.answer}</p>
+                                    ) : (
+                                        <AnswerText text={turn.answer} />
+                                    ))}
+
+                                {/* Forms first and unfolded: they are the thing the
+                                    student came for, not a reference for the answer. */}
+                                {forms(turn).length > 0 && (
+                                    <div className="space-y-2 pt-1">
+                                        {forms(turn).map((source) => (
+                                            <FormCard key={source.section_id} source={source} />
+                                        ))}
+                                    </div>
                                 )}
 
-                                {turn.sources.length > 0 && (
+                                {references(turn).length > 0 && (
                                     <details className="text-xs">
                                         <summary className="cursor-pointer text-nust-blue font-bold">
-                                            Where this came from ({turn.sources.length})
+                                            Where this came from ({references(turn).length})
                                         </summary>
-                                        <ul className="mt-2 space-y-2">
-                                            {turn.sources.map((source) => (
+                                        <div className="mt-2 flex flex-wrap gap-1.5">
+                                            {references(turn).map((source) => (
                                                 <Citation key={source.section_id} source={source} />
                                             ))}
-                                        </ul>
+                                        </div>
                                     </details>
                                 )}
                             </div>
