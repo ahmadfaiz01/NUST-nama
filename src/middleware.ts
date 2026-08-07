@@ -1,7 +1,13 @@
 import { updateSession } from '@/lib/supabase/middleware';
-import { type NextRequest } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
+import { GUPSHUP_ENABLED } from '@/lib/flags';
 
 export async function middleware(request: NextRequest) {
+    // One gate for the whole feature. Hiding the nav link alone leaves /chatter
+    // reachable by anyone who guesses the URL or has it in their history.
+    if (!GUPSHUP_ENABLED && request.nextUrl.pathname.startsWith('/chatter')) {
+        return NextResponse.redirect(new URL('/', request.url));
+    }
     return await updateSession(request);
 }
 

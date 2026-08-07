@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { GUPSHUP_ENABLED } from "@/lib/flags";
 
 import posthog from "posthog-js";
 
@@ -96,9 +97,9 @@ export function NavBar() {
         { href: "/events", label: "Events" },
         { href: "/calendar", label: "Calendar" },
         { href: "/news", label: "News" },
-        { href: "/chatter", label: "Gupshup" },
         { href: "/about", label: "About" },
     ];
+    if (GUPSHUP_ENABLED) navLinks.splice(4, 0, { href: "/chatter", label: "Gupshup" });
 
     return (
         <header className="fixed top-0 left-0 right-0 z-50 bg-nust-blue border-b-2 border-nust-orange py-2">

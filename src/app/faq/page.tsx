@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { GUPSHUP_ENABLED } from "@/lib/flags";
 
 const faqs = [
     {
@@ -16,10 +17,16 @@ const faqs = [
         q: "What is the Campus Heatmap?",
         a: "It shows real-time activity across NUST H-12 — which buildings and spots have events right now and how active they are.",
     },
-    {
-        q: "What is Gupshup?",
-        a: "Gupshup is NUST's live campus chat. Join topic or event rooms and chat with other students in real time.",
-    },
+    // Gupshup is behind GUPSHUP_ENABLED until it has moderation. Answering a
+    // question about a feature nobody can open just reads as a broken link.
+    ...(GUPSHUP_ENABLED
+        ? [
+            {
+                q: "What is Gupshup?",
+                a: "Gupshup is NUST's live campus chat. Join topic or event rooms and chat with other students in real time.",
+            },
+        ]
+        : []),
     {
         q: "What are Crowd Vibes?",
         a: "When you check in at an event (GPS-verified), you submit a vibe — positive, neutral, or negative. Crowd Vibes show the live sentiment of everyone there.",
@@ -64,7 +71,7 @@ export default function FAQPage() {
                     <div className="flex flex-wrap gap-3 justify-center">
                         <Link href="/post-event" className="btn btn-primary">📝 Post an Event</Link>
                         <Link href="/events" className="btn btn-outline">🎯 Explore Events</Link>
-                        <Link href="/chatter" className="btn btn-outline">💬 Gupshup</Link>
+                        {GUPSHUP_ENABLED && <Link href="/chatter" className="btn btn-outline">💬 Gupshup</Link>}
                         <Link href="/profile" className="btn btn-outline">👤 My Profile</Link>
                     </div>
                 </div>
