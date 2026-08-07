@@ -24,8 +24,12 @@ export function Citation({ source }: { source: Source }) {
         <li className="border-l-2 border-nust-orange pl-3 py-1 text-xs break-words">
             <span className="font-bold text-nust-blue">{source.title ?? "NUST document"}</span>
             {source.heading_path && (
-                // Heading paths run long and must wrap, not overflow, at 375px.
-                <span className="block text-gray-600 break-words">{source.heading_path}</span>
+                // Only the last segment. The full path is a chain of six headings
+                // carrying whatever text ran on from the PDF, which reads as noise
+                // and overflows at 375px; the leaf is the bit that located the answer.
+                <span className="block text-gray-600 break-words">
+                    {source.heading_path.split(">").pop()?.trim()}
+                </span>
             )}
             <span className="block text-gray-500">
                 {[pages, source.published_at?.slice(0, 10)].filter(Boolean).join(" · ")}

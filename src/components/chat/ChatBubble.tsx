@@ -26,7 +26,7 @@ export function ChatBubble() {
                 aria-label="Ask NUST Nama"
                 className="fixed bottom-4 right-4 z-50 h-14 w-14 rounded-full bg-nust-orange text-nust-blue text-2xl font-bold border-2 border-nust-blue shadow-[3px_3px_0px_var(--nust-blue)] hover:translate-y-[2px] hover:shadow-none transition-all"
             >
-                {open ? "✕" : "?"}
+                {open ? "✕" : "🤖"}
             </button>
         </>
     );

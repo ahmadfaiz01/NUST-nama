@@ -9,13 +9,24 @@ export const metadata: Metadata = {
 
 export default function AskPage() {
     return (
-        <div className="container max-w-3xl pb-10">
-            <h1 className="font-heading text-4xl text-nust-blue tracking-wide">ASK NUST NAMA</h1>
-            <p className="text-sm text-gray-600 mb-4">
-                Answers come from NUST&apos;s own documents. Every one carries its source, so you
-                can check it yourself.
-            </p>
-            <div className="h-[70vh] bg-white border-2 border-nust-blue shadow-[6px_6px_0px_var(--nust-blue)] px-4">
+        // The panel scrolls internally, so the page itself must not: a chat that
+        // scrolls the whole window pushes the input box off the screen mid-answer.
+        <div className="container max-w-3xl h-[calc(100dvh-7rem)] pb-4 flex flex-col min-h-0">
+            <div className="flex-1 min-h-0 flex flex-col bg-cream border-2 border-nust-blue shadow-[6px_6px_0px_var(--nust-blue)] overflow-hidden">
+                <div className="flex items-center gap-3 bg-nust-blue text-white px-4 py-3 shrink-0">
+                    <span className="text-2xl" aria-hidden>
+                        🤖
+                    </span>
+                    <div className="min-w-0">
+                        <h1 className="font-heading text-2xl tracking-wide leading-none">
+                            ASK NUST NAMA
+                        </h1>
+                        <p className="text-xs text-white/70 truncate">
+                            Answers from NUST&apos;s own handbooks, policies and forms
+                        </p>
+                    </div>
+                </div>
+
                 <ChatPanel />
             </div>
         </div>
