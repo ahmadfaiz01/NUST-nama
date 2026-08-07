@@ -33,6 +33,16 @@ export const PROVIDERS: Provider[] = [
     model: "openai/gpt-oss-120b",
   },
   {
+    name: "mistral",
+    baseUrl: "https://api.mistral.ai/v1",
+    apiKey: process.env.MISTRAL_API_KEY,
+    model: "mistral-large-latest",
+  },
+  {
+    // Last, because Gemini's API is not served in Pakistan: verified 2026-08-07,
+    // both the OpenAI-compatible and native endpoints return 403 "project has
+    // been denied access" while /models still returns 200. Harmless to leave —
+    // 403 fails over — and it starts working if access is ever granted.
     name: "gemini",
     baseUrl: "https://generativelanguage.googleapis.com/v1beta/openai",
     apiKey: process.env.GEMINI_API_KEY,
