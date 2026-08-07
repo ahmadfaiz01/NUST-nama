@@ -11,8 +11,16 @@
  */
 
 const BOLD = /\*\*(.+?)\*\*/g;
-/** "1." / "1)" / "-" / "•" at the start of a line, with the marker captured. */
-export const STEP = /^\s*(?:(\d+)[.)]|[-–•*])\s+(.*)$/;
+/**
+ * A step is a NUMBERED line and nothing else.
+ *
+ * Treating "-" bullets as steps too produced a twelve-step "journey" for a
+ * question with three real steps: the model's sub-points and its headings all
+ * got their own number, and "Who to ask:" arrived as step 9.
+ */
+export const STEP = /^\s*\d+[.)]\s+(.*)$/;
+/** Sub-points under a step, or a plain list. Rendered as bullets, not a journey. */
+export const BULLET = /^\s*[-‐‑‒–—―−•*]\s+(.*)$/;
 
 function inline(text: string, key: number) {
     // Split on the bold pairs, keeping the captures: odd indexes are the bold bits.
@@ -58,14 +66,24 @@ export function withoutLinks(text: string): string[] {
 export function AnswerText({ text }: { text: string }) {
     const lines = withoutLinks(text);
 
-    // Group runs of step lines so a paragraph before them stays a paragraph.
-    const blocks: Array<{ type: "p"; text: string } | { type: "steps"; items: string[] }> = [];
+    // Group runs of like lines, so a paragraph before a list stays a paragraph.
+    type Block =
+        | { type: "p"; text: string }
+        | { type: "steps"; items: string[] }
+        | { type: "bullets"; items: string[] };
+
+    const blocks: Block[] = [];
     for (const line of lines) {
         const step = line.match(STEP);
+        const bullet = line.match(BULLET);
         const last = blocks[blocks.length - 1];
+
         if (step) {
-            if (last?.type === "steps") last.items.push(step[2]);
-            else blocks.push({ type: "steps", items: [step[2]] });
+            if (last?.type === "steps") last.items.push(step[1]);
+            else blocks.push({ type: "steps", items: [step[1]] });
+        } else if (bullet) {
+            if (last?.type === "bullets") last.items.push(bullet[1]);
+            else blocks.push({ type: "bullets", items: [bullet[1]] });
         } else {
             blocks.push({ type: "p", text: line });
         }
@@ -78,6 +96,17 @@ export function AnswerText({ text }: { text: string }) {
                     <p key={i} className="break-words">
                         {inline(block.text, i)}
                     </p>
+                ) : block.type === "bullets" ? (
+                    <ul key={i} className="space-y-1">
+                        {block.items.map((item, j) => (
+                            <li key={j} className="flex gap-2 break-words">
+                                <span className="text-nust-orange shrink-0" aria-hidden>
+                                    •
+                                </span>
+                                <span>{inline(item, j)}</span>
+                            </li>
+                        ))}
+                    </ul>
                 ) : (
                     <ol key={i} className="space-y-3">
                         {block.items.map((item, j) => (

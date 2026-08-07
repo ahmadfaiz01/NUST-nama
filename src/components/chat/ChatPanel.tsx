@@ -41,8 +41,17 @@ function forms(turn: Turn): Source[] {
     return [...byUrl.values()];
 }
 
+/**
+ * Citations, capped. A question the corpus answers badly makes the model search
+ * four times over, and twelve pills under a thin answer reads as twelve reasons
+ * not to trust it.
+ */
+const MAX_REFERENCES = 6;
+
 function references(turn: Turn): Source[] {
-    return turn.sources.filter((source) => source.doc_type !== "form" || !source.url);
+    return turn.sources
+        .filter((source) => source.doc_type !== "form" || !source.url)
+        .slice(0, MAX_REFERENCES);
 }
 
 export function ChatPanel({ compact = false }: { compact?: boolean }) {

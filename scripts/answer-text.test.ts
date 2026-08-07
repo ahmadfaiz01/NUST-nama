@@ -6,7 +6,7 @@
  * pasted despite being told not to, and a step list that stops being a list.
  */
 import assert from "assert";
-import { withoutLinks, STEP } from "../src/components/chat/AnswerText";
+import { withoutLinks, STEP, BULLET } from "../src/components/chat/AnswerText";
 
 // A line that was only a link label disappears entirely.
 assert.deepStrictEqual(
@@ -24,10 +24,18 @@ assert.deepStrictEqual(withoutLinks("[Download the form](https://x.pdf) now"), [
 ]);
 assert.deepStrictEqual(withoutLinks("[Download the form](https://x.pdf"), ["Download the form"]);
 
-// Numbered, bracketed, dashed and bulleted steps all parse; prose does not.
-for (const line of ["1. Pay the fee", "2) Pay the fee", "- Pay the fee", "• Pay the fee"]) {
-  assert.strictEqual(line.match(STEP)?.[2], "Pay the fee", line);
+// Only numbered lines are steps. Bullets are bullets, prose is prose.
+for (const line of ["1. Pay the fee", "2) Pay the fee"]) {
+  assert.strictEqual(line.match(STEP)?.[1], "Pay the fee", line);
 }
+assert.strictEqual("- Pay the fee".match(STEP), null);
 assert.strictEqual("You need 75% attendance.".match(STEP), null);
+
+// Every dash the model reaches for, not just the ASCII one: gpt-oss writes
+// U+2011, which is why a dashed list rendered as flat paragraphs.
+for (const dash of ["-", "‐", "‑", "–", "—", "−", "•", "*"]) {
+  assert.strictEqual(`${dash} Pay the fee`.match(BULLET)?.[1], "Pay the fee", dash);
+}
+assert.strictEqual("You need 75% attendance.".match(BULLET), null);
 
 console.log("ok");
