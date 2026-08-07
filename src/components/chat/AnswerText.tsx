@@ -42,7 +42,15 @@ function inline(text: string, key: number) {
 export function withoutLinks(text: string): string[] {
     return text
         .split("\n")
-        .map((line) => line.replace(/https?:\/\/\S+/g, "").replace(/\s{2,}/g, " ").trim())
+        .map((line) =>
+            line
+                // Unwrap markdown links to their text FIRST. Stripping the URL
+                // first leaves "[Download the form](" stranded on the page.
+                .replace(/\[([^\]]*)\]\(\s*[^)]*\)?/g, "$1")
+                .replace(/https?:\/\/\S+/g, "")
+                .replace(/\s{2,}/g, " ")
+                .trim(),
+        )
         // The label may still be wearing its markdown: "**Form link:**".
         .filter((line) => line !== "" && !/^[-*\s]*[\w\s]{0,20}:\**$/.test(line));
 }

@@ -36,6 +36,8 @@ How you talk:
 - Lead with the answer. No preamble, no "based on the documents", no restating the question, no summary at the end.
 - Plain text. Never write ** around anything — the app does not render markdown and the asterisks show up on screen.
 - If the answer is a procedure, write it as numbered steps, one per line, starting "1. ", "2. " and so on. One short sentence per step. Anything else is prose, not a list.
+- Never answer a "how do I…" question with just the form. The student wants to know what actually happens: what they fill in, what it costs, who they hand it to, how long it takes. Give those steps. The form is attached to your answer automatically — you do not need to hand it over, and saying "here is the form" as your whole answer is a non-answer. Do not mention the attachment either — the student can see it.
+- Never write a markdown link like [text](url). Just say what the thing is.
 - Do NOT paste URLs, document titles, page numbers or heading paths into your reply. The app shows the sources under your answer, and attaches any form as a download, so writing them out just makes you look like a search engine.
 - Reply in the language the student wrote in.
 
@@ -57,9 +59,17 @@ type ToolCall = { id: string; function: { name: string; arguments: string } };
  */
 const SOURCES_PER_CALL = 3;
 
-function collectSources(result: unknown, into: Map<string, Source>) {
+/**
+ * Forms are shown as download cards, and a wrong card is worse than a wrong
+ * citation — it looks like the thing the student is meant to fill in. Search
+ * ranks them, so keep the top one and drop the rest: "Instructions for Filling
+ * Bond" sitting under a rechecking question is noise wearing a form's clothes.
+ */
+const FORMS_PER_CALL = 1;
+
+function collectSources(result: unknown, into: Map<string, Source>, limit: number) {
   if (!Array.isArray(result)) return;
-  for (const row of (result as Record<string, unknown>[]).slice(0, SOURCES_PER_CALL)) {
+  for (const row of (result as Record<string, unknown>[]).slice(0, limit)) {
     if (row && typeof row.section_id === "string") {
       into.set(row.section_id, {
         section_id: row.section_id,
@@ -128,7 +138,11 @@ export async function* askAgent(
           JSON.parse(call.function.arguments || "{}"),
           userId,
         );
-        collectSources(output, sources);
+        collectSources(
+          output,
+          sources,
+          call.function.name === "find_forms" ? FORMS_PER_CALL : SOURCES_PER_CALL,
+        );
       } catch (error) {
         // Tell the model the tool failed; it can try another phrasing.
         output = { error: String(error) };

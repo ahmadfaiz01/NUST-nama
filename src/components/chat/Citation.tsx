@@ -40,25 +40,33 @@ function pageLabel(source: Source): string | null {
  */
 export function FormCard({ source }: { source: Source }) {
     return (
-        <a
-            href={source.url ?? "#"}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 border-2 border-nust-blue bg-white px-3 py-2 hover:bg-nust-orange/10 transition-colors"
-        >
-            <span className="text-2xl shrink-0" aria-hidden>
-                📄
-            </span>
-            <span className="min-w-0">
-                <span className="block font-bold text-nust-blue text-sm break-words">
-                    {displayTitle(source)}
+        <div className="border-2 border-nust-blue bg-white shadow-[3px_3px_0px_var(--nust-blue)]">
+            <p className="bg-nust-orange text-nust-blue text-xs font-bold uppercase tracking-wide px-3 py-1">
+                Here&apos;s your form
+            </p>
+            <div className="flex items-center gap-3 p-3">
+                <span className="text-3xl shrink-0" aria-hidden>
+                    📄
                 </span>
-                <span className="block text-xs text-gray-500">
-                    PDF · opens on nust.edu.pk
-                    {isStale(source.published_at) && " · check it is the current version"}
-                </span>
-            </span>
-        </a>
+                <div className="min-w-0 flex-1">
+                    <p className="font-bold text-nust-blue text-sm break-words leading-tight">
+                        {displayTitle(source)}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                        PDF from nust.edu.pk
+                        {source.published_at && ` · ${source.published_at.slice(0, 4)}`}
+                    </p>
+                </div>
+                <a
+                    href={source.url ?? "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shrink-0 bg-nust-blue text-white text-xs font-bold rounded-full px-4 py-2 hover:bg-nust-orange hover:text-nust-blue transition-colors"
+                >
+                    Open PDF
+                </a>
+            </div>
+        </div>
     );
 }
 

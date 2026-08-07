@@ -17,6 +17,13 @@ assert.deepStrictEqual(
 // A link inside a sentence goes; the sentence stays.
 assert.deepStrictEqual(withoutLinks("Download it at https://x.pdf today"), ["Download it at today"]);
 
+// Markdown links keep their text. The truncated form is what actually shipped:
+// the URL was stripped first and left "[Download the form](" on screen.
+assert.deepStrictEqual(withoutLinks("[Download the form](https://x.pdf) now"), [
+  "Download the form now",
+]);
+assert.deepStrictEqual(withoutLinks("[Download the form](https://x.pdf"), ["Download the form"]);
+
 // Numbered, bracketed, dashed and bulleted steps all parse; prose does not.
 for (const line of ["1. Pay the fee", "2) Pay the fee", "- Pay the fee", "• Pay the fee"]) {
   assert.strictEqual(line.match(STEP)?.[2], "Pay the fee", line);
