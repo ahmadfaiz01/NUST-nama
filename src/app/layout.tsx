@@ -3,6 +3,7 @@ import { Bebas_Neue, Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
 import { NavBar } from "@/components/layout/NavBar";
 import { Footer } from "@/components/layout/Footer";
+import { ChatBubble } from "@/components/chat/ChatBubble";
 
 // Typography Setup - Pretty Patty Inspired
 const bebasNeue = Bebas_Neue({
@@ -95,6 +96,7 @@ export default function RootLayout({
           <NavBar />
           <main className="pt-24">{children}</main>
           <Footer />
+          <ChatBubble />
         </PostHogProvider>
       </body>
     </html>

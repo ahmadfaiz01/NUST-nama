@@ -92,6 +92,7 @@ export function NavBar() {
     };
 
     const navLinks = [
+        { href: "/ask", label: "Ask" },
         { href: "/events", label: "Events" },
         { href: "/calendar", label: "Calendar" },
         { href: "/news", label: "News" },

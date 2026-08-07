@@ -13,6 +13,10 @@ create table if not exists public.chat_messages (
   created_at timestamptz not null default now()
 );
 
+-- Which provider in the chain answered. Quality differs between gpt-oss-120b
+-- and Mistral, and a complaint about a bad answer is unreadable without it.
+alter table public.chat_messages add column if not exists provider text;
+
 -- Supports the per-user daily quota count, which runs on every question.
 create index if not exists chat_messages_user_day_idx
   on public.chat_messages (user_id, created_at desc);

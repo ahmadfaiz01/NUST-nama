@@ -96,7 +96,7 @@ export type ChatResult = {
  */
 export async function chat(
   messages: unknown[],
-  tools: unknown[],
+  tools: readonly unknown[],
   pinned?: string,
 ): Promise<ChatResult> {
   const chain = availableProviders();
@@ -104,7 +104,14 @@ export async function chat(
     throw new Error("No chat provider configured. Set GROQ_API_KEY or GEMINI_API_KEY.");
   }
 
-  const candidates = pinned ? chain.filter((p) => p.name === pinned) : chain;
+  // `pinned` is a preference, not a restriction: try that provider first, but
+  // still fall through the rest if it is rate-limited. Keeping the whole loop on
+  // one model makes failures readable; refusing to switch makes them fatal, and
+  // a mid-loop switch only means one model reads another's tool calls, which are
+  // ordinary messages.
+  const candidates = pinned
+    ? [...chain.filter((p) => p.name === pinned), ...chain.filter((p) => p.name !== pinned)]
+    : chain;
   const failures: string[] = [];
 
   for (const provider of candidates) {
