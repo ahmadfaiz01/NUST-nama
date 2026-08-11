@@ -66,20 +66,23 @@ answer as unverified — the model may be filling a corpus gap.
 
 ## Blocked on the owner
 
-1. Run in the Supabase SQL Editor (not `supabase db push` — colliding version
-   prefixes and a cron migration with placeholder credentials):
-   ```sql
-   alter table public.chat_messages add column if not exists provider text;
-   ```
-   Until this runs, every `chat_messages` insert fails and the daily quota never
-   counts. The route logs it.
-2. Apply `supabase/migrations/20260809_documents_admin_policies.sql`. Without it
-   the admin blacklist toggle silently does nothing.
-3. Vercel env: `GROQ_API_KEY`, `MISTRAL_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`,
-   `INGEST_API_SECRET_KEY`. The last has never been set, so the n8n webhook 500s
-   in production.
-4. Nobody has asked a question while signed in yet. Quota, cache write and the
+Both SQL items are done as of 12 Aug — the `provider` column and the admin
+policies are applied to `nftxbjprlwhgivqanbxn`, which holds the 3,485-section
+corpus. Two things remain:
+
+1. Vercel env vars. The project is `nustnama` under the team slug
+   `ahmad-faizs-projects-7990d88e` (an older `nust-nama` project also exists and
+   is dead). Paste every var from `.env.local.example`; values are in
+   `.env.local`, including the `INGEST_API_SECRET_KEY` generated on 12 Aug. The
+   same secret has to go into n8n's `x-api-secret` header, or the webhook keeps
+   500ing — the route fails closed when the key is unset. Redeploy afterwards;
+   env changes do not reach an existing build.
+2. Nobody has asked a question while signed in yet. Quota, cache write and the
    `chat_messages` insert are the only untested paths.
+
+Watch the project picker in the Supabase SQL Editor. The `provider` column was
+first added to `find-my-uni` by mistake, which is why `public.documents` came
+back as not existing; it was dropped there again, empty.
 
 ## Other state
 
@@ -93,6 +96,11 @@ answer as unverified — the model may be filling a corpus gap.
   `reasoning` field on assistant messages and Mistral 422s on it, so `agent.ts`
   rebuilds each assistant message from role/content/tool_calls before replaying
   it. Do not push the raw message back into the history.
+- **Two env vars were misnamed** in `.env.local` until 12 Aug: `GROQ_API_KEY2`
+  and `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN`, where the code reads `GROQ_API_KEY_2`
+  and `NEXT_PUBLIC_POSTHOG_KEY`. So the second Groq key never fired and PostHog
+  never received an event. Both renamed. `.env.local.example` is the source of
+  truth for names.
 - **The model ignores formatting instructions** perhaps a third of the time —
   markdown, pasted URLs, `[text](url)`. `AnswerText.tsx` strips them
   deterministically. Prompting alone did not hold.
