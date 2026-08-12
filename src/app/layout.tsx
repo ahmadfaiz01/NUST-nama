@@ -44,16 +44,12 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "NUST Nama Team" }],
   creator: "NUST Nama",
-  icons: {
-    icon: [
-      { url: "/favicon.ico" },
-      { url: "/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-    ],
-    apple: [
-      { url: "/apple-touch-icon.png" },
-    ],
-  },
+  // No `icons` here on purpose: it would override the file convention. The tab
+  // icon comes from src/app/icon.png and src/app/apple-icon.png, both the
+  // wordmark, so the logo is the single source and cannot drift again.
+  // src/app/favicon.ico used to sit alongside them holding Next's stock black
+  // triangle, and being an app-directory file it won every request for
+  // /favicon.ico regardless of what public/ or this block said.
   openGraph: {
     type: "website",
     locale: "en_US",
