@@ -28,7 +28,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://nustnama.vercel.app"),
+  metadataBase: new URL("https://nustnama.life"),
   title: "NUST Nama | Campus Events & Live Vibes",
   description:
     "Discover events, feel the crowd vibe, and coordinate with friends at NUST. Your campus intelligence platform.",
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://nustnama.vercel.app",
+    url: "https://nustnama.life",
     siteName: "NUST Nama",
     title: "NUST Nama | Campus Events & Live Vibes",
     description:

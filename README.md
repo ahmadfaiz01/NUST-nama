@@ -2,7 +2,7 @@
 
 Campus events, news and chatter for NUST students. Next.js 16 + Supabase.
 
-Live: https://nustnama.vercel.app
+Live: https://nustnama.life
 
 ## Features
 
