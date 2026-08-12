@@ -94,12 +94,19 @@ export function NavBar() {
 
     const navLinks = [
         { href: "/ask", label: "Ask" },
+        { href: "/map", label: "Map" },
         { href: "/events", label: "Events" },
         { href: "/calendar", label: "Calendar" },
         { href: "/news", label: "News" },
         { href: "/about", label: "About" },
     ];
-    if (GUPSHUP_ENABLED) navLinks.splice(4, 0, { href: "/chatter", label: "Gupshup" });
+    // Sits just before About, wherever About happens to be.
+    if (GUPSHUP_ENABLED) {
+        navLinks.splice(navLinks.findIndex((l) => l.href === "/about"), 0, {
+            href: "/chatter",
+            label: "Gupshup",
+        });
+    }
 
     return (
         <header className="fixed top-0 left-0 right-0 z-50 bg-nust-blue border-b-2 border-nust-orange py-2">
