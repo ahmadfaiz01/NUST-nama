@@ -58,7 +58,7 @@ export function EventCard({ event, index = 0 }: EventCardProps) {
 
                 {/* Date & Badge Header Row */}
                 <div className={`flex justify-between items-start mb-3 relative z-10 ${event.poster_url ? "p-4 pb-0" : "p-4 pt-5 pb-0"}`}>
-                    <div className="bg-nust-blue text-white rounded-xl p-2 text-center border border-nust-blue min-w-[56px] shadow-sm">
+                    <div className="bg-nust-orange text-white rounded-2xl p-2 text-center border-2 border-nust-blue min-w-[56px] shadow-[2px_2px_0px_var(--nust-blue)]">
                         <span className="block font-heading text-2xl leading-none">{day}</span>
                         <span className="block font-display text-[11px] font-bold uppercase">{month}</span>
                     </div>
