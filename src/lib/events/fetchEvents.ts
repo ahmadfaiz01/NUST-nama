@@ -60,7 +60,6 @@ export async function fetchEvents({
       tags,
       status,
       is_official,
-      sentiment,
       rsvps(count),
       checkins(count)
     `
