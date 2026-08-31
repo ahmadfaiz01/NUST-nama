@@ -143,7 +143,21 @@ export default function EventDetailPage() {
                                 📝 Event Details
                             </h2>
                             <p className="text-gray-600 whitespace-pre-line leading-relaxed text-lg">
-                                {event.description}
+                                {event.description?.split(/(https?:\/\/[^\s]+)/g).map((part, i) =>
+                                    part.match(/^https?:\/\//) ? (
+                                        <a
+                                            key={i}
+                                            href={part}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-nust-blue font-bold underline hover:text-nust-orange transition-colors break-all"
+                                        >
+                                            {part} ↗
+                                        </a>
+                                    ) : (
+                                        part
+                                    )
+                                )}
                             </p>
 
                             {/* Tags */}

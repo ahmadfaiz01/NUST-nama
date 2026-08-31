@@ -47,16 +47,16 @@ export default function HomePage() {
                 }}
             >
                 {/* Decorative Hero Images (Static for now, could be dynamic later) */}
-                <div className="absolute top-10 -left-16 md:-left-5 w-56 md:w-80 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block rotate-12 pointer-events-none z-0">
+                <div className="absolute top-2 -left-16 md:-left-8 w-56 md:w-80 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block rotate-6 pointer-events-none z-0">
                     <img src="/images/hero_badminton.jpg" alt="Sports at NUST" className="rounded-xl border-4 border-nust-blue shadow-[8px_8px_0px_var(--nust-blue)] aspect-[3/4] object-cover bg-white" />
                 </div>
-                <div className="absolute bottom-10 -left-10 md:left-10 w-64 md:w-96 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block -rotate-6 pointer-events-none z-0">
+                <div className="absolute -bottom-8 -left-16 md:-left-10 w-64 md:w-96 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block -rotate-6 pointer-events-none z-0">
                     <img src="/images/hero_aerial_1.jpg" alt="Campus Aerial" className="rounded-xl border-4 border-nust-blue shadow-[8px_8px_0px_var(--nust-blue)] bg-white" />
                 </div>
-                <div className="absolute top-5 -right-16 md:-right-5 w-64 md:w-96 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block -rotate-3 pointer-events-none z-0">
+                <div className="absolute top-4 -right-16 md:-right-8 w-64 md:w-96 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block -rotate-3 pointer-events-none z-0">
                     <img src="/images/hero_concert.jpg" alt="Concert Vibes" className="rounded-xl border-4 border-nust-blue shadow-[8px_8px_0px_var(--nust-blue)] bg-white" />
                 </div>
-                <div className="absolute -bottom-5 -right-10 md:-right-10 w-56 md:w-80 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block rotate-6 pointer-events-none z-0">
+                <div className="absolute bottom-16 md:bottom-24 -right-14 md:-right-8 w-56 md:w-80 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block rotate-6 pointer-events-none z-0">
                     <img src="/images/hero_aerial_2.jpg" alt="NUST Wide Shot" className="rounded-xl border-4 border-nust-blue shadow-[8px_8px_0px_var(--nust-blue)] bg-white" />
                 </div>
                 <div className="container relative z-10">
@@ -70,7 +70,7 @@ export default function HomePage() {
 
                         <h1 className="text-7xl md:text-9xl lg:text-[10rem] text-nust-blue mb-6 leading-[0.8] drop-shadow-[4px_4px_0px_rgba(229,149,0,0.5)] transform -rotate-1">
                             CAMPUS LIFE.<br />
-                            <span className="text-stroke text-white" style={{ WebkitTextStroke: "3px var(--nust-blue)" }}>UNFILTERED.</span>
+                            <span style={{ WebkitTextStroke: "3px var(--nust-blue)", color: "var(--cream)", WebkitTextFillColor: "var(--cream)", paintOrder: "stroke fill" }}>UNFILTERED.</span>
                         </h1>
 
                         <div className="mb-10">
