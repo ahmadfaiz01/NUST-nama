@@ -36,9 +36,6 @@ export function Footer() {
                             <Link href="/events" className="text-white font-bold hover:text-nust-orange transition-colors">
                                 Events
                             </Link>
-                            <Link href="/calendar" className="text-white font-bold hover:text-nust-orange transition-colors">
-                                Calendar
-                            </Link>
                             <Link href="/faq" className="text-white font-bold hover:text-nust-orange transition-colors">
                                 FAQ
                             </Link>

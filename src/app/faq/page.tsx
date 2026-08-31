@@ -54,13 +54,13 @@ export default function FAQPage() {
             }}
         >
             {/* Hero */}
-            <section className="py-12 bg-nust-blue">
+            <section className="py-10 bg-nust-blue">
                 <div className="container">
-                    <h1 className="text-4xl md:text-6xl text-white drop-shadow-[4px_4px_0px_var(--nust-orange)] mb-2">
+                    <h1 className="text-5xl md:text-6xl text-white mb-2 drop-shadow-[4px_4px_0px_var(--nust-orange)] font-heading leading-tight">
                         FREQUENTLY ASKED
                     </h1>
-                    <p className="font-display text-white/70 text-lg">
-                        Got questions? We&apos;ve got answers.
+                    <p className="font-display text-white/70 text-lg md:text-xl max-w-2xl leading-normal">
+                        Got questions? We&apos;ve got answers about campus rules, events, and features.
                     </p>
                 </div>
             </section>
@@ -69,10 +69,10 @@ export default function FAQPage() {
             <section className="py-6 border-b-2 border-nust-blue bg-white">
                 <div className="container">
                     <div className="flex flex-wrap gap-3 justify-center">
-                        <Link href="/post-event" className="btn btn-primary">📝 Post an Event</Link>
-                        <Link href="/events" className="btn btn-outline">🎯 Explore Events</Link>
-                        {GUPSHUP_ENABLED && <Link href="/chatter" className="btn btn-outline">💬 Gupshup</Link>}
-                        <Link href="/profile" className="btn btn-outline">👤 My Profile</Link>
+                        <Link href="/post-event" className="btn btn-primary">Post an Event</Link>
+                        <Link href="/events" className="btn btn-outline">Explore Events</Link>
+                        {GUPSHUP_ENABLED && <Link href="/chatter" className="btn btn-outline">Gupshup</Link>}
+                        <Link href="/profile" className="btn btn-outline">My Profile</Link>
                     </div>
                 </div>
             </section>
@@ -80,26 +80,26 @@ export default function FAQPage() {
             {/* FAQs */}
             <section className="py-12">
                 <div className="container max-w-3xl">
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                         {faqs.map((item, i) => {
                             const isOpen = openIndex === i;
                             return (
                                 <div
                                     key={i}
-                                    className="bg-nust-blue border-2 border-nust-blue rounded-xl overflow-hidden shadow-[4px_4px_0px_var(--nust-orange)]"
+                                    className="bg-white border-2 border-nust-blue rounded-2xl overflow-hidden shadow-[4px_4px_0px_var(--nust-blue)] transition-all"
                                 >
                                     <button
                                         onClick={() => setOpenIndex(isOpen ? null : i)}
-                                        className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
+                                        className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-cream/40 transition-colors cursor-pointer"
                                     >
-                                        <span className="font-display font-bold text-white pr-4">{item.q}</span>
-                                        <span className={`text-nust-orange font-heading text-2xl transition-transform duration-200 flex-shrink-0 ${isOpen ? "rotate-45" : ""}`}>
+                                        <span className="font-heading text-lg md:text-xl text-nust-blue pr-4">{item.q}</span>
+                                        <span className={`w-8 h-8 rounded-full border-2 border-nust-blue flex items-center justify-center text-nust-blue font-heading text-lg transition-transform duration-200 flex-shrink-0 ${isOpen ? "rotate-45 bg-nust-orange text-nust-blue" : "bg-cream"}`}>
                                             +
                                         </span>
                                     </button>
                                     {isOpen && (
-                                        <div className="px-5 pb-5 border-t border-white/10">
-                                            <p className="font-display text-white/80 pt-3 leading-relaxed">{item.a}</p>
+                                        <div className="px-6 pb-6 border-t-2 border-nust-blue/10 bg-cream/20">
+                                            <p className="font-display text-nust-blue/80 pt-4 leading-relaxed">{item.a}</p>
                                         </div>
                                     )}
                                 </div>
@@ -110,13 +110,20 @@ export default function FAQPage() {
             </section>
 
             {/* Still need help? */}
-            <section className="py-12 bg-nust-blue">
+            <section className="py-12">
                 <div className="container text-center">
-                    <h2 className="font-heading text-3xl text-white mb-3">STILL HAVE QUESTIONS?</h2>
-                    <p className="font-display text-white/70 mb-6">Can&apos;t find what you&apos;re looking for? Reach out.</p>
-                    <Link href="mailto:support@nustnama.com" className="btn bg-nust-orange text-nust-blue font-bold">
-                        Contact Support
-                    </Link>
+                    <div className="bg-nust-blue border-2 border-nust-blue rounded-2xl p-8 md:p-12 shadow-[8px_8px_0px_var(--nust-orange)] text-white max-w-3xl mx-auto">
+                        <h2 className="font-heading text-3xl md:text-5xl mb-3">STILL HAVE QUESTIONS?</h2>
+                        <p className="font-display text-white/70 text-lg mb-6 max-w-md mx-auto">Can&apos;t find what you&apos;re looking for? Reach out to support or ask our AI guide.</p>
+                        <div className="flex flex-wrap gap-4 justify-center">
+                            <Link href="/ask" className="btn bg-nust-orange text-nust-blue font-bold">
+                                Ask NUST Nama AI
+                            </Link>
+                            <Link href="mailto:support@nustnama.com" className="btn bg-white text-nust-blue font-bold hover:bg-cream">
+                                Contact Support
+                            </Link>
+                        </div>
+                    </div>
                 </div>
             </section>
         </div>

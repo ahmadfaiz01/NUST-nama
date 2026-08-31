@@ -217,22 +217,22 @@ export default function PostEventPage() {
     }
 
     return (
-        <div className="min-h-screen bg-cream">
+        <div
+            className="min-h-screen pb-16"
+            style={{
+                backgroundColor: "var(--cream)",
+                backgroundImage: `linear-gradient(var(--nust-blue) 1px, transparent 1px), linear-gradient(90deg, var(--nust-blue) 1px, transparent 1px)`,
+                backgroundSize: "100px 100px",
+            }}
+        >
             {/* Hero */}
-            <section
-                className="py-12"
-                style={{
-                    backgroundColor: "var(--nust-blue)",
-                    backgroundImage: `linear-gradient(var(--nust-orange) 1px, transparent 1px), linear-gradient(90deg, var(--nust-orange) 1px, transparent 1px)`,
-                    backgroundSize: "60px 60px",
-                }}
-            >
+            <section className="py-10 bg-nust-blue">
                 <div className="container">
-                    <h1 className="text-4xl md:text-6xl text-white mb-2 drop-shadow-[4px_4px_0px_var(--nust-orange)]">
+                    <h1 className="text-5xl md:text-6xl text-white mb-2 drop-shadow-[4px_4px_0px_var(--nust-orange)] font-heading leading-tight">
                         POST AN EVENT
                     </h1>
-                    <p className="text-white/80 text-lg font-display">
-                        Share your event with the NUST community
+                    <p className="font-display text-white/70 text-lg md:text-xl max-w-2xl leading-normal">
+                        Share your upcoming workshop, competition, or social with the NUST community.
                     </p>
                 </div>
             </section>

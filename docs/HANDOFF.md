@@ -1,7 +1,12 @@
-# Handoff — NUST Nama chatbot
+# Handoff — NUST Nama
 
-Last updated 8 August 2026. Read this first, then `docs/superpowers/plans/2026-08-06-chatbot.md`
-for the full plan and `PROJECT_CONTEXT.md` for the rest of the app.
+Last updated 12 August 2026. Read this first, then
+`docs/superpowers/plans/2026-08-06-chatbot.md` for the chatbot plan,
+`docs/superpowers/specs/2026-08-12-campus-map-design.md` for the map, and
+`PROJECT_CONTEXT.md` for the rest of the app.
+
+The chatbot is the bulk of this document because it is the part with traps in
+it. The map and the analytics work below are smaller and mostly done.
 
 ## Where the chatbot stands
 

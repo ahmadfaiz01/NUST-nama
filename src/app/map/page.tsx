@@ -9,17 +9,32 @@ export const metadata: Metadata = {
 
 export default function MapPage() {
     return (
-        <div className="container max-w-5xl h-[calc(100dvh-7rem)] pb-4 flex flex-col min-h-0 gap-4">
-            <div className="shrink-0">
-                <h1 className="font-heading text-3xl tracking-wide text-nust-blue leading-none">
-                    CAMPUS MAP
-                </h1>
-                <p className="text-sm text-nust-blue/70 mt-1">
-                    Every gate, hostel, cafe and school on H-12. Tap a pin.
-                </p>
-            </div>
+        <div
+            className="min-h-screen pb-12"
+            style={{
+                backgroundColor: "var(--cream)",
+                backgroundImage: `linear-gradient(var(--nust-blue) 1px, transparent 1px), linear-gradient(90deg, var(--nust-blue) 1px, transparent 1px)`,
+                backgroundSize: "100px 100px",
+            }}
+        >
+            {/* Hero Banner */}
+            <section className="py-10 bg-nust-blue">
+                <div className="container">
+                    <h1 className="text-5xl md:text-6xl text-white mb-2 drop-shadow-[4px_4px_0px_var(--nust-orange)] font-heading leading-tight">
+                        CAMPUS MAP
+                    </h1>
+                    <p className="font-display text-white/70 text-lg md:text-xl max-w-2xl leading-normal">
+                        Every gate, hostel, cafe, school and facility on H-12. Tap or hover any pin to explore.
+                    </p>
+                </div>
+            </section>
 
-            <CampusMapLoader />
+            {/* Map Section */}
+            <section className="py-8">
+                <div className="container">
+                    <CampusMapLoader />
+                </div>
+            </section>
         </div>
     );
 }

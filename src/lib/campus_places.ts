@@ -36,7 +36,6 @@ export interface CampusPlace {
     blurb: string;
 }
 
-/** Pin colours. Hostels and Mosques are pale, so markers need a dark stroke. */
 export const CATEGORY_COLOURS: Record<Category, string> = {
     Gates: "#D85503",
     Schools: "#2A5290",
@@ -48,9 +47,51 @@ export const CATEGORY_COLOURS: Record<Category, string> = {
     Facilities: "#7FD1B9",
 };
 
-/** Centre of campus, and the zoom at which every pin fits on screen. */
+/** Category Emojis / Icons for fallback */
+export const CATEGORY_ICONS: Record<Category, string> = {
+    Gates: "🚪",
+    Schools: "🎓",
+    Hostels: "🏢",
+    Cafes: "☕",
+    Sports: "⚽",
+    Mosques: "🕌",
+    Banks: "🏦",
+    Facilities: "🛠️",
+};
+
+/** High-contrast icon colors for maximum legibility on each background */
+export const CATEGORY_ICON_COLOURS: Record<Category, string> = {
+    Gates: "#FFFFFF",
+    Schools: "#FFFFFF",
+    Hostels: "#1B3A6B",
+    Cafes: "#FFFFFF",
+    Sports: "#FFFFFF",
+    Mosques: "#1B3A6B",
+    Banks: "#1B3A6B",
+    Facilities: "#1B3A6B",
+};
+
+/** High-res SVG icon strings with matched contrast for Leaflet circular markers */
+export const CATEGORY_SVG_STRINGS: Record<Category, string> = {
+    Gates: `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14"/><path d="M2 20h20"/><path d="M14 12v.01"/></svg>`,
+    Schools: `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>`,
+    Hostels: `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1B3A6B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg>`,
+    Cafes: `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></svg>`,
+    Sports: `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>`,
+    Mosques: `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1B3A6B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 0-4 4v2h8V6a4 4 0 0 0-4-4Z"/><path d="M4 22V10h16v12"/><path d="M9 22v-5a3 3 0 0 1 6 0v5"/><path d="M12 2v2"/></svg>`,
+    Banks: `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1B3A6B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m2 6 10-4 10 4"/><path d="M4 10h16"/><path d="M6 10v8"/><path d="M10 10v8"/><path d="M14 10v8"/><path d="M18 10v8"/><path d="M2 18h20"/><path d="M2 22h20"/></svg>`,
+    Facilities: `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1B3A6B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`,
+};
+
+/** Centre of campus, bounds, and the zoom at which every pin fits on screen. */
 export const CAMPUS_CENTER: [number, number] = [33.6428, 72.9905];
-export const CAMPUS_ZOOM = 15;
+export const CAMPUS_ZOOM = 15.2;
+export const CAMPUS_MIN_ZOOM = 15;
+export const CAMPUS_MAX_ZOOM = 18;
+export const CAMPUS_BOUNDS: [[number, number], [number, number]] = [
+    [33.6330, 72.9780],
+    [33.6515, 73.0030],
+];
 
 export const CAMPUS_PLACES: CampusPlace[] = [
     // ---- Gates ----

@@ -261,13 +261,15 @@ export default function ProfilePage() {
 
                         {/* Info */}
                         <div className="text-center md:text-left">
-                            <h1 className="font-heading text-4xl text-white mb-1">{(profile.name || "NUST STUDENT").toUpperCase()}</h1>
-                            <p className="font-display text-white/70 mb-2">{user.email}</p>
+                            <h1 className="font-heading text-4xl md:text-6xl text-white mb-1 drop-shadow-[4px_4px_0px_var(--nust-orange)]">
+                                {(profile.name || "NUST STUDENT").toUpperCase()}
+                            </h1>
+                            <p className="font-display text-white/70 text-lg mb-2">{user.email}</p>
                             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-                                <span className="px-3 py-1 bg-nust-orange text-nust-blue font-bold text-sm rounded-full">
+                                <span className="px-3 py-1 bg-nust-orange text-nust-blue font-bold text-sm rounded-full border-2 border-nust-blue shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">
                                     {profile.school || "NUST"}
                                 </span>
-                                <span className="text-white/50 text-sm font-display">
+                                <span className="text-white/60 text-sm font-display">
                                     Member since {new Date(user.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
                                 </span>
                             </div>
@@ -275,21 +277,15 @@ export default function ProfilePage() {
                     </div>
 
                     {/* Stats */}
-                    <div className="grid grid-cols-3 gap-4 mt-8 max-w-lg">
-                        <div className="bg-white/10 rounded-lg p-4 text-center">
-                            <div className="font-heading text-3xl text-white">{myRsvps.length}</div>
-                            <div className="font-display text-xs text-white/70 uppercase">RSVPs</div>
+                    <div className="grid grid-cols-2 gap-4 mt-8 max-w-sm">
+                        <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 rounded-2xl p-4 text-center shadow-[4px_4px_0px_rgba(0,0,0,0.2)]">
+                            <div className="font-heading text-3xl md:text-4xl text-white">{myRsvps.length}</div>
+                            <div className="font-display text-xs text-white/70 uppercase font-bold tracking-wider mt-1">RSVPs</div>
                         </div>
-                        <div className="bg-white/10 rounded-lg p-4 text-center">
-                            <div className="font-heading text-3xl text-white">{myEvents.length}</div>
-                            <div className="font-display text-xs text-white/70 uppercase">Posted</div>
+                        <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 rounded-2xl p-4 text-center shadow-[4px_4px_0px_rgba(0,0,0,0.2)]">
+                            <div className="font-heading text-3xl md:text-4xl text-white">{myEvents.length}</div>
+                            <div className="font-display text-xs text-white/70 uppercase font-bold tracking-wider mt-1">Events Posted</div>
                         </div>
-                        {/* 
-                        <div className="bg-white/10 rounded-lg p-4 text-center">
-                            <div className="font-heading text-3xl text-white">{mockUser.rsvpCount}</div>
-                            <div className="font-display text-xs text-white/70 uppercase">RSVPs</div>
-                        </div> 
-                        */}
                     </div>
                 </div>
             </section>

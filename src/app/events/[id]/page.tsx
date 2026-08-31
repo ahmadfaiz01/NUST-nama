@@ -89,11 +89,18 @@ export default function EventDetailPage() {
     const endDate = event.end_time ? new Date(event.end_time) : null;
 
     return (
-        <div className="min-h-screen bg-cream pb-20">
+        <div
+            className="min-h-screen pb-20"
+            style={{
+                backgroundColor: "var(--cream)",
+                backgroundImage: `linear-gradient(var(--nust-blue) 1px, transparent 1px), linear-gradient(90deg, var(--nust-blue) 1px, transparent 1px)`,
+                backgroundSize: "100px 100px",
+            }}
+        >
             {/* Hero / Header */}
             <div className="bg-nust-blue text-white py-12 relative overflow-hidden">
                 <div className="container relative z-10">
-                    <Link href="/events" className="inline-flex items-center gap-2 text-white/70 hover:text-white mb-6 transition-colors font-display text-sm font-bold uppercase tracking-wider">
+                    <Link href="/events" className="inline-flex items-center gap-2 text-white/70 hover:text-white mb-4 transition-colors font-display text-sm font-bold uppercase tracking-wider">
                         ← Back to Feed
                     </Link>
 
@@ -101,22 +108,19 @@ export default function EventDetailPage() {
                         {event.title}
                     </h1>
 
-                    <div className="flex flex-wrap items-center gap-4 text-lg font-display opacity-90">
-                        <span className="bg-white/10 px-3 py-1 rounded border border-white/20">
+                    <div className="flex flex-wrap items-center gap-3 text-base md:text-lg font-display">
+                        <span className="bg-white/10 backdrop-blur-sm px-3.5 py-1 rounded-xl border border-white/20">
                             📅 {startDate.toLocaleDateString("en-US", { weekday: 'short', month: 'long', day: 'numeric' })}
                         </span>
-                        <span className="bg-white/10 px-3 py-1 rounded border border-white/20">
+                        <span className="bg-white/10 backdrop-blur-sm px-3.5 py-1 rounded-xl border border-white/20">
                             ⏰ {startDate.toLocaleTimeString("en-US", { hour: 'numeric', minute: '2-digit' })}
                             {endDate && ` - ${endDate.toLocaleTimeString("en-US", { hour: 'numeric', minute: '2-digit' })}`}
                         </span>
                     </div>
                 </div>
-
-                {/* Background pattern */}
-                <div className="absolute top-0 right-0 w-1/3 h-full bg-nust-orange/10 transform skew-x-12"></div>
             </div>
 
-            <div className="container -mt-8 relative z-20">
+            <div className="container mt-8 relative z-20">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                     {/* Main Content (Left Col) */}
@@ -124,17 +128,17 @@ export default function EventDetailPage() {
 
                         {/* Poster Image */}
                         {event.poster_url ? (
-                            <div className="rounded-xl overflow-hidden border-4 border-white shadow-xl bg-gray-100">
+                            <div className="rounded-2xl overflow-hidden border-2 border-nust-blue shadow-[6px_6px_0px_var(--nust-blue)] bg-gray-100">
                                 <img src={event.poster_url} alt={event.title} className="w-full h-auto max-h-[500px] object-contain bg-black/5" />
                             </div>
                         ) : (
-                            <div className="h-64 rounded-xl border-4 border-white shadow-xl bg-nust-blue/5 flex items-center justify-center">
-                                <span className="text-nust-blue/30 font-display text-xl uppercase font-bold">No Poster Available</span>
+                            <div className="h-64 rounded-2xl border-2 border-nust-blue shadow-[6px_6px_0px_var(--nust-blue)] bg-white flex items-center justify-center">
+                                <span className="text-nust-blue/40 font-display text-lg uppercase font-bold">No Poster Available</span>
                             </div>
                         )}
 
                         {/* Description */}
-                        <div className="bg-white rounded-xl p-8 border-2 border-nust-blue shadow-[4px_4px_0px_var(--nust-blue)]">
+                        <div className="bg-white rounded-2xl p-8 border-2 border-nust-blue shadow-[4px_4px_0px_var(--nust-blue)]">
                             <h2 className="font-heading text-2xl text-nust-blue mb-4 flex items-center gap-2">
                                 📝 Event Details
                             </h2>
@@ -158,7 +162,7 @@ export default function EventDetailPage() {
                     <div className="space-y-6">
 
                         {/* Action Card */}
-                        <div className="bg-white rounded-xl p-6 border-2 border-nust-blue shadow-[4px_4px_0px_var(--nust-blue)] sticky top-24">
+                        <div className="bg-white rounded-2xl p-6 border-2 border-nust-blue shadow-[4px_4px_0px_var(--nust-blue)] sticky top-24">
 
                             {/* Venue & Map */}
                             <div className="mb-6">

@@ -61,14 +61,21 @@ export default async function NewsPage() {
     const archiveItems = hasRecent ? (olderNews ?? []) : [];
 
     return (
-        <div className="min-h-screen bg-cream">
+        <div
+            className="min-h-screen pb-16"
+            style={{
+                backgroundColor: "var(--cream)",
+                backgroundImage: `linear-gradient(var(--nust-blue) 1px, transparent 1px), linear-gradient(90deg, var(--nust-blue) 1px, transparent 1px)`,
+                backgroundSize: "100px 100px",
+            }}
+        >
             {/* Hero */}
-            <section className="py-16 bg-nust-orange">
+            <section className="py-10 bg-nust-blue">
                 <div className="container">
-                    <h1 className="text-5xl md:text-7xl text-nust-blue mb-4 drop-shadow-[4px_4px_0px_rgba(255,255,255,0.3)]">
+                    <h1 className="text-5xl md:text-6xl text-white mb-2 drop-shadow-[4px_4px_0px_var(--nust-orange)] font-heading leading-tight">
                         CAMPUS NEWS
                     </h1>
-                    <p className="text-nust-blue/80 text-xl max-w-2xl">
+                    <p className="font-display text-white/70 text-lg md:text-xl max-w-2xl leading-normal">
                         Stay updated with the latest announcements, notices, and happenings at NUST.
                     </p>
                 </div>
@@ -84,7 +91,7 @@ export default async function NewsPage() {
                                 href={item.url || "#"}
                                 target={item.url && item.url !== "#" ? "_blank" : undefined}
                                 rel={item.url && item.url !== "#" ? "noopener noreferrer" : undefined}
-                                className={`block bg-white border-2 border-nust-blue rounded-lg overflow-hidden shadow-[4px_4px_0px_var(--nust-blue)] hover:shadow-[8px_8px_0px_var(--nust-blue)] hover:-translate-y-1 transition-all ${index === 0 ? "lg:col-span-2" : ""
+                                className={`block bg-white border-2 border-nust-blue rounded-2xl overflow-hidden shadow-[4px_4px_0px_var(--nust-blue)] hover:shadow-[8px_8px_0px_var(--nust-blue)] hover:-translate-y-1 transition-all ${index === 0 ? "lg:col-span-2" : ""
                                     }`}
                             >
                                 <div className="p-6">
@@ -101,15 +108,12 @@ export default async function NewsPage() {
                                         {item.title}
                                     </h3>
 
-                                    <p className="text-nust-blue/70 line-clamp-2">
+                                    <p className="text-nust-blue/70 line-clamp-2 font-display">
                                         {item.summary || "Click to read the full article."}
                                     </p>
 
-                                    <div className="mt-4 flex items-center gap-2 text-nust-orange font-bold">
-                                        Read More
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                        </svg>
+                                    <div className="mt-4 flex items-center gap-2 text-nust-orange font-bold font-heading text-sm uppercase">
+                                        Read More →
                                     </div>
                                 </div>
                             </Link>
@@ -118,8 +122,8 @@ export default async function NewsPage() {
 
                     {/* Archive */}
                     {archiveItems.length > 0 && (
-                        <div className="mt-16 bg-nust-blue rounded-xl p-8 md:p-12 shadow-[8px_8px_0px_var(--nust-orange)]">
-                            <h2 className="text-4xl text-white mb-6 text-center">EARLIER ON CAMPUS</h2>
+                        <div className="mt-16 bg-nust-blue border-2 border-nust-blue rounded-2xl p-8 md:p-12 shadow-[8px_8px_0px_var(--nust-orange)]">
+                            <h2 className="text-4xl text-white mb-6 text-center font-heading">EARLIER ON CAMPUS</h2>
                             <div className="max-w-3xl mx-auto divide-y divide-white/20">
                                 {archiveItems.map((item) => (
                                     <Link
@@ -132,7 +136,7 @@ export default async function NewsPage() {
                                         <span className="text-white/50 text-sm font-medium shrink-0 w-16">
                                             {item.published_at ? formatDate(item.published_at) : "—"}
                                         </span>
-                                        <span className="text-white group-hover:text-nust-orange transition-colors">
+                                        <span className="text-white group-hover:text-nust-orange transition-colors font-display">
                                             {item.title}
                                         </span>
                                     </Link>

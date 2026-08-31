@@ -3,31 +3,63 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { MapContainer, TileLayer, CircleMarker, Popup, Tooltip } from "react-leaflet";
+import { MapContainer, TileLayer, CircleMarker, Popup, Tooltip, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import {
+    CAMPUS_CENTER,
+    CAMPUS_ZOOM,
+    CAMPUS_MIN_ZOOM,
+    CAMPUS_MAX_ZOOM,
+    CAMPUS_BOUNDS,
+} from "@/lib/campus_places";
 
 // Fix for default marker icons
 // @ts-ignore
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+    iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
-const CENTER: [number, number] = [33.6425, 72.9905];
-
 const intensityStyles = {
-    high: { color: "#EF4444", fillColor: "#EF4444", fillOpacity: 0.8, radius: 25, label: "LIT 🔥" },
-    medium: { color: "#F97316", fillColor: "#F97316", fillOpacity: 0.6, radius: 20, label: "VIBING 😎" },
-    low: { color: "#EAB308", fillColor: "#EAB308", fillOpacity: 0.4, radius: 15, label: "CHILL ☕" },
-    // Sentiment Overrides
-    lit: { color: "#EF4444", fillColor: "#EF4444", fillOpacity: 0.9, radius: 28, label: "LIT 🔥" },
-    vibing: { color: "#3B82F6", fillColor: "#3B82F6", fillOpacity: 0.7, radius: 22, label: "VIBING 😎" },
-    meh: { color: "#9CA3AF", fillColor: "#9CA3AF", fillOpacity: 0.5, radius: 15, label: "MEH 😐" },
-    dead: { color: "#4B5563", fillColor: "#4B5563", fillOpacity: 0.4, radius: 12, label: "DEAD 😴" },
+    high: { color: "#1B3A6B", fillColor: "#EF4444", fillOpacity: 0.9, radius: 22, label: "LIT 🔥" },
+    medium: { color: "#1B3A6B", fillColor: "#F97316", fillOpacity: 0.8, radius: 18, label: "VIBING 😎" },
+    low: { color: "#1B3A6B", fillColor: "#EAB308", fillOpacity: 0.7, radius: 14, label: "CHILL ☕" },
+    lit: { color: "#1B3A6B", fillColor: "#EF4444", fillOpacity: 0.9, radius: 22, label: "LIT 🔥" },
+    vibing: { color: "#1B3A6B", fillColor: "#3B82F6", fillOpacity: 0.8, radius: 18, label: "VIBING 😎" },
+    meh: { color: "#1B3A6B", fillColor: "#9CA3AF", fillOpacity: 0.6, radius: 14, label: "MEH 😐" },
+    dead: { color: "#1B3A6B", fillColor: "#4B5563", fillOpacity: 0.5, radius: 12, label: "DEAD 😴" },
 };
+
+function MapResizer() {
+    const map = useMap();
+    useEffect(() => {
+        map.setMinZoom(CAMPUS_MIN_ZOOM);
+        map.setMaxZoom(CAMPUS_MAX_ZOOM);
+        map.setMaxBounds(CAMPUS_BOUNDS);
+        map.options.maxBoundsViscosity = 1.0;
+        const t = setTimeout(() => {
+            map.invalidateSize();
+        }, 200);
+        return () => clearTimeout(t);
+    }, [map]);
+    return null;
+}
+
+function RecenterButton() {
+    const map = useMap();
+    return (
+        <button
+            type="button"
+            onClick={() => map.setView(CAMPUS_CENTER, CAMPUS_ZOOM)}
+            className="absolute bottom-4 right-4 z-[400] bg-white border-2 border-nust-blue text-nust-blue font-heading text-xs uppercase tracking-widest px-3 py-2 rounded-xl shadow-[3px_3px_0px_var(--nust-blue)] hover:bg-nust-orange hover:text-nust-blue transition-all cursor-pointer"
+        >
+            🎯 Recenter
+        </button>
+    );
+}
 
 export default function LeafletMap() {
     const [hotspots, setHotspots] = useState<any[]>([]);
@@ -42,23 +74,21 @@ export default function LeafletMap() {
                 .gte("start_time", new Date().toISOString());
 
             if (data) {
-                const mapped = data.map(e => {
+                const mapped = data.map((e) => {
                     const rsvpCount = e.rsvps?.[0]?.count || 0;
                     const checkins = e.checkins || [];
 
-                    // Determine Sentiment Logic
-                    // 1. Calculate dominant sentiment if checkins exist
-                    let dominantSentiment = "low"; // default fallback
+                    let dominantSentiment = "low";
                     if (checkins.length > 0) {
                         const sentiments = checkins.map((c: any) => c.sentiment).filter(Boolean);
                         if (sentiments.length > 0) {
-                            // Simple mode (most frequent)
                             const counts: Record<string, number> = {};
-                            sentiments.forEach((s: string) => counts[s] = (counts[s] || 0) + 1);
-                            dominantSentiment = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
+                            sentiments.forEach((s: string) => (counts[s] = (counts[s] || 0) + 1));
+                            dominantSentiment = Object.keys(counts).reduce((a, b) =>
+                                counts[a] > counts[b] ? a : b
+                            );
                         }
                     } else {
-                        // Fallback to RSVP counts if no checkins yet
                         if (rsvpCount > 50) dominantSentiment = "high";
                         else if (rsvpCount > 20) dominantSentiment = "medium";
                     }
@@ -70,7 +100,7 @@ export default function LeafletMap() {
                         people: rsvpCount,
                         lat: e.venue_lat,
                         lng: e.venue_lng,
-                        intensity: dominantSentiment
+                        intensity: dominantSentiment,
                     };
                 });
                 setHotspots(mapped);
@@ -80,33 +110,27 @@ export default function LeafletMap() {
     }, []);
 
     return (
-        <div className="h-full w-full rounded-2xl overflow-hidden border-2 border-nust-blue shadow-lg z-0 relative bg-cream group">
-
-            {/* Emoji Background Pattern */}
-            <div className="absolute inset-0 z-[1] pointer-events-none opacity-[0.06] overflow-hidden select-none"
-                style={{
-                    backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ctext x='25' y='25' font-size='35' text-anchor='middle'%3E🔥%3C/text%3E%3Ctext x='75' y='75' font-size='35' text-anchor='middle'%3E💯%3C/text%3E%3C/svg%3E\")",
-                    backgroundSize: "80px 80px"
-                }}>
-            </div>
-
+        <div className="w-full h-full min-h-[480px] rounded-2xl overflow-hidden border-2 border-nust-blue shadow-[6px_6px_0px_var(--nust-blue)] relative bg-cream group z-0">
             <MapContainer
-                center={CENTER}
-                zoom={15}
-                style={{ height: "100%", width: "100%", zIndex: 10 }}
+                center={CAMPUS_CENTER}
+                zoom={CAMPUS_ZOOM}
+                minZoom={CAMPUS_MIN_ZOOM}
+                maxZoom={CAMPUS_MAX_ZOOM}
+                maxBounds={CAMPUS_BOUNDS}
+                maxBoundsViscosity={1.0}
+                style={{ height: "100%", width: "100%" }}
                 scrollWheelZoom={true}
                 zoomControl={true}
-                className="z-10 bg-transparent"
+                className="z-10"
             >
+                <MapResizer />
                 <TileLayer
-                    attribution='&copy; <a href="https://carto.com/">CARTO</a>'
-                    url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-                    className="opacity-90 mix-blend-multiply"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
 
                 {hotspots.map((spot) => {
                     const style = intensityStyles[spot.intensity as keyof typeof intensityStyles];
-                    // Fallback style if undefined
                     const finalStyle = style || intensityStyles.low;
 
                     return (
@@ -115,33 +139,38 @@ export default function LeafletMap() {
                             center={[spot.lat, spot.lng]}
                             radius={finalStyle.radius}
                             pathOptions={{
-                                color: "white",
-                                weight: 2,
+                                color: "#1B3A6B",
+                                weight: 2.5,
                                 fillColor: finalStyle.fillColor,
                                 fillOpacity: finalStyle.fillOpacity,
                             }}
                         >
-                            {/* Event Label */}
+                            {/* Hover Tooltip */}
                             <Tooltip
                                 direction="top"
-                                offset={[0, -finalStyle.radius - 5]}
+                                offset={[0, -finalStyle.radius - 4]}
                                 opacity={1}
                                 permanent={false}
-                                className="!bg-white !border-2 !border-nust-blue !text-nust-blue !font-bold !rounded-md !px-2 !py-0.5 !shadow-md !text-xs !font-display uppercase tracking-widest"
+                                className="!bg-white !border-2 !border-nust-blue !text-nust-blue !font-bold !rounded-xl !px-3 !py-1 !shadow-[3px_3px_0px_var(--nust-blue)] !text-xs !font-display uppercase tracking-wider"
                             >
-                                {spot.event}
+                                <div className="flex items-center gap-1.5">
+                                    <span>🔥</span>
+                                    <span>{spot.event}</span>
+                                </div>
                             </Tooltip>
 
                             <Popup className="minimal-popup">
-                                <div className="text-center min-w-[120px]">
-                                    <h3 className="font-heading text-lg text-nust-blue leading-none mb-1">{spot.name}</h3>
+                                <div className="text-center min-w-[140px] p-1">
+                                    <h3 className="font-heading text-base text-nust-blue leading-tight mb-1">
+                                        {spot.name}
+                                    </h3>
                                     <div className="flex items-center justify-center gap-1 text-xs font-bold text-nust-orange mb-2">
-                                        <span>{finalStyle.label.split(' ')[1]}</span>
-                                        <span>{spot.people} here</span>
+                                        <span>{finalStyle.label}</span>
+                                        <span>• {spot.people} attending</span>
                                     </div>
                                     <Link
                                         href={`/events/${spot.id}`}
-                                        className="block w-full bg-nust-blue text-white text-[10px] font-bold py-1.5 rounded hover:bg-nust-blue/90"
+                                        className="block w-full bg-nust-blue text-white font-heading text-xs py-1.5 rounded-lg hover:bg-nust-orange hover:text-nust-blue transition-all"
                                     >
                                         CHECK IN / VIEW
                                     </Link>
@@ -150,23 +179,43 @@ export default function LeafletMap() {
                         </CircleMarker>
                     );
                 })}
+
+                <RecenterButton />
             </MapContainer>
 
-            {/* Legend - Updated dynamically? For now static but improved */}
-            <div className="absolute bottom-4 right-4 z-[400] bg-white/95 backdrop-blur border border-nust-orange/30 p-3 rounded-xl shadow-lg">
+            {/* Grain Noise Overlay */}
+            <div className="map-grain-overlay" aria-hidden="true" />
+
+            <style jsx global>{`
+                .map-grain-overlay {
+                    position: absolute;
+                    inset: 0;
+                    pointer-events: none;
+                    z-index: 390;
+                    opacity: 0.16;
+                    mix-blend-mode: multiply;
+                    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+                }
+                .leaflet-tile-pane {
+                    filter: contrast(0.92) saturate(0.82) brightness(1.02);
+                }
+            `}</style>
+
+            {/* Vibe Radar Legend */}
+            <div className="absolute bottom-4 left-4 z-[400] bg-white/95 backdrop-blur border-2 border-nust-blue p-3 rounded-xl shadow-[3px_3px_0px_var(--nust-blue)]">
                 <h4 className="font-heading text-nust-blue text-xs mb-2">VIBE RADAR</h4>
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                     <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded-full bg-red-500 opacity-80 border border-red-600"></div>
-                        <span className="text-xs font-bold text-nust-blue">Lit 🔥</span>
+                        <div className="w-3.5 h-3.5 rounded-full bg-red-500 border border-nust-blue" />
+                        <span className="text-xs font-bold text-nust-blue font-display">Lit 🔥</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded-full bg-blue-500 opacity-60 border border-blue-600"></div>
-                        <span className="text-xs font-bold text-nust-blue">Vibing 😎</span>
+                        <div className="w-3.5 h-3.5 rounded-full bg-orange-500 border border-nust-blue" />
+                        <span className="text-xs font-bold text-nust-blue font-display">Vibing 😎</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded-full bg-yellow-500 opacity-40 border border-yellow-600"></div>
-                        <span className="text-xs font-bold text-nust-blue">Avg / Chill ☕</span>
+                        <div className="w-3.5 h-3.5 rounded-full bg-yellow-500 border border-nust-blue" />
+                        <span className="text-xs font-bold text-nust-blue font-display">Chill ☕</span>
                     </div>
                 </div>
             </div>

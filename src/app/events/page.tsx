@@ -5,11 +5,46 @@ import { useRef, useCallback, useEffect, useState } from "react";
 import { EventCard } from "@/components/events/EventCard";
 import { useInfiniteEvents } from "@/hooks/useInfiniteEvents";
 import { usePostHog } from "posthog-js/react";
+import {
+    Sparkles,
+    Laptop,
+    Palette,
+    Trophy,
+    Briefcase,
+    Film,
+    GraduationCap,
+    Wrench,
+    Layers,
+    Search,
+    X,
+    CalendarDays,
+} from "lucide-react";
 
-const categories = ["All", "Tech", "Cultural", "Sports", "Career", "Entertainment", "Academic", "Workshop", "Other"];
+interface CategoryOption {
+    name: string;
+    icon: React.ElementType;
+}
+
+const EVENT_CATEGORIES: CategoryOption[] = [
+    { name: "All", icon: Sparkles },
+    { name: "Tech", icon: Laptop },
+    { name: "Cultural", icon: Palette },
+    { name: "Sports", icon: Trophy },
+    { name: "Career", icon: Briefcase },
+    { name: "Entertainment", icon: Film },
+    { name: "Academic", icon: GraduationCap },
+    { name: "Workshop", icon: Wrench },
+    { name: "Other", icon: Layers },
+];
+
+const DATE_FILTERS = [
+    { id: "all", label: "All Dates" },
+    { id: "today", label: "Today" },
+    { id: "tomorrow", label: "Tomorrow" },
+    { id: "week", label: "This Week" },
+] as const;
 
 // ─── Sentinel component for IntersectionObserver ──────────────────────────────
-// When this div scrolls into view, it triggers loadMore()
 function InfiniteScrollSentinel({ onIntersect, disabled }: { onIntersect: () => void; disabled: boolean }) {
     const ref = useRef<HTMLDivElement>(null);
 
@@ -17,7 +52,7 @@ function InfiniteScrollSentinel({ onIntersect, disabled }: { onIntersect: () => 
         if (disabled) return;
         const observer = new IntersectionObserver(
             (entries) => { if (entries[0].isIntersecting) onIntersect(); },
-            { rootMargin: "300px" } // Start loading 300px before the bottom
+            { rootMargin: "300px" }
         );
         if (ref.current) observer.observe(ref.current);
         return () => observer.disconnect();
@@ -33,7 +68,7 @@ export default function EventsPage() {
     const [dateFilter, setDateFilter] = useState<"all" | "today" | "tomorrow" | "week">("all");
     const posthog = usePostHog();
 
-    // Debounced search value — only passed to the hook after 500ms
+    // Debounced search value — only passed to the hook after 400ms
     const [debouncedSearch, setDebouncedSearch] = useState("");
     useEffect(() => {
         const t = setTimeout(() => {
@@ -41,7 +76,7 @@ export default function EventsPage() {
             if (searchQuery.trim().length > 1) {
                 posthog?.capture("events_searched", { query: searchQuery.trim() });
             }
-        }, 500);
+        }, 400);
         return () => clearTimeout(t);
     }, [searchQuery, posthog]);
 
@@ -53,7 +88,7 @@ export default function EventsPage() {
         if (dateFilter !== "all") posthog?.capture("events_filtered", { filter_type: "date", value: dateFilter });
     }, [dateFilter, posthog]);
 
-    // ── Paginated data fetching via the new hook ──────────────────────────────
+    // ── Paginated data fetching via hook ─────────────────────────────────────
     const { events, isLoading, isLoadingMore, hasMore, loadMore } = useInfiniteEvents({
         category: selectedCategory,
         search: debouncedSearch,
@@ -62,9 +97,17 @@ export default function EventsPage() {
 
     const handleLoadMore = useCallback(() => loadMore(), [loadMore]);
 
+    const isFiltered = selectedCategory !== "All" || searchQuery.trim().length > 0 || dateFilter !== "all";
+
+    const clearAllFilters = () => {
+        setSelectedCategory("All");
+        setSearchQuery("");
+        setDateFilter("all");
+    };
+
     return (
         <div
-            className="min-h-screen"
+            className="min-h-screen pb-20"
             style={{
                 backgroundColor: "var(--cream)",
                 backgroundImage: `linear-gradient(var(--nust-blue) 1px, transparent 1px), linear-gradient(90deg, var(--nust-blue) 1px, transparent 1px)`,
@@ -72,138 +115,170 @@ export default function EventsPage() {
             }}
         >
             {/* Hero Banner */}
-            <section className="py-12 bg-nust-blue transition-all duration-500 ease-in-out">
+            <section className="py-10 bg-nust-blue">
                 <div className="container">
-                    <h1 className="text-5xl md:text-7xl text-white mb-4 drop-shadow-[4px_4px_0px_var(--nust-orange)] font-heading">
+                    <h1 className="text-5xl md:text-6xl text-white mb-2 drop-shadow-[4px_4px_0px_var(--nust-orange)] font-heading leading-tight">
                         DISCOVER EVENTS
                     </h1>
-                    <p className="font-display text-white/70 text-xl max-w-2xl mt-2">
-                        From tech talks to cultural nights, find everything happening at NUST.
+                    <p className="font-display text-white/70 text-lg md:text-xl max-w-2xl leading-normal">
+                        From tech hackathons to sports matches, explore everything happening at NUST.
                     </p>
                 </div>
             </section>
 
-            {/* Filters Section (Sticky) */}
-            <section className="py-4 border-b-2 border-nust-blue bg-white sticky top-20 z-40 shadow-sm">
-                <div className="container space-y-4">
-                    {/* Top Row: Search & Date */}
-                    <div className="flex flex-col md:flex-row gap-4 justify-between">
-                        {/* Search Bar */}
-                        <div className="relative flex-1 max-w-lg">
-                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl">🔍</span>
-                            <input
-                                type="text"
-                                placeholder="Search events..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-12 pr-4 py-3 rounded-full border-2 border-nust-blue bg-cream/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-nust-orange transition-all font-display placeholder:text-nust-blue/40"
-                            />
+            {/* Main Content */}
+            <section className="py-8">
+                <div className="container flex flex-col gap-6">
+
+                    {/* Unified Search & Filters Bar */}
+                    <div className="bg-white p-5 md:p-6 rounded-2xl border-2 border-nust-blue shadow-[4px_4px_0px_var(--nust-blue)] flex flex-col gap-4">
+                        {/* Top: Accessible Search Input + Date Filter Switcher */}
+                        <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-nust-blue" aria-hidden="true" />
+                                <input
+                                    type="search"
+                                    aria-label="Search events"
+                                    placeholder="Search events by title, society, venue..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full pl-10 pr-10 py-2.5 rounded-xl border-2 border-nust-blue bg-cream/30 focus:bg-white focus:outline-none focus:ring-2 focus:ring-nust-orange text-sm font-display text-nust-blue placeholder:text-nust-blue/50 transition-colors"
+                                />
+                                {searchQuery && (
+                                    <button
+                                        type="button"
+                                        aria-label="Clear search query"
+                                        onClick={() => setSearchQuery("")}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-nust-blue/60 hover:text-nust-blue p-1 cursor-pointer"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Date Filter Buttons */}
+                            <div className="flex items-center gap-1.5 overflow-x-auto p-1" role="tablist" aria-label="Date filters">
+                                {DATE_FILTERS.map((f) => {
+                                    const active = dateFilter === f.id;
+                                    return (
+                                        <button
+                                            key={f.id}
+                                            type="button"
+                                            role="tab"
+                                            aria-selected={active}
+                                            onClick={() => setDateFilter(f.id)}
+                                            className={`px-3.5 py-1.5 rounded-full font-sans font-medium text-sm border-2 border-nust-blue transition-all cursor-pointer whitespace-nowrap ${
+                                                active
+                                                    ? "bg-nust-orange text-nust-blue font-semibold shadow-[2px_2px_0px_var(--nust-blue)]"
+                                                    : "bg-white text-nust-blue shadow-[2px_2px_0px_var(--nust-blue)] hover:bg-cream hover:translate-y-[-1px]"
+                                            }`}
+                                        >
+                                            {f.label}
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
 
-                        {/* Date Filter */}
-                        <div className="flex bg-gray-100 p-1 rounded-full border-2 border-transparent">
-                            {[
-                                { id: "all", label: "All Upcoming" },
-                                { id: "today", label: "Today" },
-                                { id: "tomorrow", label: "Tomorrow" },
-                                { id: "week", label: "This Week" }
-                            ].map((filter) => (
+                        {/* Bottom: Clean Category Filter Pills */}
+                        <div className="flex flex-wrap items-center justify-center gap-2.5 pt-3 border-t-2 border-nust-blue/10 p-1" role="tablist" aria-label="Category filters">
+                            {EVENT_CATEGORIES.map((cat) => {
+                                const isActive = selectedCategory === cat.name;
+                                return (
+                                    <button
+                                        key={cat.name}
+                                        type="button"
+                                        role="tab"
+                                        aria-selected={isActive}
+                                        onClick={() => setSelectedCategory(cat.name)}
+                                        className={`px-4 py-1.5 rounded-full font-sans font-medium text-sm border-2 border-nust-blue transition-all cursor-pointer ${
+                                            isActive
+                                                ? "bg-nust-blue text-white font-semibold shadow-[3px_3px_0px_var(--nust-orange)]"
+                                                : "bg-white text-nust-blue shadow-[2px_2px_0px_var(--nust-blue)] hover:bg-cream hover:translate-y-[-1px]"
+                                        }`}
+                                    >
+                                        {cat.name}
+                                    </button>
+                                );
+                            })}
+
+                            {isFiltered && (
                                 <button
-                                    key={filter.id}
-                                    onClick={() => setDateFilter(filter.id as any)}
-                                    className={`px-4 py-2 rounded-full font-bold text-sm transition-all ${dateFilter === filter.id
-                                        ? "bg-white text-nust-blue shadow-sm border border-gray-200"
-                                        : "text-gray-500 hover:text-nust-blue"
-                                    }`}
+                                    type="button"
+                                    onClick={clearAllFilters}
+                                    className="text-xs font-sans font-semibold text-nust-blue/70 hover:text-nust-orange underline cursor-pointer px-2 py-1"
                                 >
-                                    {filter.label}
+                                    Reset Filters
                                 </button>
-                            ))}
+                            )}
                         </div>
                     </div>
 
-                    {/* Bottom Row: Categories */}
-                    <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-                        {categories.map((cat) => (
-                            <button
-                                key={cat}
-                                onClick={() => setSelectedCategory(cat)}
-                                className={`px-5 py-2 rounded-full font-heading text-lg border-2 transition-all whitespace-nowrap ${selectedCategory === cat
-                                    ? "bg-nust-blue text-white border-nust-blue"
-                                    : "bg-white text-nust-blue border-nust-blue hover:bg-nust-blue hover:text-white"
-                                }`}
-                            >
-                                {cat}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Events Grid */}
-            <section className="py-12">
-                <div className="container">
-                    <div className="flex items-center justify-between mb-8">
-                        <p className="text-nust-blue/60 font-display uppercase tracking-widest font-bold">
-                            Showing {events.length} events{hasMore ? "+" : ""}
+                    {/* Results Count Bar */}
+                    <div className="flex items-center justify-between px-1">
+                        <p className="text-nust-blue font-display text-sm font-semibold">
+                            {isLoading && events.length === 0
+                                ? "Loading events..."
+                                : `Showing ${events.length} event${events.length === 1 ? "" : "s"}${hasMore ? "+" : ""}`}
                         </p>
                     </div>
 
-                    {/* Initial load spinner */}
+                    {/* Loading State */}
                     {isLoading && events.length === 0 ? (
-                        <div className="flex items-center justify-center py-20">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-nust-blue"></div>
+                        <div className="flex flex-col items-center justify-center py-20 gap-3">
+                            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-nust-blue" />
+                            <p className="font-display text-sm text-nust-blue/60">Fetching events...</p>
                         </div>
-                    ) : events.length === 0 && !isLoading ? (
-                        /* Empty State */
-                        <div className="text-center py-20 bg-white/50 rounded-xl border-2 border-dashed border-nust-blue/20">
-                            <div className="text-6xl mb-4 opacity-50">🕵️‍♂️</div>
-                            <h3 className="text-2xl font-heading text-nust-blue mb-2">NO EVENTS FOUND</h3>
-                            <p className="text-nust-blue/60 max-w-md mx-auto mb-8">
-                                We couldn&apos;t find any events matching your filters. Try adjusting your search or category.
+                    ) : events.length === 0 ? (
+                        /* Decluttered Empty State */
+                        <div className="text-center py-16 px-6 bg-white rounded-2xl border-2 border-nust-blue shadow-[4px_4px_0px_var(--nust-blue)] max-w-lg mx-auto w-full">
+                            <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-nust-orange/20 border-2 border-nust-blue flex items-center justify-center text-2xl shadow-[2px_2px_0px_var(--nust-blue)]">
+                                📅
+                            </div>
+                            <h3 className="font-heading text-2xl text-nust-blue mb-2">NO EVENTS FOUND</h3>
+                            <p className="font-display text-nust-blue/70 text-sm mb-6 leading-relaxed">
+                                {isFiltered
+                                    ? "No events match your current filter selection. Try resetting filters or searching for something else."
+                                    : "No upcoming events posted right now. Check back soon or post an event yourself!"}
                             </p>
-                            <div className="flex gap-4 justify-center">
+                            {isFiltered ? (
                                 <button
-                                    onClick={() => { setSearchQuery(""); setDateFilter("all"); setSelectedCategory("All"); }}
-                                    className="btn btn-outline"
+                                    type="button"
+                                    onClick={clearAllFilters}
+                                    className="btn btn-primary text-sm py-2 px-5"
                                 >
-                                    Clear Filters
+                                    Clear All Filters
                                 </button>
-                                <Link href="/post-event" className="btn btn-primary">
+                            ) : (
+                                <Link href="/post-event" className="btn btn-primary text-sm py-2 px-5">
                                     Post an Event
                                 </Link>
-                            </div>
+                            )}
                         </div>
                     ) : (
-                        <>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                                {events.map((event, index) => (
-                                    <div key={event.id} className="transform transition-all hover:-translate-y-2 duration-300">
-                                        <EventCard event={event} index={index} />
-                                    </div>
-                                ))}
-                            </div>
+                        /* Events Grid */
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {events.map((event) => (
+                                <EventCard key={event.id} event={event} />
+                            ))}
+                        </div>
+                    )}
 
-                            {/* Infinite scroll sentinel — triggers loadMore when scrolled into view */}
-                            <InfiniteScrollSentinel
-                                onIntersect={handleLoadMore}
-                                disabled={!hasMore || isLoadingMore}
-                            />
+                    {/* Infinite Scroll Sentinel */}
+                    <InfiniteScrollSentinel onIntersect={handleLoadMore} disabled={!hasMore || isLoadingMore} />
 
-                            {/* Loading more spinner */}
-                            {isLoadingMore && (
-                                <div className="flex justify-center py-10">
-                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-nust-blue"></div>
-                                </div>
-                            )}
+                    {/* Load More Indicator */}
+                    {isLoadingMore && (
+                        <div className="flex items-center justify-center py-6">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-nust-blue" />
+                        </div>
+                    )}
 
-                            {/* End of results */}
-                            {!hasMore && events.length > 0 && (
-                                <div className="text-center py-10 text-nust-blue/40 font-display text-sm uppercase tracking-widest">
-                                    — You&apos;ve seen all {events.length} events —
-                                </div>
-                            )}
-                        </>
+                    {/* End of results */}
+                    {!hasMore && events.length > 0 && !isLoading && (
+                        <p className="text-center py-6 text-nust-blue/50 font-display text-sm">
+                            🎉 You have seen all upcoming events!
+                        </p>
                     )}
                 </div>
             </section>

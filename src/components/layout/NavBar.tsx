@@ -96,13 +96,10 @@ export function NavBar() {
         { href: "/ask", label: "Ask" },
         { href: "/map", label: "Map" },
         { href: "/events", label: "Events" },
-        { href: "/calendar", label: "Calendar" },
         { href: "/news", label: "News" },
-        { href: "/about", label: "About" },
     ];
-    // Sits just before About, wherever About happens to be.
     if (GUPSHUP_ENABLED) {
-        navLinks.splice(navLinks.findIndex((l) => l.href === "/about"), 0, {
+        navLinks.push({
             href: "/chatter",
             label: "Gupshup",
         });

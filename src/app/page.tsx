@@ -73,12 +73,11 @@ export default function HomePage() {
                             <span className="text-stroke text-white" style={{ WebkitTextStroke: "3px var(--nust-blue)" }}>UNFILTERED.</span>
                         </h1>
 
-                        <p className="text-xl md:text-2xl text-nust-blue/80 max-w-2xl mx-auto mb-10 font-display font-medium leading-relaxed">
-                            Realtime vibes, spotted events, and zero FOMO. <br />
-                            <span className="bg-nust-orange px-2 py-1 transform -rotate-2 inline-block border-2 border-nust-blue text-white font-bold mt-2 shadow-[4px_4px_0px_var(--nust-blue)]">
+                        <div className="mb-10">
+                            <span className="bg-nust-orange px-4 py-2 transform -rotate-2 inline-block border-2 border-nust-blue text-white text-xl md:text-2xl font-display font-bold shadow-[4px_4px_0px_var(--nust-blue)]">
                                 Literally everything happening at NUST.
                             </span>
-                        </p>
+                        </div>
 
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16">
                             <Link
