@@ -15,9 +15,11 @@ type Turn = {
 };
 
 const TOOL_LABELS: Record<string, string> = {
+    search_campus_places: "Finding campus location…",
+    search_campus_knowledge: "Checking campus rules & guides…",
     search_sections: "Searching NUST handbooks…",
     read_section: "Reading the full section…",
-    find_forms: "Looking for the form…",
+    find_forms: "Finding the official form…",
     search_events: "Checking campus events…",
     get_my_rsvps: "Checking your RSVPs…",
 };

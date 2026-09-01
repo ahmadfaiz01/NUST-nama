@@ -21,32 +21,28 @@ export type Provider = {
 /** Ordered best-first. Entries without a configured key are skipped at runtime. */
 export const PROVIDERS: Provider[] = [
   {
-    name: "groq",
+    name: "groq-primary",
     baseUrl: "https://api.groq.com/openai/v1",
     apiKey: process.env.GROQ_API_KEY,
     model: "openai/gpt-oss-120b",
   },
   {
+    name: "groq-fast",
+    baseUrl: "https://api.groq.com/openai/v1",
+    apiKey: process.env.GROQ_API_KEY,
+    model: "openai/gpt-oss-20b",
+  },
+  {
     name: "groq-backup",
     baseUrl: "https://api.groq.com/openai/v1",
-    apiKey: process.env.GROQ_API_KEY_2,
+    apiKey: process.env.GROQ_API_KEY_2 || process.env.GROQ_API_KEY,
     model: "openai/gpt-oss-120b",
   },
   {
     name: "mistral",
     baseUrl: "https://api.mistral.ai/v1",
     apiKey: process.env.MISTRAL_API_KEY,
-    model: "mistral-large-latest",
-  },
-  {
-    // Last, because Gemini's API is not served in Pakistan: verified 2026-08-07,
-    // both the OpenAI-compatible and native endpoints return 403 "project has
-    // been denied access" while /models still returns 200. Harmless to leave —
-    // 403 fails over — and it starts working if access is ever granted.
-    name: "gemini",
-    baseUrl: "https://generativelanguage.googleapis.com/v1beta/openai",
-    apiKey: process.env.GEMINI_API_KEY,
-    model: "gemini-2.5-flash",
+    model: "mistral-small-latest",
   },
 ];
 

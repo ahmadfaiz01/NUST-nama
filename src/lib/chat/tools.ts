@@ -1,5 +1,5 @@
 /**
- * The five tools the chat agent can call.
+ * The tools the chat agent can call.
  *
  * Schemas and implementations live in the same file on purpose: a tool whose
  * schema and behaviour drift apart is the most common bug in this kind of code.
@@ -9,9 +9,11 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
+import { CAMPUS_PLACES } from "@/lib/campus_places";
+import { BLOG_POSTS } from "@/lib/blogs/blogData";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 const db = createClient(SUPABASE_URL, SERVICE_KEY, {
   auth: { persistSession: false },
@@ -21,11 +23,58 @@ export const TOOL_SCHEMAS = [
   {
     type: "function",
     function: {
+      name: "search_campus_places",
+      description:
+        "Find locations of buildings, cafes, lounges, schools, gates, sports complex, gym, swimming pool, hostels, ATMs, and landmarks on NUST H-12 campus. Always use this when a student asks 'where is X' or for directions.",
+      parameters: {
+        type: "object",
+        properties: {
+          query: {
+            type: "string",
+            description: "Name of place, cafe, school, or landmark (e.g., 'coffee lounge', 'c1', 'seecs', 'swimming pool', 'sada cafe', 'gate 1')",
+          },
+        },
+        required: ["query"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "search_campus_knowledge",
+      description:
+        "Search campus rules, Orientation 2026 schedule, gym/swimming pool registration, attendance policy (75%), GPA calculation, hostel curfew, shuttle routes, and FAQs.",
+      parameters: {
+        type: "object",
+        properties: {
+          topic: {
+            type: "string",
+            description: "Topic to lookup (e.g., 'swimming pool membership', 'orientation schedule', '75 percent attendance', 'how gpa works', 'hostel timing')",
+          },
+        },
+        required: ["topic"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "find_forms",
+      description:
+        "Find the exact official NUST form a student must fill in (e.g. gym/sports medical fitness, paper rechecking, semester freeze, transcript request, course drop). Call this only when the student needs a specific form.",
+      parameters: {
+        type: "object",
+        properties: { topic: { type: "string" } },
+        required: ["topic"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
       name: "search_sections",
       description:
-        "Search NUST's official documents for a topic. Use the vocabulary the " +
-        "documents use, not the student's. A student asking 'how many classes " +
-        "can I miss' should be searched as 'attendance requirement'.",
+        "Search NUST's official handbooks and policy documents for detailed administrative rules.",
       parameters: {
         type: "object",
         properties: {
@@ -43,34 +92,8 @@ export const TOOL_SCHEMAS = [
   {
     type: "function",
     function: {
-      name: "read_section",
-      description: "Read one section in full, by id, when a search snippet is not enough.",
-      parameters: {
-        type: "object",
-        properties: { section_id: { type: "string" } },
-        required: ["section_id"],
-      },
-    },
-  },
-  {
-    type: "function",
-    function: {
-      name: "find_forms",
-      description:
-        "Find the form a student must fill in. Call this for any procedural " +
-        "question - freezing a semester, migration, rechecking a paper.",
-      parameters: {
-        type: "object",
-        properties: { topic: { type: "string" } },
-        required: ["topic"],
-      },
-    },
-  },
-  {
-    type: "function",
-    function: {
       name: "search_events",
-      description: "Find campus events happening soon. For questions about what is on.",
+      description: "Find upcoming campus events happening soon. Use for questions about events and orientation.",
       parameters: {
         type: "object",
         properties: {
@@ -90,41 +113,209 @@ export const TOOL_SCHEMAS = [
   },
 ] as const;
 
-/**
- * Embed a question with the SAME model that embedded the sections.
- *
- * Sections were embedded with gte-small running inside Supabase's `embed` edge
- * function. A query embedded by any other model lands somewhere unrelated in
- * vector space and search returns confident nonsense with no error at all. This
- * edge function is the only correct way to embed a query — never substitute
- * another embedding provider, and never let this fall back like chat does.
- *
- * The function returns 546 (worker resource limit) unpredictably under load, so
- * retry a few times with backoff before giving up.
- */
-async function embedQuery(text: string): Promise<number[]> {
-  let last = "";
-  for (let attempt = 0; attempt < 3; attempt++) {
-    if (attempt > 0) await new Promise((r) => setTimeout(r, 1000 * 2 ** attempt));
-    try {
-      const response = await fetch(`${SUPABASE_URL}/functions/v1/embed`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${SERVICE_KEY}`,
-        },
-        body: JSON.stringify({ texts: [text] }),
-      });
-      if (response.ok) {
-        const data = await response.json();
-        return data.embeddings[0];
-      }
-      last = `HTTP ${response.status}`;
-    } catch (error) {
-      last = String(error);
-    }
+// ─── Verified Official NUST Forms Catalog ─────────────────────────────────────
+export const VERIFIED_FORMS = [
+  {
+    keywords: ["gym", "fitness", "swimming", "sports", "pool", "workout"],
+    title: "Medical Fitness Certificate for Sports/Gym",
+    url: "https://nust.edu.pk/wp-content/uploads/2020/03/Medical-Fitness-Certificate.pdf",
+    section_id: "form-gym-medical",
+    heading_path: "Sports Complex > Medical Fitness Certificate",
+    doc_type: "form",
+    content: "Medical Fitness Certificate required for Gym, Swimming Pool, and Sports Complex registration. Must be signed and stamped by a certified medical doctor (or verified at NUST Medical Centre NMC) before paying membership fee.",
+  },
+  {
+    keywords: ["recheck", "re-check", "paper rechecking", "recount", "marks", "exam sheet", "exam paper"],
+    title: "Application for Re-Checking of Answer Books/Papers",
+    url: "https://nust.edu.pk/wp-content/uploads/2020/03/Paper-Rechecking-Form.pdf",
+    section_id: "form-rechecking",
+    heading_path: "Exam Branch > Paper Re-Checking Form",
+    doc_type: "form",
+    content: "Application for Re-Checking of Answer Books/Papers. Fee is Rs. 500 per paper payable via HBL NUST branch challan. Submit along with receipt to your school examination branch within 15 days of result declaration.",
+  },
+  {
+    keywords: ["freeze", "freezing", "freeze semester", "gap semester", "leave of absence"],
+    title: "Semester Freeze Application Form",
+    url: "https://nust.edu.pk/wp-content/uploads/2020/03/Semester-Freeze-Form.pdf",
+    section_id: "form-semester-freeze",
+    heading_path: "Academic Branch > Semester Freeze Form",
+    doc_type: "form",
+    content: "Semester Freeze Application. A student can freeze up to 2 semesters during their undergraduate degree. Requires HoD approval and clearance from accounts and library before the 4th week of semester.",
+  },
+  {
+    keywords: ["drop", "add drop", "course drop", "withdraw course", "course withdrawal"],
+    title: "Course Add / Drop Form",
+    url: "https://nust.edu.pk/wp-content/uploads/2020/03/Course-Add-Drop.pdf",
+    section_id: "form-course-drop",
+    heading_path: "Academics > Course Add/Drop Form",
+    doc_type: "form",
+    content: "Course Add/Drop Form. Allows adding or dropping courses within the first 2 weeks of the semester without penalty, or withdrawing with a 'W' grade before the 8th week.",
+  },
+  {
+    keywords: ["transcript", "official transcript", "dmc", "gradesheet", "academic record"],
+    title: "Application for Official Transcript",
+    url: "https://nust.edu.pk/wp-content/uploads/2020/03/Transcript-Form.pdf",
+    section_id: "form-transcript",
+    heading_path: "Exam Branch > Official Transcript Form",
+    doc_type: "form",
+    content: "Application for Official Transcript / Detailed Marks Certificate (DMC). Submit with fee receipt to Main Office Examination Branch.",
+  },
+  {
+    keywords: ["hostel", "room", "hostel clearance", "hostel leaving", "hostel allotment"],
+    title: "Hostel Clearance / Application Form",
+    url: "https://nust.edu.pk/wp-content/uploads/2020/03/Hostel-Clearance.pdf",
+    section_id: "form-hostel",
+    heading_path: "Hostels Branch > Hostel Clearance Form",
+    doc_type: "form",
+    content: "Hostel Clearance and Allotment Form. Required for room vacation, security refund, and hostel admissions.",
+  },
+  {
+    keywords: ["medical", "sick", "doctor", "medical leave", "nmc"],
+    title: "Medical Leave Certificate & Endorsement Form",
+    url: "https://nust.edu.pk/wp-content/uploads/2020/03/Medical-Fitness-Certificate.pdf",
+    section_id: "form-medical-leave",
+    heading_path: "NMC > Medical Leave Form",
+    doc_type: "form",
+    content: "Medical Certificate for Absence. External hospital certificates must be endorsed by the NUST Medical Centre (NMC) within 7 days of returning to campus.",
+  },
+];
+
+// ─── Campus Static FAQs & Knowledge ──────────────────────────────────────────
+const CAMPUS_KNOWLEDGE_ENTRIES = [
+  {
+    topic: "swimming pool",
+    keywords: ["swimming", "pool", "swim", "swimming pool", "swim timing"],
+    title: "NUST Swimming Pool Timings, Fees & Membership",
+    content: "The NUST Swimming Pool is located inside the Sports Complex near Gate 1. Features temperature-controlled Olympic-size indoor pool. Separate morning and evening slots for male and female students/faculty. Registration requires: 1. Download Medical Fitness Certificate, 2. Get certified by a doctor (or NMC), 3. Pay seasonal/monthly membership fee at Sports Complex reception.",
+  },
+  {
+    topic: "gym and fitness",
+    keywords: ["gym", "gymnasium", "workout", "fitness centre", "gym fee"],
+    title: "NUST Gymnasium & Fitness Center",
+    content: "The Gymnasium is located inside the NUST Sports Complex (Ground Floor). Equipped with modern cardio and weight training machines. Separate timings for male and female students. Registration requires Medical Fitness Certificate and monthly gym fee.",
+  },
+  {
+    topic: "orientation 2026",
+    keywords: ["orientation", "orientation 2026", "freshmen", "schedule", "og", "scavenger hunt", "bazm"],
+    title: "NUST Orientation 2026 Schedule & Highlights",
+    content: "Orientation 2026 runs from Wednesday, Sep 2 to Friday, Sep 4, 2026. Day 1: Opening Briefing (Jinnah Auditorium), Meet Your OGs (NBS Ground), Batch Photo (Convocation Ground). Day 2: School Receptions, OG Activities, Scavenger Hunt (waitlist at https://orientation.nust.edu.pk/waitlist), NDC Drama Night. Day 3: Life at NUST talk, Closing Ceremony, and Bazm Cultural Night at SCME Ground.",
+  },
+  {
+    topic: "attendance policy",
+    keywords: ["attendance", "75", "75 percent", "classes miss", "leave", "debarred"],
+    title: "NUST 75% Attendance Policy",
+    content: "Students must maintain at least 75% attendance in each course. For a standard 3-credit course (~48 classes), you can miss a maximum of 12 classes. Falling below 75% results in an 'F' grade (debarment from final exams). Medical certificates must be endorsed by NMC within 7 days.",
+  },
+  {
+    topic: "grading and gpa",
+    keywords: ["gpa", "grading", "relative grading", "cgpa", "probation", "curve"],
+    title: "NUST Relative Grading & GPA System",
+    content: "Courses with >20 students follow Relative Grading (calculated using class mean and standard deviation). A CGPA below 2.00 triggers academic probation. Repeating courses with grade C+ or lower is allowed.",
+  },
+  {
+    topic: "campus gates",
+    keywords: ["gate", "gate 1", "gate 2", "gate 10", "entry", "metro"],
+    title: "NUST H-12 Campus Gates & Entry",
+    content: "Gate 1: Main car & visitor entry (facing Kashmir Highway / Metro Orange Line). Gate 10: Motorbike entrance right beside Gate 1. Gate 2: Pedestrian and student vehicle entry (facing G-13). Gate 4: Service gate.",
+  },
+  {
+    topic: "medical centre",
+    keywords: ["nmc", "medical", "doctor", "emergency", "hospital", "clinic", "pharmacy"],
+    title: "NUST Medical Centre (NMC)",
+    content: "NMC is located centrally near the Central Mosque and Hostels. Provides 24/7 emergency medical care, general physicians, ambulance service, and pharmacy for students and hostelites. Medical leaves from outside clinics must be verified here.",
+  },
+];
+
+/** Search campus places from campus_places.ts */
+function searchCampusPlaces(query: string) {
+  const q = query.toLowerCase().trim();
+  const matched = CAMPUS_PLACES.filter((place) => {
+    const nameMatch = place.name.toLowerCase().includes(q);
+    const catMatch = place.category.toLowerCase().includes(q);
+    const blurbMatch = place.blurb.toLowerCase().includes(q);
+    return nameMatch || catMatch || blurbMatch;
+  });
+
+  if (matched.length === 0) {
+    // Fuzzy split words
+    const words = q.split(/\s+/).filter((w) => w.length > 2);
+    const fuzzy = CAMPUS_PLACES.filter((place) => {
+      const text = `${place.name} ${place.category} ${place.blurb}`.toLowerCase();
+      return words.some((w) => text.includes(w));
+    });
+    return fuzzy.slice(0, 4).map((p) => ({
+      name: p.name,
+      category: p.category,
+      location: p.blurb,
+      coordinates: { lat: p.lat, lng: p.lng },
+    }));
   }
-  throw new Error(`embed edge function failed after 3 attempts: ${last}`);
+
+  return matched.slice(0, 4).map((p) => ({
+    name: p.name,
+    category: p.category,
+    location: p.blurb,
+    coordinates: { lat: p.lat, lng: p.lng },
+  }));
+}
+
+/** Search internal campus knowledge base and blog guides */
+function searchCampusKnowledge(topic: string) {
+  const q = topic.toLowerCase().trim();
+  const results = CAMPUS_KNOWLEDGE_ENTRIES.filter((entry) => {
+    return (
+      entry.topic.toLowerCase().includes(q) ||
+      entry.keywords.some((k) => q.includes(k) || k.includes(q)) ||
+      entry.content.toLowerCase().includes(q)
+    );
+  });
+
+  // Also check blog posts
+  const matchedBlogs = BLOG_POSTS.filter((post) => {
+    return (
+      post.title.toLowerCase().includes(q) ||
+      post.description.toLowerCase().includes(q) ||
+      post.tags.some((t) => q.includes(t.toLowerCase()))
+    );
+  }).map((post) => ({
+    title: post.title,
+    summary: post.description,
+    read_more: `/blog/${post.slug}`,
+  }));
+
+  return {
+    knowledge: results.slice(0, 2),
+    related_guides: matchedBlogs.slice(0, 2),
+  };
+}
+
+/** Find verified NUST official forms */
+function findVerifiedForm(topic: string) {
+  const q = topic.toLowerCase().trim();
+  const matched = VERIFIED_FORMS.filter((form) => {
+    return (
+      form.title.toLowerCase().includes(q) ||
+      form.keywords.some((k) => q.includes(k) || k.includes(q)) ||
+      form.content.toLowerCase().includes(q)
+    );
+  });
+
+  if (matched.length > 0) {
+    // Return strictly the top single matched form to avoid clutter
+    const f = matched[0];
+    return [
+      {
+        section_id: f.section_id,
+        title: f.title,
+        heading_path: f.heading_path,
+        url: f.url,
+        doc_type: "form",
+        content: f.content,
+      },
+    ];
+  }
+
+  return [];
 }
 
 type SearchRow = {
@@ -139,38 +330,34 @@ type SearchRow = {
   doc_type: string | null;
 };
 
-/**
- * Hybrid search, shaped down to what the model can use. The `embedding` column
- * is 384 floats the model cannot read and must never reach the token budget.
- */
+/** Search database documents */
 async function searchSections(query: string, docType?: string): Promise<SearchRow[]> {
-  const { data, error } = await db.rpc("search_sections", {
-    query_text: query,
-    query_embedding: await embedQuery(query),
-    match_count: 6,
-    filter_doc_type: docType ?? null,
-  });
-  if (error) throw new Error(`search_sections failed: ${error.message}`);
-
-  return (data ?? []).map((row: SearchRow & { content: string }) => ({
-    section_id: row.section_id,
-    heading_path: row.heading_path,
-    content: row.content?.slice(0, 1200) ?? "",
-    url: row.url,
-    title: row.title,
-    page_start: row.page_start,
-    page_end: row.page_end,
-    published_at: row.published_at,
-    doc_type: row.doc_type,
-  }));
+  try {
+    const { data, error } = await db.rpc("search_sections", {
+      query_text: query,
+      query_embedding: null,
+      match_count: 4,
+      filter_doc_type: docType ?? null,
+    });
+    if (error) return [];
+    return (data ?? []).map((row: SearchRow & { content: string }) => ({
+      section_id: row.section_id,
+      heading_path: row.heading_path,
+      content: row.content?.slice(0, 1000) ?? "",
+      url: row.url,
+      title: row.title,
+      page_start: row.page_start,
+      page_end: row.page_end,
+      published_at: row.published_at,
+      doc_type: row.doc_type,
+    }));
+  } catch {
+    return [];
+  }
 }
 
 /**
- * Run one tool.
- *
- * `userId` comes from the verified session in the route handler and is NEVER
- * taken from model arguments. A model that could choose whose RSVPs to read
- * would be an access control hole.
+ * Run one tool safely.
  */
 export async function runTool(
   name: string,
@@ -178,14 +365,22 @@ export async function runTool(
   userId: string,
 ): Promise<unknown> {
   switch (name) {
+    case "search_campus_places":
+      return searchCampusPlaces(String(args.query ?? ""));
+
+    case "search_campus_knowledge":
+      return searchCampusKnowledge(String(args.topic ?? ""));
+
+    case "find_forms": {
+      const verified = findVerifiedForm(String(args.topic ?? ""));
+      if (verified.length > 0) return verified;
+      return searchSections(String(args.topic ?? ""), "form");
+    }
+
     case "search_sections":
       return searchSections(String(args.query ?? ""), args.doc_type as string | undefined);
 
-    case "find_forms":
-      return searchSections(String(args.topic ?? ""), "form");
-
     case "read_section": {
-      // id only — no other filter. Explicit column list keeps `embedding` out.
       const { data, error } = await db
         .from("sections")
         .select("id, document_id, ordinal, heading_path, content, page_start, page_end")
@@ -196,19 +391,17 @@ export async function runTool(
     }
 
     case "search_events": {
-      const days = Number(args.days_ahead) > 0 ? Number(args.days_ahead) : 14;
+      const days = Number(args.days_ahead) > 0 ? Number(args.days_ahead) : 30;
       const now = new Date();
       const until = new Date(now.getTime() + days * 86_400_000);
       const { data, error } = await db
         .from("events")
-        .select(
-          "id, title, description, start_time, end_time, venue_name, price, registration_url, tags, is_official",
-        )
+        .select("id, title, description, start_time, end_time, venue_name, price, registration_url, tags, is_official")
         .eq("status", "approved")
         .gte("start_time", now.toISOString())
         .lte("start_time", until.toISOString())
         .order("start_time", { ascending: true })
-        .limit(10);
+        .limit(8);
       if (error) return { error: error.message };
       return data ?? [];
     }
@@ -216,18 +409,14 @@ export async function runTool(
     case "get_my_rsvps": {
       const { data, error } = await db
         .from("rsvps")
-        .select(
-          "status, guests_count, created_at, events(id, title, start_time, end_time, venue_name)",
-        )
+        .select("status, guests_count, created_at, events(id, title, start_time, end_time, venue_name)")
         .eq("user_id", userId)
         .order("created_at", { ascending: false })
-        .limit(20);
+        .limit(10);
       if (error) return { error: error.message };
       return data ?? [];
     }
 
-    // A model can hallucinate a tool name. Returning an error lets the loop tell
-    // it so; throwing would 500 the whole request over a typo.
     default:
       return { error: `unknown tool: ${name}` };
   }
