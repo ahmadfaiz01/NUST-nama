@@ -64,7 +64,7 @@ export default function HomePage() {
 
                         <div className="absolute top-0 right-0 md:right-20 animate-float hidden md:block">
                             <div className="w-24 h-24 bg-nust-orange rounded-full border-2 border-nust-blue flex items-center justify-center rotate-12 shadow-[4px_4px_0px_var(--nust-blue)]">
-                                <span className="font-heading text-nust-blue text-center leading-none text-sm">Gen Z<br />Approved</span>
+                                <span className="font-heading text-nust-blue text-center leading-none text-base tracking-wider">NO MORE<br />FOMO</span>
                             </div>
                         </div>
 
