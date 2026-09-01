@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     },
 };
 
-const CATEGORIES = ["All", "Orientation", "Academics", "Food & Cafes", "Campus Life"] as const;
+const CATEGORIES = ["All", "Admissions", "Orientation", "Academics", "Food & Cafes", "Campus Life"] as const;
 
 export default async function BlogIndexPage({
     searchParams,
