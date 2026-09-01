@@ -96,6 +96,7 @@ export function NavBar() {
         { href: "/ask", label: "Ask" },
         { href: "/map", label: "Map" },
         { href: "/events", label: "Events" },
+        { href: "/blog", label: "Blog" },
         { href: "/news", label: "News" },
     ];
     if (GUPSHUP_ENABLED) {

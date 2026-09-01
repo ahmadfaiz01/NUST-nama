@@ -29,53 +29,98 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://nustnama.life"),
-  title: "NUST Nama | Campus Events & Live Vibes",
+  title: {
+    default: "NUST Nama | Campus Events, Guides & Live Vibes",
+    template: "%s | NUST Nama",
+  },
   description:
-    "Discover events, feel the crowd vibe, and coordinate with friends at NUST. Your campus intelligence platform.",
+    "Discover events, campus guides, orientation schedules, rules, and live activity at NUST H-12 Islamabad. Your official student campus intelligence platform.",
   keywords: [
     "NUST",
+    "NUST Islamabad",
+    "NUST H-12",
+    "NUST Orientation 2026",
+    "NUST events",
+    "NUST campus guide",
+    "NUST attendance policy",
+    "NUST GPA grading",
+    "NUST cafes",
+    "NUST hostels",
     "NUSTnama",
-    "events",
-    "campus",
-    "students",
-    "Pakistan",
-    "university",
-    "social",
+    "Pakistan university",
   ],
   authors: [{ name: "NUST Nama Team" }],
   creator: "NUST Nama",
-  // No `icons` here on purpose: it would override the file convention. The tab
-  // icon comes from src/app/icon.png and src/app/apple-icon.png, both the
-  // wordmark, so the logo is the single source and cannot drift again.
-  // src/app/favicon.ico used to sit alongside them holding Next's stock black
-  // triangle, and being an app-directory file it won every request for
-  // /favicon.ico regardless of what public/ or this block said.
+  publisher: "NUST Nama",
+  alternates: {
+    canonical: "https://nustnama.life",
+  },
+  other: {
+    "geo.region": "PK-IS",
+    "geo.placename": "Islamabad, NUST H-12 Campus, Pakistan",
+    "geo.position": "33.6428;72.9905",
+    "ICBM": "33.6428, 72.9905",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://nustnama.life",
     siteName: "NUST Nama",
-    title: "NUST Nama | Campus Events & Live Vibes",
+    title: "NUST Nama | Campus Events, Guides & Live Vibes",
     description:
-      "Discover events, feel the crowd vibe, and coordinate with friends at NUST.",
-    images: [{ url: "/images/hero_aerial_1.jpg", alt: "NUST Nama" }],
+      "Discover events, feel the crowd vibe, read verified student guides, and coordinate with friends at NUST H-12.",
+    images: [{ url: "/images/hero_aerial_1.jpg", width: 1200, height: 630, alt: "NUST Nama Campus" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "NUST Nama",
-    description: "Your campus intelligence platform",
+    description: "Your campus intelligence platform for NUST H-12 Islamabad",
+    images: ["/images/hero_aerial_1.jpg"],
   },
   manifest: "/site.webmanifest",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#004B87",
+  themeColor: "#1B3A6B",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
 };
 
 import { PostHogProvider } from "@/components/providers/PostHogProvider";
+
+const rootSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollegeOrUniversity",
+      "@id": "https://nustnama.life/#organization",
+      "name": "NUST Nama",
+      "url": "https://nustnama.life",
+      "logo": "https://nustnama.life/icon.png",
+      "description": "Student campus intelligence platform for National University of Sciences and Technology (NUST) H-12 Islamabad.",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "NUST H-12 Campus, Scholar Avenue",
+        "addressLocality": "Islamabad",
+        "postalCode": "44000",
+        "addressCountry": "PK"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 33.6428,
+        "longitude": 72.9905
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://nustnama.life/#website",
+      "url": "https://nustnama.life",
+      "name": "NUST Nama",
+      "publisher": { "@id": "https://nustnama.life/#organization" }
+    }
+  ]
+};
 
 export default function RootLayout({
   children,
@@ -87,6 +132,12 @@ export default function RootLayout({
       lang="en"
       className={`${bebasNeue.variable} ${spaceGrotesk.variable} ${inter.variable}`}
     >
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(rootSchema) }}
+        />
+      </head>
       <body className="min-h-screen bg-cream text-foreground antialiased relative selection:bg-nust-orange selection:text-white">
         <PostHogProvider>
           <NavBar />

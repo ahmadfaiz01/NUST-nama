@@ -36,6 +36,15 @@ export function Footer() {
                             <Link href="/events" className="text-white font-bold hover:text-nust-orange transition-colors">
                                 Events
                             </Link>
+                            <Link href="/blog" className="text-white font-bold hover:text-nust-orange transition-colors">
+                                Blog & Guides
+                            </Link>
+                            <Link href="/map" className="text-white font-bold hover:text-nust-orange transition-colors">
+                                Campus Map
+                            </Link>
+                            <Link href="/ask" className="text-white font-bold hover:text-nust-orange transition-colors">
+                                Ask AI
+                            </Link>
                             <Link href="/faq" className="text-white font-bold hover:text-nust-orange transition-colors">
                                 FAQ
                             </Link>
