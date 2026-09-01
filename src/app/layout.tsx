@@ -52,10 +52,14 @@ export const metadata: Metadata = {
   authors: [{ name: "NUST Nama Team" }],
   creator: "NUST Nama",
   publisher: "NUST Nama",
+  verification: {
+    google: "ueP7Wuzxw3BYm6l_kcssGCl9Bdnee48b_l2Ilc5Ps7c",
+  },
   alternates: {
     canonical: "https://nustnama.life",
   },
   other: {
+    "google-site-verification": "ueP7Wuzxw3BYm6l_kcssGCl9Bdnee48b_l2Ilc5Ps7c",
     "geo.region": "PK-IS",
     "geo.placename": "Islamabad, NUST H-12 Campus, Pakistan",
     "geo.position": "33.6428;72.9905",
