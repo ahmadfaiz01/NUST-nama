@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
-    BLOG_POSTS,
     getBlogPost,
     getAllBlogSlugs,
     getRelatedBlogPosts,
@@ -10,11 +11,10 @@ import {
 import {
     Calendar,
     Clock,
-    Share2,
     ChevronRight,
-    ArrowLeft,
-    CheckCircle2,
     HelpCircle,
+    Bookmark,
+    CheckCircle,
 } from "lucide-react";
 import { ShareButtons } from "./ShareButtons";
 
@@ -96,7 +96,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     const relatedPosts = getRelatedBlogPosts(slug, 3);
     const postUrl = `https://nustnama.life/blog/${post.slug}`;
 
-    // ─── JSON-LD Structured Data Schemas (GEO & Google Rich Snippets) ─────────
+    // ─── JSON-LD Structured Data Schemas ─────────────────────────────────────
     const articleSchema = {
         "@context": "https://schema.org",
         "@type": "BlogPosting",
@@ -183,7 +183,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             )}
 
             {/* Breadcrumb Navigation */}
-            <div className="bg-white border-b-2 border-nust-blue/15 py-3">
+            <div className="bg-white border-b-2 border-nust-blue/15 py-3 shadow-xs">
                 <div className="container max-w-4xl mx-auto px-4 flex items-center gap-1.5 text-xs text-nust-blue/70 font-sans font-medium">
                     <Link href="/" className="hover:text-nust-orange transition-colors">
                         Home
@@ -193,7 +193,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                         Blog & Guides
                     </Link>
                     <ChevronRight className="w-3.5 h-3.5 text-nust-blue/40" />
-                    <span className="text-nust-blue font-bold truncate max-w-[240px] md:max-w-md">
+                    <span className="text-nust-blue font-bold truncate max-w-[200px] sm:max-w-md">
                         {post.title}
                     </span>
                 </div>
@@ -204,10 +204,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 {/* Header Card */}
                 <div className="bg-white rounded-2xl border-2 border-nust-blue shadow-[6px_6px_0px_var(--nust-blue)] p-6 md:p-10 mb-8">
                     <div className="flex flex-wrap items-center gap-3 mb-4">
-                        <span className="bg-nust-orange text-white text-xs font-bold px-3 py-1 rounded-full border-2 border-nust-blue shadow-[1.5px_1.5px_0px_var(--nust-blue)]">
+                        <span className="bg-nust-orange text-white text-xs font-bold px-3.5 py-1 rounded-full border-2 border-nust-blue shadow-[1.5px_1.5px_0px_var(--nust-blue)] uppercase tracking-wider">
                             {post.category}
                         </span>
-                        <span className="text-xs text-nust-blue/60 font-sans font-medium flex items-center gap-1">
+                        <span className="text-xs text-nust-blue/70 font-sans font-medium flex items-center gap-1">
                             <Calendar className="w-3.5 h-3.5 text-nust-orange" />
                             {new Date(post.publishedAt).toLocaleDateString("en-US", {
                                 month: "long",
@@ -215,13 +215,13 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                                 year: "numeric",
                             })}
                         </span>
-                        <span className="text-xs text-nust-blue/60 font-sans font-medium flex items-center gap-1">
+                        <span className="text-xs text-nust-blue/70 font-sans font-medium flex items-center gap-1">
                             <Clock className="w-3.5 h-3.5 text-nust-blue" />
                             {post.readTime}
                         </span>
                     </div>
 
-                    <h1 className="text-3xl md:text-5xl font-heading text-nust-blue mb-6 leading-[1.1] tracking-tight">
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-heading text-nust-blue mb-6 leading-[1.08] tracking-tight">
                         {post.title}
                     </h1>
 
@@ -249,128 +249,129 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 </div>
 
                 {/* Featured Cover Image */}
-                <div className="rounded-2xl overflow-hidden border-2 border-nust-blue shadow-[6px_6px_0px_var(--nust-blue)] mb-10 bg-black/5 max-h-[460px]">
+                <div className="rounded-2xl overflow-hidden border-2 border-nust-blue shadow-[6px_6px_0px_var(--nust-blue)] mb-8 bg-black/5 max-h-[480px]">
                     <img
                         src={post.coverImage}
                         alt={post.title}
-                        className="w-full h-full object-cover max-h-[460px]"
+                        className="w-full h-full object-cover max-h-[480px]"
                     />
                 </div>
 
-                {/* Article Body Content */}
-                <div className="bg-white rounded-2xl border-2 border-nust-blue shadow-[6px_6px_0px_var(--nust-blue)] p-6 md:p-12 mb-10">
-                    <div className="prose prose-lg max-w-none font-sans text-gray-800 leading-relaxed space-y-6">
-                        {/* Direct Answer Summary Box for GEO (Generative AI Overviews) */}
-                        <div className="bg-[#FAF8F2] border-2 border-nust-blue/40 rounded-xl p-5 my-4">
-                            <h2 className="font-heading text-xl text-nust-blue mb-1 flex items-center gap-2">
-                                📌 Key Takeaway / Quick Summary
-                            </h2>
-                            <p className="text-sm text-gray-700 font-sans leading-relaxed">
-                                {post.description}
-                            </p>
-                        </div>
+                {/* Direct Answer Summary Box for GEO (Generative AI Overviews) */}
+                <div className="bg-white border-2 border-nust-blue rounded-2xl shadow-[4px_4px_0px_var(--nust-blue)] p-6 mb-8 flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-nust-orange text-white flex items-center justify-center shrink-0 border-2 border-nust-blue shadow-xs mt-0.5">
+                        <Bookmark className="w-5 h-5" />
+                    </div>
+                    <div>
+                        <h2 className="font-heading text-xl text-nust-blue mb-1 leading-tight tracking-wide">
+                            QUICK SUMMARY & TAKEAWAY
+                        </h2>
+                        <p className="text-sm text-gray-700 font-sans leading-relaxed">
+                            {post.description}
+                        </p>
+                    </div>
+                </div>
 
-                        {/* Render Body Sections with custom formatting */}
-                        {post.content.split("\n\n").map((paragraph, index) => {
-                            // Headers
-                            if (paragraph.startsWith("## ")) {
-                                return (
-                                    <h2
-                                        key={index}
-                                        className="font-heading text-3xl md:text-4xl text-nust-blue pt-4 pb-2 border-b-2 border-nust-blue/15"
-                                    >
-                                        {paragraph.replace("## ", "")}
+                {/* Article Body Content Rendered with ReactMarkdown */}
+                <div className="bg-white rounded-2xl border-2 border-nust-blue shadow-[6px_6px_0px_var(--nust-blue)] p-6 sm:p-10 md:p-12 mb-10">
+                    <div className="font-sans text-gray-800 leading-relaxed space-y-6">
+                        <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                                h2: ({ children }) => (
+                                    <h2 className="text-2xl sm:text-3xl font-heading text-nust-blue pt-6 pb-2 border-b-2 border-nust-blue/15 tracking-wide flex items-center gap-2">
+                                        <span className="text-nust-orange">#</span>
+                                        <span>{children}</span>
                                     </h2>
-                                );
-                            }
-                            if (paragraph.startsWith("### ")) {
-                                return (
-                                    <h3
-                                        key={index}
-                                        className="font-heading text-2xl md:text-3xl text-nust-blue pt-2"
-                                    >
-                                        {paragraph.replace("### ", "")}
+                                ),
+                                h3: ({ children }) => (
+                                    <h3 className="text-xl sm:text-2xl font-display font-bold text-nust-blue pt-4 tracking-tight">
+                                        {children}
                                     </h3>
-                                );
-                            }
-
-                            // Bullet Lists
-                            if (paragraph.startsWith("* ") || paragraph.startsWith("- ")) {
-                                const items = paragraph.split("\n");
-                                return (
-                                    <ul key={index} className="space-y-2 my-4 pl-2">
-                                        {items.map((item, itemIdx) => (
-                                            <li key={itemIdx} className="flex items-start gap-2 text-base text-gray-700">
-                                                <span className="text-nust-orange font-bold mt-1 text-xs">◆</span>
-                                                <span
-                                                    dangerouslySetInnerHTML={{
-                                                        __html: item
-                                                            .replace(/^[\*\-]\s+/, "")
-                                                            .replace(/\*\*(.*?)\*\*/g, '<strong class="text-nust-blue font-bold">$1</strong>')
-                                                            .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="text-nust-blue font-bold underline hover:text-nust-orange">$1</a>'),
-                                                    }}
-                                                />
-                                            </li>
-                                        ))}
-                                    </ul>
-                                );
-                            }
-
-                            // Numbered Lists
-                            if (/^\d+\.\s/.test(paragraph)) {
-                                const items = paragraph.split("\n");
-                                return (
-                                    <ol key={index} className="space-y-2.5 my-4 pl-2">
-                                        {items.map((item, itemIdx) => (
-                                            <li key={itemIdx} className="flex items-start gap-2.5 text-base text-gray-700">
-                                                <span className="w-5 h-5 rounded-full bg-nust-blue text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
-                                                    {itemIdx + 1}
-                                                </span>
-                                                <span
-                                                    dangerouslySetInnerHTML={{
-                                                        __html: item
-                                                            .replace(/^\d+\.\s+/, "")
-                                                            .replace(/\*\*(.*?)\*\*/g, '<strong class="text-nust-blue font-bold">$1</strong>')
-                                                            .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="text-nust-blue font-bold underline hover:text-nust-orange">$1</a>'),
-                                                    }}
-                                                />
-                                            </li>
-                                        ))}
-                                    </ol>
-                                );
-                            }
-
-                            // Blockquotes
-                            if (paragraph.startsWith("> ")) {
-                                return (
-                                    <div
-                                        key={index}
-                                        className="border-l-4 border-nust-orange bg-nust-orange/5 p-4 rounded-r-xl font-medium text-gray-700 my-4"
+                                ),
+                                p: ({ children }) => (
+                                    <p className="text-base sm:text-lg text-gray-700 leading-relaxed">
+                                        {children}
+                                    </p>
+                                ),
+                                strong: ({ children }) => (
+                                    <strong className="text-nust-blue font-bold">
+                                        {children}
+                                    </strong>
+                                ),
+                                a: ({ href, children }) => (
+                                    <a
+                                        href={href}
+                                        className="text-nust-blue font-bold underline decoration-nust-orange decoration-2 hover:text-nust-orange transition-colors"
+                                        target={href?.startsWith("http") ? "_blank" : undefined}
+                                        rel={href?.startsWith("http") ? "noopener noreferrer" : undefined}
                                     >
-                                        <p
-                                            dangerouslySetInnerHTML={{
-                                                __html: paragraph
-                                                    .replace(/^>\s+/, "")
-                                                    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-nust-blue font-bold">$1</strong>'),
-                                            }}
-                                        />
+                                        {children}
+                                    </a>
+                                ),
+                                ul: ({ children }) => (
+                                    <ul className="space-y-2.5 my-4 pl-2 list-none">
+                                        {children}
+                                    </ul>
+                                ),
+                                ol: ({ children }) => (
+                                    <ol className="space-y-3 my-4 pl-2 list-decimal list-inside text-gray-700 font-medium">
+                                        {children}
+                                    </ol>
+                                ),
+                                li: ({ children }) => (
+                                    <li className="flex items-start gap-2.5 text-base sm:text-lg text-gray-700 leading-relaxed">
+                                        <span className="text-nust-orange font-bold mt-1 text-xs shrink-0">◆</span>
+                                        <div className="flex-1">{children}</div>
+                                    </li>
+                                ),
+                                blockquote: ({ children }) => (
+                                    <div className="border-l-4 border-nust-orange bg-nust-orange/5 p-4 sm:p-5 rounded-r-xl font-medium text-gray-700 my-6 shadow-xs border-y border-r border-nust-blue/10">
+                                        <div className="flex items-start gap-3">
+                                            <span className="text-xl">💡</span>
+                                            <div className="text-sm sm:text-base leading-relaxed">{children}</div>
+                                        </div>
                                     </div>
-                                );
-                            }
-
-                            // Regular Paragraph
-                            return (
-                                <p
-                                    key={index}
-                                    className="text-base md:text-lg text-gray-700 leading-relaxed"
-                                    dangerouslySetInnerHTML={{
-                                        __html: paragraph
-                                            .replace(/\*\*(.*?)\*\*/g, '<strong class="text-nust-blue font-bold">$1</strong>')
-                                            .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="text-nust-blue font-bold underline hover:text-nust-orange">$1</a>'),
-                                    }}
-                                />
-                            );
-                        })}
+                                ),
+                                table: ({ children }) => (
+                                    <div className="my-6 overflow-x-auto rounded-xl border-2 border-nust-blue shadow-[3px_3px_0px_var(--nust-blue)]">
+                                        <table className="w-full text-left border-collapse text-sm sm:text-base">
+                                            {children}
+                                        </table>
+                                    </div>
+                                ),
+                                thead: ({ children }) => (
+                                    <thead className="bg-nust-blue text-white font-heading text-lg tracking-wider border-b-2 border-nust-blue">
+                                        {children}
+                                    </thead>
+                                ),
+                                th: ({ children }) => (
+                                    <th className="p-3.5 font-bold uppercase border-r border-white/20 last:border-r-0">
+                                        {children}
+                                    </th>
+                                ),
+                                tbody: ({ children }) => (
+                                    <tbody className="divide-y divide-gray-200 bg-white">
+                                        {children}
+                                    </tbody>
+                                ),
+                                tr: ({ children }) => (
+                                    <tr className="hover:bg-cream/40 transition-colors">
+                                        {children}
+                                    </tr>
+                                ),
+                                td: ({ children }) => (
+                                    <td className="p-3.5 text-gray-700 border-r border-gray-200 last:border-r-0 font-sans">
+                                        {children}
+                                    </td>
+                                ),
+                                hr: () => (
+                                    <hr className="my-8 border-t-2 border-dashed border-nust-blue/15" />
+                                ),
+                            }}
+                        >
+                            {post.content}
+                        </ReactMarkdown>
                     </div>
 
                     {/* FAQ Section (Optimized for AI Overviews / Google Snippets) */}
@@ -389,10 +390,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                                         key={i}
                                         className="bg-[#FCFAF5] border-2 border-nust-blue/30 rounded-xl p-5 shadow-[2px_2px_0px_rgba(27,58,107,0.1)]"
                                     >
-                                        <h3 className="font-sans font-bold text-base text-nust-blue mb-2">
-                                            Q: {faq.question}
+                                        <h3 className="font-display font-bold text-base text-nust-blue mb-2 flex items-center gap-2">
+                                            <span className="text-nust-orange font-bold">Q:</span>
+                                            {faq.question}
                                         </h3>
-                                        <p className="font-sans text-sm text-gray-700 leading-relaxed">
+                                        <p className="font-sans text-sm sm:text-base text-gray-700 leading-relaxed pl-5">
                                             {faq.answer}
                                         </p>
                                     </div>
@@ -427,7 +429,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                             <h3 className="font-heading text-2xl text-nust-blue leading-none">
                                 Written by {post.author.name}
                             </h3>
-                            <span className="text-xs font-bold text-nust-orange bg-nust-orange/10 px-2 py-0.5 rounded-full border border-nust-orange/30">
+                            <span className="text-xs font-bold text-nust-orange bg-nust-orange/10 px-2 py-0.5 rounded-full border border-nust-orange/30 flex items-center gap-1">
+                                <CheckCircle className="w-3 h-3" />
                                 Verified Contributor
                             </span>
                         </div>

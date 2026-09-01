@@ -67,85 +67,75 @@ export const BLOG_POSTS: BlogPost[] = [
         faqs: [
             {
                 question: "What are the official dates for NUST Orientation 2026?",
-                answer: "NUST Orientation 2026 takes place over 3 days from Wednesday, September 2nd to Friday, September 4th, 2026 on the H-12 Islamabad campus.",
+                answer: "NUST Orientation 2026 takes place over 3 full days from Wednesday, September 2nd to Friday, September 4th, 2026 on the H-12 Islamabad campus.",
             },
             {
                 question: "Which gate should freshmen use for Orientation?",
-                answer: "Gate 1 (metro and car entry) and Gate 2 (G-13 pedestrian entry) are the main access points. Gate 10 is available for motorbike entry right beside Gate 1.",
+                answer: "Gate 1 (main entrance facing Kashmir Highway / Metro Orange Line) and Gate 2 (facing Sector G-13) are the primary access points. Motorbikes must enter through Gate 10 right next to Gate 1.",
             },
             {
                 question: "How do I register for the Orientation Scavenger Hunt?",
-                answer: "You can join the official waitlist directly at https://orientation.nust.edu.pk/waitlist for the Pokémon-themed campus Scavenger Hunt happening on Day 2.",
+                answer: "Join the official waitlist directly at https://orientation.nust.edu.pk/waitlist for the Pokémon-themed campus Scavenger Hunt happening on Day 2.",
             },
         ],
         content: `
-## Welcome to NUST H-12, Class of 2026!
+Stepping into NUST's 700-acre H-12 campus for the first time can feel exciting yet intimidating. With over 15 schools, sprawling hostels, and thousands of new faces, **Orientation Week (ON'26)** is designed to transition you seamlessly into university life.
 
-Stepping into NUST's 700-acre H-12 campus for the first time can feel overwhelming. With over 15 schools, multiple hostel sectors, and thousands of new faces, **Orientation Week** is your official launchpad.
-
-Here is the verified 3-day schedule, event locations, and insider advice from seniors so you don't miss a thing.
+Below is your verified, minute-by-minute schedule, venue details, and survival tips from senior students.
 
 ---
 
-### Day 1: Wednesday, 2nd September 2026 — The Grand Welcome
+## 📅 Day 1: Wednesday, Sep 2 — The Grand Welcome
 
-The first day is dedicated to getting familiar with university leadership, meeting your department principals, and getting allocated to your Orientation Guides (OGs).
+The opening day focuses on introducing you and your parents to university leadership, meeting your department heads, and getting assigned to your **Orientation Guides (OGs)**.
 
-* **10:00 – 11:30 | Opening Briefing & Q&A with Parents**  
-  *Venue:* Jinnah Auditorium / NBS Hall (Broadcast)  
-  *What to expect:* Key address by the Rector and Registrar explaining NUST core policies, transport, and campus safety. Parents are warmly invited.
-* **12:00 – 13:00 | Principal S3H Address + Q&A**  
-  *Venue:* Jinnah Auditorium
-* **14:00 – 15:00 | Principal NBS Address + Q&A**  
-  *Venue:* Jinnah Auditorium
-* **15:30 – 16:30 | Principal SEECS Address + Q&A**  
-  *Venue:* Jinnah Auditorium
-* **14:00 – 16:00 | Meet Your OGs (Orientation Guides)**  
-  *Venue:* NBS Ground  
-  *What to expect:* Icebreakers, squad name assignments, and campus tour groups.
-* **16:00 – 21:00 | Official Batch Photograph**  
-  *Venue:* Convocation Ground  
-  *Pro Tip:* Wear semi-formal or smart casual attire; this photo remains in NUST archives for your entire degree!
+| Time | Event | Venue | Details |
+| :--- | :--- | :--- | :--- |
+| **10:00 – 11:30** | Opening Briefing & Q&A with Parents | Jinnah Auditorium / NBS Hall | Keynote address by the Rector & Registrar on campus policies, safety, and academics. |
+| **12:00 – 13:00** | Principal S3H Address + Q&A | Jinnah Auditorium | Orientation for School of Social Sciences & Humanities. |
+| **14:00 – 15:00** | Principal NBS Address + Q&A | Jinnah Auditorium | Orientation for NUST Business School freshers. |
+| **15:30 – 16:30** | Principal SEECS Address + Q&A | Jinnah Auditorium | Orientation for School of Electrical Engineering & Computer Science. |
+| **14:00 – 16:00** | Meet Your OGs (Orientation Guides) | NBS Ground | Icebreakers, squad name assignments, and tour group allocation. |
+| **16:00 – 21:00** | Official Batch Photograph | Convocation Ground | The iconic whole-batch class photo that stays in NUST archives forever. |
+
+> **Pro Tip:** Wear smart casuals or semi-formal attire for the batch photo. The sun can get warm on the grounds, so carry a water bottle!
 
 ---
 
-### Day 2: Thursday, 3rd September 2026 — School Tours & Society Showcases
+## 🎯 Day 2: Thursday, Sep 3 — School Tours & Society Showcases
 
-* **09:00 – 13:00 | Department & School Reception**  
-  *Venue:* Respective School Blocks / NET Exam Hall  
-  *What to expect:* Meet your Head of Department (HoD), course advisors, tour computer/hardware labs, and receive timetable packets.
-* **13:00 – 19:00 | OG Team Activities & Games**  
-  *Venue:* NBS Ground
-* **13:00 – 18:00 | Orientation Scavenger Hunt**  
-  *Venue:* NBS Ground (Registration required via [orientation.nust.edu.pk/waitlist](https://orientation.nust.edu.pk/waitlist))
-* **14:00 – 19:00 | Clubs & Societies Showcase**  
-  *Venue:* Central Grounds  
-  *What to expect:* Over 30+ official student bodies (NUST Science Society, GDSC, NUST Dramatics Club, PNEC Racing, etc.) setting up interactive recruitment stalls.
-* **18:00 – 21:00 | Drama Night by NDC (NUST Dramatics Club)**  
-  *Venue:* Jinnah Auditorium
+Day 2 is where the real campus energy kicks off. You will tour your school's research labs, sign up for student clubs, and compete in campus-wide challenges.
+
+| Time | Event | Venue | Details |
+| :--- | :--- | :--- | :--- |
+| **09:00 – 13:00** | Department & School Reception | Respective School Blocks | Meet your HoD, course advisors, lab engineers, and receive your semester timetable. |
+| **13:00 – 19:00** | OG Team Games & Campus Relay | NBS Ground | Fun interactive outdoor challenges with your OG squad. |
+| **13:00 – 18:00** | Orientation Scavenger Hunt | NBS Ground / Campus Wide | Pokémon-themed quest across H-12 landmarks. Registration required at [orientation.nust.edu.pk/waitlist](https://orientation.nust.edu.pk/waitlist). |
+| **14:00 – 19:00** | Clubs & Societies Expo | Central Grounds | Over 30+ official student bodies (NUST Science Society, GDSC, NUST Dramatics Club, etc.) recruiting freshmen. |
+| **18:00 – 21:00** | Drama Night by NDC | Jinnah Auditorium | Live stage play and comedy sketches by NUST Dramatics Club. |
 
 ---
 
-### Day 3: Friday, 4th September 2026 — Life at NUST & Bazm Night
+## 🌟 Day 3: Friday, Sep 4 — Life at NUST & Bazm Night
 
-* **10:00 – 12:30 | Life at NUST (Registrar, FAO, & Alumni Talk)**  
-  *Venue:* Jinnah Auditorium  
-  *What to expect:* Crucial details regarding GPA policies, financial aid, fee installments, and alumni career paths.
-* **10:00 – 12:30 | Life at NUST — SEECS Special Session**  
-  *Venue:* SCEE Seminar Hall
-* **15:30 – 16:30 | Closing Ceremony**  
-  *Venue:* Jinnah Auditorium
-* **17:00 – 22:00 | Bazm Night / Cultural Evening**  
-  *Venue:* SCME Ground  
-  *What to expect:* Live musical performances, food stalls, and the traditional send-off into regular classes!
+The final day prepares you for academic success, followed by an unforgettable musical and cultural evening under the stars.
+
+| Time | Event | Venue | Details |
+| :--- | :--- | :--- | :--- |
+| **10:00 – 12:30** | Life at NUST (Registrar, FAO, & Alumni) | Jinnah Auditorium | Vital session on GPA rules, financial aid, fee installments, and alumni career paths. |
+| **10:00 – 12:30** | Life at NUST — SEECS Special Session | SCEE Seminar Hall | Technical roadmap and career tips for computing & engineering students. |
+| **15:30 – 16:30** | Closing Ceremony & Awards | Jinnah Auditorium | Concluding address, OG awards, and announcement of competition winners. |
+| **17:00 – 22:00** | Bazm Night & Society Stalls | SCME Ground | Cultural food stalls, live acoustic performances, and celebration. |
 
 ---
 
-### 5 Essential Tips for Freshmen:
-1. **Transport:** Metro Orange Line / Red Line feeder buses drop off right at Gate 1 and Gate 2.
-2. **Dress Code:** Smart casuals. Comfortable sneakers are mandatory—you'll easily log 8,000+ steps per day walking between blocks.
-3. **Food:** Quickest bites near the venues are Concordia 1 (C1) and Central Library Cafe.
-4. **Campus Map:** Open the live [NUST Nama Campus Map](/map) on your phone to instantly pinpoint any hall, gate, or cafe.
+## 🎒 5 Essential Freshmen Survival Tips
+
+1. **Footwear is King:** NUST H-12 is massive (700+ acres). You will easily log 8,000 to 12,000 steps a day walking between hostels, cafes, and academic blocks. Wear comfortable sneakers.
+2. **Transportation:** The Metro Orange Line & Green Line feeder buses stop right outside Gate 1 and Gate 2. If riding a bike, use Gate 10.
+3. **Food on the Go:** Concordia 1 (C1) and the Central Library Cafe are the quickest spots for lunch between orientation sessions.
+4. **ID Card & Documents:** Always keep your provisional admission letter and CNIC handy during the first week while official smart student cards are being printed.
+5. **Interactive Campus Map:** Bookmark the live [NUST Nama Campus Map](/map) to search all 77 buildings, cafes, gates, and libraries right from your phone.
 `,
     },
     {
@@ -183,42 +173,46 @@ The first day is dedicated to getting familiar with university leadership, meeti
             },
         ],
         content: `
-## The Golden Rule: 75% Minimum Attendance
+One of the quickest ways students run into academic trouble at NUST is taking attendance casually. Unlike many colleges, **NUST strictly enforces the 75% attendance rule across all undergraduate and postgraduate programs**.
 
-One of the most common pitfalls for freshmen at NUST is taking attendance lightly. Unlike school, **NUST strictly enforces the 75% attendance rule across all undergraduate and postgraduate programs**.
-
-Falling below 75% in any course means you receive an **'F' grade (debarred)** and are prohibited from sitting in the End-Semester Final Examination.
+Falling below 75% in any registered course means you are awarded an **'F' grade (debarred)** and are prohibited from sitting in the End-Semester Final Examination.
 
 ---
 
-### How Many Lectures Can You Safely Miss?
+## 📊 How Many Classes Can You Safely Miss?
 
-Attendance is counted on a per-course basis, not semester aggregate. Here is the math for a standard 16-week academic semester:
+Attendance is tracked per-course on CMS/LMS, not as an aggregate across the semester. Here is the exact calculation for a typical 16-week semester:
 
-| Course Type | Total Classes (Approx.) | Maximum Allowed Absences (25%) |
-| :--- | :--- | :--- |
-| **3-Credit Theory (3 hrs/week)** | ~48 lectures | **Max 12 lectures** |
-| **2-Credit Theory (2 hrs/week)** | ~32 lectures | **Max 8 lectures** |
-| **1-Credit Lab (3 hrs lab/week)** | ~16 lab sessions | **Max 4 lab sessions** |
+| Course Type | Total Classes Held | Minimum Required (75%) | Max Allowed Absences (25%) |
+| :--- | :--- | :--- | :--- |
+| **3-Credit Theory (3 hrs/wk)** | ~48 lectures | **36 lectures** | **Max 12 lectures** |
+| **2-Credit Theory (2 hrs/wk)** | ~32 lectures | **24 lectures** | **Max 8 lectures** |
+| **1-Credit Lab (3 hrs lab/wk)** | ~16 lab sessions | **12 lab sessions** | **Max 4 lab sessions** |
+| **4-Credit Course (4 hrs/wk)** | ~64 lectures | **48 lectures** | **Max 16 lectures** |
 
-> **Warning:** Labs have very few total sessions. Missing just 4 labs can result in an instant debarment from the practical exam!
-
----
-
-### The Medical Leave & Duty Leave Process
-
-If you fall sick or represent NUST in an official competition/conference:
-
-1. **Medical Certificate from NMC:** Any medical slip from outside hospitals must be endorsed by the **NUST Medical Centre (NMC)** on campus.
-2. **Submission Deadline:** Submit your leave application along with verified medical slips to your School Coordinator within **7 working days** of returning to campus.
-3. **Duty Leave:** If attending a society event or hackathon, ensure the faculty advisor issues an official duty leave letter *prior* to departure.
+> **Critical Warning for Labs:** Because practical lab courses meet only once a week, missing just **4 labs** puts you under the 75% threshold and results in instant debarment from practical finals!
 
 ---
 
-### What to Do If Your Attendance Drops to 74%?
+## 🏥 Official Medical & Duty Leave Procedures
 
-* **Talk to your instructor immediately:** Professors have a brief window before finals to review genuine emergencies.
-* **Dean's Discretionary Condonation:** In rare, verified medical cases with hospital stays, the Dean/Commandant can condone attendance down to 65% upon formal petition.
+If you fall ill or represent NUST in an official competition or conference, follow this exact workflow:
+
+### 1. Medical Leave from NMC
+* Any medical slip from outside hospitals must be endorsed by the **NUST Medical Centre (NMC)** on campus.
+* Submit your leave application along with the endorsed medical certificate to your School Coordination / Examination Branch within **7 working days** of returning to classes.
+
+### 2. Duty Leave (Competitions / Hackathons)
+* If attending an official society event or sports tournament, ensure the Faculty Advisor submits a formal **Duty Leave Request** to the Dean *prior* to departure.
+* Duty leaves count toward attendance and protect your 75% standing.
+
+---
+
+## ⚠️ What Happens If Your Attendance Drops Below 75%?
+
+1. **CMS Warning Alerts:** Once your attendance drops below 80%, automated alert emails are sent via the CMS portal.
+2. **Debarment Notice:** In the final week of classes, the School Examination branch posts the official debarment list. Debarred students cannot sit in the final exam and receive an 'F' grade in that course.
+3. **Dean's Discretionary Condonation:** In exceptional, hospitalized medical emergencies, the Dean has discretionary authority to condone attendance down to 65% upon formal appeal.
 `,
     },
     {
@@ -244,52 +238,58 @@ If you fall sick or represent NUST in an official competition/conference:
         faqs: [
             {
                 question: "What is the difference between relative and absolute grading at NUST?",
-                answer: "In absolute grading, fixed mark brackets determine grades (e.g. 85+ is A). In relative grading, your grade depends on your performance compared to the class average (mean) and standard deviation.",
+                answer: "In absolute grading, fixed mark brackets determine grades (e.g. 85+ is A). In relative grading, your grade depends on your performance relative to the class mean (average) and standard deviation.",
             },
             {
                 question: "What CGPA puts you on academic probation at NUST?",
-                answer: "An undergraduate student with a CGPA below 2.00 is placed on Academic Probation. Falling on probation for 3 consecutive semesters results in academic dismissal.",
+                answer: "An undergraduate student with a CGPA below 2.00 is placed on Academic Probation. Remaining on probation for 3 consecutive semesters can lead to academic dismissal.",
             },
         ],
         content: `
-## Understanding Relative vs. Absolute Grading at NUST
+At NUST, most computing, engineering, business, and social science courses with more than 20 students follow **Relative Grading**. Smaller elective batches (under 20 students) and specific laboratory practicals use **Absolute Grading**.
 
-At NUST, most engineering, computing, business, and social sciences courses with more than 20 students use **Relative Grading**. Smaller classes (under 20 students) or specific lab practicals may use **Absolute Grading**.
-
----
-
-### How the Relative Grading Curve Works
-
-Instead of fixing 80% as an 'A', your final grade is calculated based on:
-1. **Class Mean ($\mu$):** The average score of all students in the section.
-2. **Standard Deviation ($\sigma$):** How widely marks are spread around the average.
-
-* **Grade 'A' (4.00 GPA):** Typically awarded to scores higher than $\mu + 1.5\sigma$.
-* **Grade 'B+' (3.50 GPA):** Roughly $\mu + 1.0\sigma$.
-* **Grade 'B' (3.00 GPA):** Near $\mu + 0.5\sigma$.
-* **Grade 'C' (2.00 GPA):** Around the class average ($\mu$).
-
-> **Key Takeaway:** If an exam was brutally hard and the class average was 45/100, scoring a 65/100 can easily earn you an **A (4.0 GPA)**!
+Understanding how the grading curve functions is the key to maintaining a high CGPA without burning out.
 
 ---
 
-### NUST GPA Grading Scale
+## 📈 The Relative Grading Bell Curve Explained
 
-| Letter Grade | Grade Point (GPA) | Performance Level |
-| :--- | :--- | :--- |
-| **A** | **4.00** | Exceptional / Outstanding |
-| **B+** | **3.50** | Very Good |
-| **B** | **3.00** | Good / Above Average |
-| **C+** | **2.50** | Satisfactory |
-| **C** | **2.00** | Average (Passing) |
-| **D** | **1.00** | Bare Pass |
-| **F** | **0.00** | Fail (Must Repeat) |
+Instead of fixing 80 marks as an 'A', your final grade is determined by your statistical standing in the section:
+
+* **Class Mean (μ):** The average score of all students in the course section.
+* **Standard Deviation (σ):** How widely marks are distributed above and below the average.
+
+### Grade Distribution Thresholds:
+* **Grade 'A' (4.00 GPA):** Awarded to students scoring significantly above the mean (typically **Score ≥ μ + 1.5σ**).
+* **Grade 'B+' (3.50 GPA):** Awarded around **Score ≥ μ + 1.0σ**.
+* **Grade 'B' (3.00 GPA):** Awarded around **Score ≥ μ + 0.5σ**.
+* **Grade 'C+' (2.50 GPA):** Awarded near the class average (**Score ≈ μ**).
+* **Grade 'C' (2.00 GPA):** Passing benchmark (**Score ≥ μ - 1.0σ**).
+* **Grade 'F' (0.00 GPA):** Failing score (**Score < μ - 2.0σ**).
+
+> **The Big Advantage:** If an exam was exceptionally difficult and the class average was only 42/100, scoring a 60/100 can easily earn you a **4.0 GPA (A Grade)**!
 
 ---
 
-### Important Academic Warnings
-* **Probation Threshold:** Any semester ending with a **CGPA below 2.00** triggers an official probation warning.
-* **Course Repeats:** You can repeat any course where you received a **C+ or below** to improve your grade point.
+## 📑 Official NUST Letter Grade & GPA Conversion Scale
+
+| Letter Grade | Grade Point (GPA) | Percentage Range (Absolute) | Academic Standing |
+| :--- | :--- | :--- | :--- |
+| **A** | **4.00** | 80% and above | Outstanding / Exceptional |
+| **B+** | **3.50** | 75% – 79% | Very Good |
+| **B** | **3.00** | 70% – 74% | Good / Above Average |
+| **C+** | **2.50** | 65% – 69% | Satisfactory |
+| **C** | **2.00** | 60% – 64% | Average (Minimum Pass) |
+| **D** | **1.00** | 50% – 59% | Bare Minimum Pass |
+| **F** | **0.00** | Below 50% | Fail (Must Repeat Course) |
+
+---
+
+## 🚨 Academic Probation & Course Repeat Rules
+
+* **Probation Threshold:** Any semester ending with a **CGPA below 2.00** triggers an official Academic Probation warning.
+* **Repeating Courses:** You can repeat any course in which you received a **C+ or lower** to improve your grade point. The higher grade completely replaces the older grade in your CGPA calculation!
+* **Rector's & Dean's Honor Roll:** Students achieving a semester GPA (SGPA) of **3.50+** earn Dean's Honor Roll, while **3.85+** earns Rector's Honor Roll.
 `,
     },
     {
@@ -315,59 +315,58 @@ Instead of fixing 80% as an 'A', your final grade is calculated based on:
         faqs: [
             {
                 question: "What is the difference between C1 and C2 at NUST?",
-                answer: "Concordia 1 (C1) is located in the central academic zone near NBS/S3H and features fast food, shawarmas, and juices. Concordia 2 (C2) is near the hostels and offers traditional BBQ, karahi, and late-night options.",
+                answer: "Concordia 1 (C1) is located in the central academic zone near NBS/S3H and is best for quick lunches, burgers, and juices. Concordia 2 (C2) is near the hostels and specializes in evening BBQ, karahi, and desi dining.",
             },
             {
-                question: "Where can I get the best coffee on campus?",
-                answer: "The Central Library Cafe and SADA courtyard cafe serve the highest-rated specialty espresso, iced lattes, and bakery items.",
+                question: "Where can I find the best coffee and quiet study snacks?",
+                answer: "The Central Library Cafe and SADA Courtyard Cafe serve the top-rated espresso, iced lattes, and bakery pastries in a calm atmosphere.",
             },
         ],
         content: `
-## The Food Scene at NUST H-12
+With more than 15,000 students on campus daily, NUST H-12 hosts a diverse culinary landscape—from budget-friendly 100-rupee chai dhabas to full-service barbecue lawns and artisanal coffee spots.
 
-With over 15,000 students on campus daily, NUST H-12 hosts a diverse culinary ecosystem ranging from 100-rupee chai spots to full-service dining halls and specialty cafes.
-
-Here is the definitive ranking of every major food hub on campus.
+Here is the student-ranked definitive guide to every major food hub on campus.
 
 ---
 
-### 1. Concordia 1 (C1) — The Fast Food Capital
+## 🥇 1. Concordia 1 (C1) — The Daytime Fast Food Hub
 * **Location:** Behind NBS and S3H ([View on Map](/map))
-* **Best For:** Quick lunch breaks between classes, fresh juices, crispy chicken burgers, and paratha rolls.
-* **Top Picks:**
-  * **Chicken Roll Paratha** — Fast, filling, and budget-friendly.
-  * **Fresh Seasonal Juices & Shakes** — Mango, Peach, and Mint Lemonade.
-  * **Zinger Burger & Fries** — Student comfort classic.
+* **Best For:** Quick lunch breaks between lectures, fresh fruit juices, loaded burgers, and wraps.
+* **Must-Try Items:**
+  * **Chicken Paratha Roll** — Quick, hearty, and easy on the pocket.
+  * **Fresh Seasonal Juices** — Mint Lemonade, Mango Shake, and Peach Slush.
+  * **Zinger Burger with Fries** — The campus standard quick bite.
 
 ---
 
-### 2. Concordia 2 (C2) — The Evening & Hostel Hub
-* **Location:** Beside the Boys' Hostels (Attar / Razi)
-* **Best For:** Dinner, late-night tea sessions, BBQ platters, and traditional desi cuisine.
-* **Top Picks:**
-  * **Chicken Sajji & BBQ Tikka** — Best enjoyed with hostel friends after sundown.
-  * **Chicken Karahi with Tandoori Naan** — Freshly prepared in large woks.
-  * **Karak Doodh Patti** — The lifeblood of exam night study sessions.
+## 🌙 2. Concordia 2 (C2) — The Evening & Hostel Hub
+* **Location:** Adjacent to Attar & Razi Hostels ([View on Map](/map))
+* **Best For:** Group dinners, late-night tea sessions, BBQ platters, and authentic desi woks.
+* **Must-Try Items:**
+  * **Chicken Sajji & BBQ Tikka** — Best shared with friends under the open sky.
+  * **Chicken Karahi with Tandoori Naan** — Cooked fresh to order in large woks.
+  * **Karak Doodh Patti** — The essential fuel for late-night exam prep.
 
 ---
 
-### 3. South Edge (C3) & Lake View
-* **Location:** South campus near SMME and the NUST Lake
-* **Best For:** Scenic outdoor seating by the water, quiet lunches away from main rush.
-* **Top Picks:** Club sandwiches, loaded fries, and refreshing iced tea.
+## 🌊 3. South Edge (C3) & Lake View
+* **Location:** South campus near SMME and the NUST Lake ([View on Map](/map))
+* **Best For:** Scenic outdoor seating by the water, peaceful lunches away from the main rush.
+* **Must-Try Items:** Club sandwiches, loaded cheesy fries, and iced peach tea.
 
 ---
 
-### 4. Central Library Cafe
-* **Location:** Ground Floor, Central Library
-* **Best For:** Study fuel, quality coffee, and pastries.
-* **Top Picks:** Iced Caramel Macchiato and warm chocolate brownies.
+## ☕ 4. Central Library Cafe
+* **Location:** Ground Floor, Central Library ([View on Map](/map))
+* **Best For:** Quiet study sessions, specialty espresso, cold brew, and bakery treats.
+* **Must-Try Items:** Iced Caramel Macchiato and warm fudge brownies.
 
 ---
 
-### 5. SADA Courtyard Cafe
+## 🎨 5. SADA Courtyard Cafe
 * **Location:** School of Art, Design and Architecture (SADA)
-* **Best For:** Artistic ambiance, pasta, artisanal sandwiches, and aesthetic outdoor benches.
+* **Best For:** Bohemian artistic vibes, gourmet sandwiches, and al fresco benches.
+* **Must-Try Items:** Grilled chicken paninis and chocolate croissants.
 `,
     },
 ];
