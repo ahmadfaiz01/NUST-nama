@@ -128,8 +128,23 @@ export default function EventDetailPage() {
 
                         {/* Poster Image */}
                         {event.poster_url ? (
-                            <div className="rounded-2xl overflow-hidden border-2 border-nust-blue shadow-[6px_6px_0px_var(--nust-blue)] bg-gray-100">
-                                <img src={event.poster_url} alt={event.title} className="w-full h-auto max-h-[500px] object-contain bg-black/5" />
+                            <div className="rounded-2xl overflow-hidden border-2 border-nust-blue shadow-[6px_6px_0px_var(--nust-blue)] relative bg-gray-100">
+                                <img
+                                    src={event.poster_url}
+                                    alt={event.title}
+                                    className="w-full h-auto max-h-[520px] object-contain bg-black/5 mx-auto"
+                                    style={{
+                                        filter: "contrast(1.05) saturate(0.85) brightness(0.96) hue-rotate(-8deg)",
+                                    }}
+                                />
+                                {/* Purplish Tint + Grain Noise Overlay */}
+                                <div
+                                    className="absolute inset-0 pointer-events-none mix-blend-multiply opacity-20"
+                                    style={{
+                                        backgroundColor: "#6D28D9",
+                                        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                                    }}
+                                />
                             </div>
                         ) : (
                             <div className="h-64 rounded-2xl border-2 border-nust-blue shadow-[6px_6px_0px_var(--nust-blue)] bg-white flex items-center justify-center">

@@ -19,7 +19,7 @@ async function main() {
         venue_lng: 72.9928,
         category: "Cultural",
         tags: ["Orientation2026", "ScavengerHunt", "Game", "Waitlist", "Freshmen"],
-        poster_url: "https://orientation.nust.edu.pk/_next/image?url=%2Fgame-poster.png&w=828&q=75",
+        poster_url: "/images/events/scavenger-hunt.jpg",
         registration_url: "https://orientation.nust.edu.pk/waitlist",
         status: "approved",
         is_official: true,

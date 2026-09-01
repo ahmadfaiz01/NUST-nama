@@ -52,6 +52,17 @@ export function EventCard({ event, index = 0 }: EventCardProps) {
                             src={event.poster_url}
                             alt={event.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            style={{
+                                filter: "contrast(1.05) saturate(0.85) brightness(0.96) hue-rotate(-8deg)",
+                            }}
+                        />
+                        {/* Purplish Tint + Grain Noise Overlay */}
+                        <div
+                            className="absolute inset-0 pointer-events-none mix-blend-multiply opacity-25"
+                            style={{
+                                backgroundColor: "#6D28D9",
+                                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                            }}
                         />
                     </div>
                 )}
