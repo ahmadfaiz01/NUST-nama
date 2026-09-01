@@ -24,9 +24,13 @@ export function ChatBubble() {
             <button
                 onClick={() => setOpen((o) => !o)}
                 aria-label="Ask NUST Nama"
-                className="fixed bottom-4 right-4 z-50 h-14 w-14 rounded-full bg-nust-orange text-nust-blue text-2xl font-bold border-2 border-nust-blue shadow-[3px_3px_0px_var(--nust-blue)] hover:translate-y-[2px] hover:shadow-none transition-all"
+                className="fixed bottom-4 right-4 z-50 h-14 w-14 rounded-full bg-white border-2 border-nust-blue shadow-[3px_3px_0px_var(--nust-blue)] hover:translate-y-[2px] hover:shadow-none transition-all overflow-hidden flex items-center justify-center p-0.5 cursor-pointer"
             >
-                {open ? "✕" : "🤖"}
+                {open ? (
+                    <span className="text-xl font-bold text-nust-blue">✕</span>
+                ) : (
+                    <img src="/images/bot-avatar.png" alt="Ask NUST Nama" className="w-full h-full object-cover rounded-full scale-110" />
+                )}
             </button>
         </>
     );

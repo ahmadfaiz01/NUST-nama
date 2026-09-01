@@ -15,9 +15,9 @@ export default function AskPage() {
             <div className="flex-1 min-h-0 flex flex-col bg-cream border-2 border-nust-blue shadow-[6px_6px_0px_var(--nust-blue)] rounded-2xl overflow-hidden">
                 {/* Pinned Top Blue Header */}
                 <div className="flex items-center gap-3 bg-nust-blue text-white px-4 py-3 shrink-0">
-                    <span className="text-2xl" aria-hidden>
-                        🤖
-                    </span>
+                    <div className="w-10 h-10 rounded-full border-2 border-white bg-white overflow-hidden shadow-sm shrink-0 flex items-center justify-center">
+                        <img src="/images/bot-avatar.png" alt="NUST Nama Mascot" className="w-full h-full object-cover scale-110" />
+                    </div>
                     <div className="min-w-0">
                         <h1 className="font-heading text-2xl tracking-wide leading-none">
                             ASK NUST NAMA

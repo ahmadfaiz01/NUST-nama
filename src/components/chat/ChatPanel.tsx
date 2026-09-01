@@ -134,17 +134,28 @@ export function ChatPanel({ compact = false }: { compact?: boolean }) {
                 className={`flex-1 min-h-0 overflow-y-auto space-y-4 ${compact ? "p-3" : "p-4"}`}
             >
                 {turns.length === 0 && (
-                    <div className="text-sm text-gray-600">
-                        <p className="mb-3">
-                            Ask about NUST&apos;s rules, fees, forms or what&apos;s on campus. Every
-                            answer comes from NUST&apos;s own documents, with a link to the original.
+                    <div className="text-sm text-gray-600 space-y-3">
+                        <div className="flex items-center gap-3 p-3.5 bg-white border-2 border-nust-blue rounded-2xl shadow-[3px_3px_0px_var(--nust-blue)]">
+                            <div className="w-12 h-12 rounded-full border-2 border-nust-blue bg-white overflow-hidden shadow-xs shrink-0 flex items-center justify-center">
+                                <img src="/images/bot-avatar.png" alt="NUST Nama Mascot" className="w-full h-full object-cover scale-110" />
+                            </div>
+                            <div>
+                                <h3 className="font-heading text-lg text-nust-blue leading-tight">Hey! I&apos;m your NUST AI Guide</h3>
+                                <p className="text-xs text-nust-blue/70 font-sans mt-0.5">
+                                    Ask about campus rules, fees, forms, or what&apos;s happening!
+                                </p>
+                            </div>
+                        </div>
+
+                        <p className="text-xs text-nust-blue/70 font-medium px-1">
+                            Every answer comes directly from official NUST documents and handbooks. Try asking:
                         </p>
                         <div className="flex flex-wrap gap-2">
                             {EXAMPLES.map((example) => (
                                 <button
                                     key={example}
                                     onClick={() => ask(example)}
-                                    className="border-2 border-nust-blue rounded-full px-3 py-1 text-xs bg-white hover:bg-nust-orange hover:text-nust-blue transition-colors"
+                                    className="border-2 border-nust-blue rounded-full px-3 py-1.5 text-xs font-sans font-medium bg-white text-nust-blue hover:bg-nust-orange hover:text-white transition-colors cursor-pointer shadow-[2px_2px_0px_var(--nust-blue)]"
                                 >
                                     {example}
                                 </button>
@@ -157,20 +168,24 @@ export function ChatPanel({ compact = false }: { compact?: boolean }) {
                     <div key={i} className="space-y-2">
                         {/* Student, right — the usual side for "mine" in every chat app */}
                         <div className="flex justify-end">
-                            <p className="max-w-[85%] bg-nust-blue text-white text-sm rounded-2xl rounded-br-sm px-3 py-2 break-words">
+                            <p className="max-w-[85%] bg-nust-blue text-white text-sm rounded-2xl rounded-br-sm px-3.5 py-2.5 break-words font-sans">
                                 {turn.question}
                             </p>
                         </div>
 
-                        <div className="flex justify-start">
-                            <div className="max-w-[90%] bg-white border-2 border-nust-blue rounded-2xl rounded-bl-sm px-3 py-2 space-y-2">
+                        <div className="flex justify-start items-start gap-2">
+                            <div className="w-7 h-7 rounded-full border border-nust-blue bg-white overflow-hidden shadow-xs shrink-0 mt-0.5 flex items-center justify-center">
+                                <img src="/images/bot-avatar.png" alt="Bot" className="w-full h-full object-cover scale-110" />
+                            </div>
+
+                            <div className="max-w-[88%] bg-white border-2 border-nust-blue rounded-2xl rounded-tl-sm px-3.5 py-2.5 space-y-2 shadow-[2px_2px_0px_rgba(27,58,107,0.1)]">
                                 {turn.status && (
-                                    <p className="text-sm text-gray-500 animate-pulse">{turn.status}</p>
+                                    <p className="text-sm text-gray-500 animate-pulse font-sans">{turn.status}</p>
                                 )}
 
                                 {turn.answer &&
                                     (turn.error ? (
-                                        <p className="text-sm text-amber-700">{turn.answer}</p>
+                                        <p className="text-sm text-amber-700 font-sans">{turn.answer}</p>
                                     ) : (
                                         <AnswerText text={turn.answer} />
                                     ))}
