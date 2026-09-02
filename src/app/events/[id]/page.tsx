@@ -54,7 +54,6 @@ export default function EventDetailPage() {
             .from("events")
             .select(`
                 *,
-                profiles:created_by (name, avatar_url),
                 rsvps (count),
                 checkins (count)
             `)
@@ -64,7 +63,17 @@ export default function EventDetailPage() {
         if (error) {
             console.error("Error fetching event:", error);
             setError("Event not found or failed to load. " + error.message);
-        } else {
+        } else if (data) {
+            if (data.created_by) {
+                const { data: profile } = await supabase
+                    .from("profiles")
+                    .select("name, avatar_url")
+                    .eq("id", data.created_by)
+                    .maybeSingle();
+                if (profile) {
+                    data.profiles = profile;
+                }
+            }
             setEvent(data);
         }
         setLoading(false);
