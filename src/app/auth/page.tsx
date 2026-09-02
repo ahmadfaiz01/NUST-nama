@@ -44,10 +44,13 @@ function AuthForm() {
         setRuntimeError(null);
         const supabase = createClient();
 
+        const isLocal = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+        const redirectBase = isLocal ? window.location.origin : "https://nustnama.life";
+
         const { error } = await supabase.auth.signInWithOAuth({
             provider: "google",
             options: {
-                redirectTo: `${window.location.origin}/auth/callback`,
+                redirectTo: `${redirectBase}/auth/callback`,
                 queryParams: {
                     prompt: "select_account",
                 },

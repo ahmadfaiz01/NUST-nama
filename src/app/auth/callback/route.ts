@@ -22,11 +22,14 @@ function isAllowedEmail(email: string): boolean {
 
 export async function GET(request: Request) {
     const { searchParams, origin } = new URL(request.url);
+    const isLocal = origin.includes("localhost") || origin.includes("127.0.0.1");
+    const targetOrigin = isLocal ? origin : "https://nustnama.life";
+
     const code = searchParams.get('code');
     const next = searchParams.get('next') ?? '/';
 
     if (!code) {
-        return NextResponse.redirect(`${origin}/auth?error=invalid_callback`);
+        return NextResponse.redirect(`${targetOrigin}/auth?error=invalid_callback`);
     }
 
     const supabase = await createClient();
@@ -37,7 +40,7 @@ export async function GET(request: Request) {
     if (error || !data.user) {
         console.error('[auth/callback] Code exchange error:', error?.message);
         return NextResponse.redirect(
-            `${origin}/auth?error=${encodeURIComponent(error?.message ?? 'Authentication failed')}`
+            `${targetOrigin}/auth?error=${encodeURIComponent(error?.message ?? 'Authentication failed')}`
         );
     }
 
@@ -66,12 +69,12 @@ export async function GET(request: Request) {
         }
 
         return NextResponse.redirect(
-            `${origin}/auth?error=${encodeURIComponent(
+            `${targetOrigin}/auth?error=${encodeURIComponent(
                 'Access denied. Only @nust.edu.pk and NUST school emails are allowed.'
             )}`
         );
     }
 
     // ─── Allowed — redirect to intended page ──────────────────────────────
-    return NextResponse.redirect(`${origin}${next}`);
+    return NextResponse.redirect(`${targetOrigin}${next}`);
 }
