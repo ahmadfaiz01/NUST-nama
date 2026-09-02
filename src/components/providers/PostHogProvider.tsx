@@ -78,9 +78,12 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
         // throws and takes the rest of this effect with it.
         if (!key) return;
 
+        const host = process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com';
+        const isEu = host.includes('eu.');
+
         posthog.init(key, {
-            api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://eu.i.posthog.com',
-            ui_host: 'https://eu.posthog.com',
+            api_host: host,
+            ui_host: isEu ? 'https://eu.posthog.com' : 'https://us.posthog.com',
             capture_pageview: false, // We do this manually via PostHogPageView
             capture_pageleave: true,
             // CRITICAL: Only create person profiles for identified (logged-in) users.
