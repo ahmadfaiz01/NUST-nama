@@ -233,52 +233,52 @@ export default function CampusMap() {
                 }
             `}</style>
 
-            {/* Top View Mode Switcher */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-3 md:p-4 rounded-2xl border-2 border-nust-blue shadow-[4px_4px_0px_var(--nust-blue)]">
-                <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-nust-blue font-heading uppercase tracking-wider">
-                        Map Mode:
-                    </span>
-                    <div className="inline-flex bg-cream p-1 rounded-xl border-2 border-nust-blue">
-                        <button
-                            type="button"
-                            onClick={() => setViewMode("guide")}
-                            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold font-sans transition-all cursor-pointer ${
-                                viewMode === "guide"
-                                    ? "bg-nust-blue text-white shadow-xs"
-                                    : "text-nust-blue hover:text-nust-orange"
-                            }`}
-                        >
-                            <Compass className="w-3.5 h-3.5" />
-                            <span>Campus Guide (77 Places)</span>
-                        </button>
+            {/* Top View Mode Switcher - Clean, Center-aligned without heavy card container */}
+            <div className="flex flex-col items-center justify-center gap-2 w-full my-1">
+                <div className="inline-flex items-center bg-white p-1.5 rounded-2xl border-2 border-nust-blue shadow-[4px_4px_0px_var(--nust-blue)]">
+                    <button
+                        type="button"
+                        onClick={() => setViewMode("guide")}
+                        className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs sm:text-sm font-bold font-sans transition-all cursor-pointer ${
+                            viewMode === "guide"
+                                ? "bg-nust-blue text-white shadow-xs"
+                                : "text-nust-blue hover:text-nust-orange hover:bg-cream"
+                        }`}
+                    >
+                        <Compass className="w-4 h-4" />
+                        <span>Campus Guide (77 Places)</span>
+                    </button>
 
-                        <button
-                            type="button"
-                            onClick={() => setViewMode("heatmap")}
-                            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold font-sans transition-all cursor-pointer ${
-                                viewMode === "heatmap"
-                                    ? "bg-nust-orange text-white shadow-xs"
-                                    : "text-nust-blue hover:text-nust-orange"
-                            }`}
-                        >
-                            <Flame className="w-3.5 h-3.5" />
-                            <span>Live Heatmap & Events</span>
-                            {hotspots.length > 0 && (
-                                <span className="ml-1 px-1.5 py-0.2 text-[10px] rounded-full bg-white text-nust-blue font-bold">
-                                    {hotspots.length}
-                                </span>
-                            )}
-                        </button>
-                    </div>
+                    <button
+                        type="button"
+                        onClick={() => setViewMode("heatmap")}
+                        className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs sm:text-sm font-bold font-sans transition-all cursor-pointer ${
+                            viewMode === "heatmap"
+                                ? "bg-nust-orange text-white shadow-xs"
+                                : "text-nust-blue hover:text-nust-orange hover:bg-cream"
+                        }`}
+                    >
+                        <Flame className="w-4 h-4" />
+                        <span>Live Vibe Heatmap</span>
+                        {hotspots.length > 0 && (
+                            <span
+                                className={`px-2 py-0.5 text-[11px] rounded-full font-bold ${
+                                    viewMode === "heatmap"
+                                        ? "bg-white text-nust-orange"
+                                        : "bg-nust-orange/15 text-nust-orange"
+                                }`}
+                            >
+                                {hotspots.length}
+                            </span>
+                        )}
+                    </button>
                 </div>
 
-                {/* Subtitle / Legend summary */}
-                <div className="text-xs text-nust-blue/70 font-sans font-medium flex items-center gap-2">
+                <div className="text-xs text-nust-blue/70 font-sans font-medium text-center">
                     {viewMode === "guide" ? (
-                        <span>Showing verified landmarks, schools, gates & cafes</span>
+                        <span>Showing verified landmarks, schools, cafes & facilities</span>
                     ) : (
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center justify-center gap-3">
                             <span className="flex items-center gap-1 text-red-600 font-bold">● LIT 🔥</span>
                             <span className="flex items-center gap-1 text-orange-600 font-bold">● VIBING 😎</span>
                             <span className="flex items-center gap-1 text-amber-600 font-bold">● CHILL ☕</span>

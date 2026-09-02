@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { Calendar, ExternalLink, Sparkles, Building2, Newspaper } from "lucide-react";
+import { Calendar, ExternalLink, Newspaper } from "lucide-react";
 
 export const metadata: Metadata = {
     title: "Campus News & Official Announcements | NUST Nama",
@@ -60,12 +60,9 @@ export default async function NewsPage({
     const { data: newsItems } = await query;
     const items = newsItems && newsItems.length > 0 ? newsItems : [];
 
-    const featuredItem = items[0];
-    const regularItems = items.slice(1);
-
     return (
         <div className="min-h-screen pb-24 bg-cream">
-            {/* Standardized Hero Banner */}
+            {/* Hero Banner */}
             <div className="bg-nust-blue text-white py-12 relative overflow-hidden border-b-2 border-nust-blue">
                 <div className="container relative z-10 text-center max-w-3xl mx-auto px-4">
                     <span className="inline-block bg-nust-orange text-white text-xs font-bold uppercase tracking-widest px-3.5 py-1 rounded-full border-2 border-nust-blue shadow-[2px_2px_0px_var(--nust-blue)] mb-3">
@@ -101,56 +98,6 @@ export default async function NewsPage({
             </div>
 
             <div className="container max-w-6xl mx-auto px-4 mt-10">
-                {/* Featured Headline Story */}
-                {featuredItem && (
-                    <div className="mb-12">
-                        <div className="flex items-center gap-2 mb-3 px-1">
-                            <Sparkles className="w-5 h-5 text-nust-orange" />
-                            <h2 className="font-heading text-xl text-nust-blue tracking-wider uppercase">
-                                TOP STORY
-                            </h2>
-                        </div>
-
-                        <div className="bg-white rounded-2xl border-2 border-nust-blue shadow-[6px_6px_0px_var(--nust-blue)] p-6 md:p-8">
-                            <div className="flex flex-wrap items-center gap-3 mb-4">
-                                <span
-                                    className={`text-xs font-bold px-3 py-1 rounded-full border-2 shadow-xs uppercase tracking-wider ${
-                                        getSourceStyle(featuredItem.source).bg
-                                    } ${getSourceStyle(featuredItem.source).text} ${
-                                        getSourceStyle(featuredItem.source).border
-                                    }`}
-                                >
-                                    {featuredItem.source}
-                                </span>
-                                <span className="text-xs text-nust-blue/60 font-sans font-medium flex items-center gap-1">
-                                    <Calendar className="w-3.5 h-3.5 text-nust-orange" />
-                                    {formatDate(featuredItem.published_at)}
-                                </span>
-                            </div>
-
-                            <h3 className="font-heading text-3xl md:text-5xl text-nust-blue mb-4 leading-tight">
-                                {featuredItem.title}
-                            </h3>
-
-                            <p className="text-gray-700 font-sans text-base md:text-lg leading-relaxed mb-6">
-                                {featuredItem.summary}
-                            </p>
-
-                            {featuredItem.url && featuredItem.url !== "#" && (
-                                <Link
-                                    href={featuredItem.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="btn btn-primary text-xs py-2 px-5 inline-flex items-center gap-1.5 shadow-[2px_2px_0px_var(--nust-blue)]"
-                                >
-                                    <span>Read Official Release</span>
-                                    <ExternalLink className="w-3.5 h-3.5" />
-                                </Link>
-                            )}
-                        </div>
-                    </div>
-                )}
-
                 {/* News Grid */}
                 <div className="space-y-6">
                     <div className="flex items-center justify-between border-b-2 border-nust-blue/15 pb-4">
@@ -164,9 +111,9 @@ export default async function NewsPage({
                         </div>
                     </div>
 
-                    {regularItems.length > 0 ? (
+                    {items.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-2">
-                            {regularItems.map((item) => {
+                            {items.map((item) => {
                                 const sourceStyle = getSourceStyle(item.source);
                                 return (
                                     <div

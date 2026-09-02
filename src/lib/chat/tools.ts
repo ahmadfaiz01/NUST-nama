@@ -134,13 +134,13 @@ export const VERIFIED_FORMS = [
     content: "Application for Re-Checking of Answer Books/Papers. Fee is Rs. 500 per paper payable via HBL NUST branch challan. Submit along with receipt to your school examination branch within 15 days of result declaration.",
   },
   {
-    keywords: ["freeze", "freezing", "freeze semester", "gap semester", "leave of absence"],
+    keywords: ["freeze", "freezing", "freeze semester", "semester freeze", "gap semester", "leave of absence", "gap year", "freeze course"],
     title: "Semester Freeze Application Form",
     url: "https://nust.edu.pk/wp-content/uploads/2020/03/Semester-Freeze-Form.pdf",
     section_id: "form-semester-freeze",
     heading_path: "Academic Branch > Semester Freeze Form",
     doc_type: "form",
-    content: "Semester Freeze Application. A student can freeze up to 2 semesters during their undergraduate degree. Requires HoD approval and clearance from accounts and library before the 4th week of semester.",
+    content: "Semester Freeze Application Form. A student can freeze up to 2 semesters during their undergraduate degree. Requires HoD approval and clearance from accounts and library before the 4th week of semester.",
   },
   {
     keywords: ["drop", "add drop", "course drop", "withdraw course", "course withdrawal"],
@@ -161,7 +161,7 @@ export const VERIFIED_FORMS = [
     content: "Application for Official Transcript / Detailed Marks Certificate (DMC). Submit with fee receipt to Main Office Examination Branch.",
   },
   {
-    keywords: ["hostel", "room", "hostel clearance", "hostel leaving", "hostel allotment"],
+    keywords: ["hostel", "hostel clearance", "hostel leaving", "hostel allotment", "hostel admission", "hostel form"],
     title: "Hostel Clearance / Application Form",
     url: "https://nust.edu.pk/wp-content/uploads/2020/03/Hostel-Clearance.pdf",
     section_id: "form-hostel",
@@ -292,17 +292,38 @@ function searchCampusKnowledge(topic: string) {
 /** Find verified NUST official forms */
 function findVerifiedForm(topic: string) {
   const q = topic.toLowerCase().trim();
-  const matched = VERIFIED_FORMS.filter((form) => {
-    return (
-      form.title.toLowerCase().includes(q) ||
-      form.keywords.some((k) => q.includes(k) || k.includes(q)) ||
-      form.content.toLowerCase().includes(q)
-    );
-  });
+  const words = q.split(/\s+/).filter((w) => w.length > 2);
 
-  if (matched.length > 0) {
-    // Return strictly the top single matched form to avoid clutter
-    const f = matched[0];
+  // Score each form based on match relevance
+  const scored = VERIFIED_FORMS.map((form) => {
+    let score = 0;
+    const titleLower = form.title.toLowerCase();
+    const contentLower = form.content.toLowerCase();
+
+    // Exact full query match
+    if (titleLower.includes(q)) score += 20;
+    if (q.includes(titleLower)) score += 20;
+
+    // Keyword matches
+    for (const kw of form.keywords) {
+      if (q === kw || q.includes(kw)) score += 15;
+      else if (words.some((w) => w === kw)) score += 10;
+      else if (words.some((w) => kw.includes(w) || w.includes(kw))) score += 4;
+    }
+
+    // Word occurrences in title & content
+    for (const w of words) {
+      if (titleLower.includes(w)) score += 5;
+      if (contentLower.includes(w)) score += 2;
+    }
+
+    return { form, score };
+  })
+    .filter((s) => s.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  if (scored.length > 0 && scored[0].score >= 4) {
+    const f = scored[0].form;
     return [
       {
         section_id: f.section_id,
