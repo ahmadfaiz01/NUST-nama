@@ -216,7 +216,7 @@ export default function EventsPage() {
 
                     {/* Results Count Bar */}
                     <div className="flex items-center justify-between px-1">
-                        <p className="text-nust-blue font-display text-sm font-semibold">
+                        <p className="text-nust-blue font-sans text-xs font-bold uppercase tracking-wider">
                             {isLoading && events.length === 0
                                 ? "Loading events..."
                                 : `Showing ${events.length} event${events.length === 1 ? "" : "s"}${hasMore ? "+" : ""}`}

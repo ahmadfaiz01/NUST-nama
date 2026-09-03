@@ -97,7 +97,7 @@ export default async function NewsPage({
                 </div>
             </div>
 
-            <div className="container max-w-6xl mx-auto px-4 mt-10">
+            <div className="container max-w-6xl mx-auto px-4 mt-8">
                 {/* News Grid */}
                 <div className="space-y-6">
                     <div className="flex items-center justify-between border-b-2 border-nust-blue/15 pb-4">

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BLOG_POSTS } from "@/lib/blogs/blogData";
-import { Calendar, Clock, Sparkles, ArrowRight, BookOpen } from "lucide-react";
+import { BookOpen } from "lucide-react";
 
 export const metadata: Metadata = {
     title: "NUST Campus Guides & Student Blog | Rules, Cafes & Life at H-12",
@@ -43,12 +43,6 @@ export default async function BlogIndexPage({
             ? BLOG_POSTS
             : BLOG_POSTS.filter((p) => p.category === selectedCategory);
 
-    const featuredPost = selectedCategory === "All" ? BLOG_POSTS[0] : filteredPosts[0];
-    const regularPosts =
-        selectedCategory === "All"
-            ? BLOG_POSTS.slice(1)
-            : filteredPosts.slice(1);
-
     return (
         <div className="min-h-screen pb-24 bg-cream">
             {/* Standardized Hero Banner */}
@@ -86,89 +80,13 @@ export default async function BlogIndexPage({
                 </div>
             </div>
 
-            <div className="container max-w-6xl mx-auto px-4 mt-10">
-                {/* Featured Post Hero Card */}
-                {featuredPost && (
-                    <div className="mb-12">
-                        <div className="flex items-center gap-2 mb-3 px-1">
-                            <Sparkles className="w-5 h-5 text-nust-orange" />
-                            <h2 className="font-heading text-xl text-nust-blue tracking-wider uppercase">
-                                {selectedCategory === "All" ? "FEATURED GUIDE" : `TOP GUIDE IN ${selectedCategory.toUpperCase()}`}
-                            </h2>
-                        </div>
-
-                        <Link
-                            href={`/blog/${featuredPost.slug}`}
-                            className="group block bg-white rounded-2xl border-2 border-nust-blue shadow-[6px_6px_0px_var(--nust-blue)] hover:shadow-[10px_10px_0px_var(--nust-orange)] hover:-translate-y-1 transition-all duration-300 overflow-hidden"
-                        >
-                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
-                                <div className="lg:col-span-5 h-64 lg:h-full min-h-[300px] relative overflow-hidden border-b-2 lg:border-b-0 lg:border-r-2 border-nust-blue bg-black/5">
-                                    <img
-                                        src={featuredPost.coverImage}
-                                        alt={featuredPost.title}
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                    />
-                                    <div className="absolute top-3 left-3 bg-nust-orange text-white text-xs font-bold px-3 py-1 rounded-full border-2 border-nust-blue shadow-[2px_2px_0px_var(--nust-blue)]">
-                                        {featuredPost.category}
-                                    </div>
-                                </div>
-
-                                <div className="lg:col-span-7 p-6 lg:p-8 flex flex-col justify-between">
-                                    <div>
-                                        <div className="flex items-center gap-3 text-xs text-nust-blue/70 mb-3 font-sans font-medium">
-                                            <span className="flex items-center gap-1">
-                                                <Calendar className="w-3.5 h-3.5 text-nust-orange" />
-                                                {new Date(featuredPost.publishedAt).toLocaleDateString("en-US", {
-                                                    month: "short",
-                                                    day: "numeric",
-                                                    year: "numeric",
-                                                })}
-                                            </span>
-                                            <span>•</span>
-                                            <span className="flex items-center gap-1">
-                                                <Clock className="w-3.5 h-3.5 text-nust-blue" />
-                                                {featuredPost.readTime}
-                                            </span>
-                                        </div>
-
-                                        <h3 className="font-heading text-3xl md:text-4xl text-nust-blue mb-3 leading-[1.1] group-hover:text-nust-orange transition-colors">
-                                            {featuredPost.title}
-                                        </h3>
-
-                                        <p className="text-gray-600 font-sans text-sm md:text-base leading-relaxed mb-6 line-clamp-3">
-                                            {featuredPost.description}
-                                        </p>
-                                    </div>
-
-                                    <div className="flex items-center justify-between pt-4 border-t-2 border-nust-blue/10 mt-auto">
-                                        <div className="flex items-center gap-2.5">
-                                            <img
-                                                src={featuredPost.author.avatar}
-                                                alt={featuredPost.author.name}
-                                                className="w-8 h-8 rounded-full border border-nust-blue object-cover bg-white"
-                                            />
-                                            <div>
-                                                <p className="text-xs font-bold text-nust-blue font-sans">{featuredPost.author.name}</p>
-                                                <p className="text-[10px] text-gray-500 font-sans">{featuredPost.author.role}</p>
-                                            </div>
-                                        </div>
-
-                                        <span className="btn btn-primary text-xs py-2 px-5 flex items-center gap-1.5 shadow-[2px_2px_0px_var(--nust-blue)]">
-                                            Read Guide <ArrowRight className="w-3.5 h-3.5" />
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </Link>
-                    </div>
-                )}
-
-                {/* All Articles Section */}
+            <div className="container max-w-6xl mx-auto px-4 mt-8">
+                {/* Articles Section */}
                 <div className="space-y-6">
                     <div className="flex items-center justify-between border-b-2 border-nust-blue/15 pb-4">
                         <div>
                             <h2 className="font-heading text-2xl md:text-3xl text-nust-blue">
-                                {selectedCategory === "All" ? "ALL ARTICLES & GUIDES" : `${selectedCategory.toUpperCase()} ARTICLES`}
+                                {selectedCategory === "All" ? "LATEST ARTICLES & SURVIVAL GUIDES" : `${selectedCategory.toUpperCase()} ARTICLES`}
                             </h2>
                             <p className="text-xs text-nust-blue/70 font-sans mt-0.5">
                                 Verified by students & updated every semester.
@@ -177,9 +95,9 @@ export default async function BlogIndexPage({
                     </div>
 
                     {/* Articles Grid */}
-                    {regularPosts.length > 0 ? (
+                    {filteredPosts.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-2">
-                            {regularPosts.map((post) => (
+                            {filteredPosts.map((post) => (
                                 <Link
                                     key={post.slug}
                                     href={`/blog/${post.slug}`}
@@ -203,6 +121,7 @@ export default async function BlogIndexPage({
                                                     {new Date(post.publishedAt).toLocaleDateString("en-US", {
                                                         month: "short",
                                                         day: "numeric",
+                                                        year: "numeric",
                                                     })}
                                                 </span>
                                                 <span>•</span>
@@ -229,7 +148,7 @@ export default async function BlogIndexPage({
                                             </div>
 
                                             <span className="text-xs font-bold text-nust-orange flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                                                Read →
+                                                Read Guide →
                                             </span>
                                         </div>
                                     </div>

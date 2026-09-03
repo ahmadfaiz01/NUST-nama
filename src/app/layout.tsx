@@ -145,7 +145,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-cream text-foreground antialiased relative selection:bg-nust-orange selection:text-white">
         <PostHogProvider>
           <NavBar />
-          <main className="pt-24">{children}</main>
+          <main className="pt-[82px]">{children}</main>
           <Footer />
           <ChatBubble />
         </PostHogProvider>
