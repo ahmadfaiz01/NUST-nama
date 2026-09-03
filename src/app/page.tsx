@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { CampusHeatmap } from "@/components/events/CampusHeatmap";
 import { EventCard } from "@/components/events/EventCard";
+import { UrgentBannerTape } from "@/components/layout/UrgentBannerTape";
 import { usePostHog } from "posthog-js/react";
 
 export default function HomePage() {
@@ -37,10 +38,12 @@ export default function HomePage() {
 
     return (
         <div className="min-h-screen overflow-hidden bg-cream">
+            {/* Urgent Red Announcement Tape */}
+            <UrgentBannerTape />
 
             {/* Hero Section */}
             <section
-                className="relative pt-20 pb-28"
+                className="relative pt-12 pb-24"
                 style={{
                     backgroundImage: `linear-gradient(var(--nust-blue) 1px, transparent 1px), linear-gradient(90deg, var(--nust-blue) 1px, transparent 1px)`,
                     backgroundSize: "100px 100px",

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Calendar, ExternalLink, Newspaper } from "lucide-react";
+import { UrgentBannerTape } from "@/components/layout/UrgentBannerTape";
 
 export const metadata: Metadata = {
     title: "Campus News & Official Announcements | NUST Nama",
@@ -62,6 +63,9 @@ export default async function NewsPage({
 
     return (
         <div className="min-h-screen pb-24 bg-cream">
+            {/* Urgent Red Announcement Tape */}
+            <UrgentBannerTape />
+
             {/* Hero Banner */}
             <div className="bg-nust-blue text-white py-12 relative overflow-hidden border-b-2 border-nust-blue">
                 <div className="container relative z-10 text-center max-w-3xl mx-auto px-4">
