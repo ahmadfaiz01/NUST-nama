@@ -43,20 +43,20 @@ export default function HomePage() {
 
             {/* Hero Section */}
             <section
-                className="relative pt-12 pb-24"
+                className="relative pt-16 md:pt-20 pb-28"
                 style={{
                     backgroundImage: `linear-gradient(var(--nust-blue) 1px, transparent 1px), linear-gradient(90deg, var(--nust-blue) 1px, transparent 1px)`,
                     backgroundSize: "100px 100px",
                 }}
             >
-                {/* Decorative Hero Images (Static for now, could be dynamic later) */}
-                <div className="absolute top-2 -left-16 md:-left-8 w-56 md:w-80 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block rotate-6 pointer-events-none z-0">
+                {/* Decorative Hero Images */}
+                <div className="absolute top-12 -left-16 md:-left-8 w-56 md:w-80 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block rotate-6 pointer-events-none z-0">
                     <img src="/images/hero_badminton.jpg" alt="Sports at NUST" className="rounded-xl border-4 border-nust-blue shadow-[8px_8px_0px_var(--nust-blue)] aspect-[3/4] object-cover bg-white" />
                 </div>
                 <div className="absolute -bottom-8 -left-16 md:-left-10 w-64 md:w-96 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block -rotate-6 pointer-events-none z-0">
                     <img src="/images/hero_aerial_1.jpg" alt="Campus Aerial" className="rounded-xl border-4 border-nust-blue shadow-[8px_8px_0px_var(--nust-blue)] bg-white" />
                 </div>
-                <div className="absolute top-4 -right-16 md:-right-8 w-64 md:w-96 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block -rotate-3 pointer-events-none z-0">
+                <div className="absolute top-14 -right-16 md:-right-8 w-64 md:w-96 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block -rotate-3 pointer-events-none z-0">
                     <img src="/images/hero_concert.jpg" alt="Concert Vibes" className="rounded-xl border-4 border-nust-blue shadow-[8px_8px_0px_var(--nust-blue)] bg-white" />
                 </div>
                 <div className="absolute bottom-16 md:bottom-24 -right-14 md:-right-8 w-56 md:w-80 grayscale hover:grayscale-0 transition-all duration-500 hidden lg:block rotate-6 pointer-events-none z-0">

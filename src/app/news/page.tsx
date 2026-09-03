@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { Calendar, ExternalLink, Newspaper } from "lucide-react";
-import { UrgentBannerTape } from "@/components/layout/UrgentBannerTape";
+import { ExternalLink, Newspaper } from "lucide-react";
 
 export const metadata: Metadata = {
     title: "Campus News & Official Announcements | NUST Nama",
@@ -63,10 +62,7 @@ export default async function NewsPage({
 
     return (
         <div className="min-h-screen pb-24 bg-cream">
-            {/* Urgent Red Announcement Tape */}
-            <UrgentBannerTape />
-
-            {/* Hero Banner */}
+            {/* Hero Banner - Flushed with Navbar */}
             <div className="bg-nust-blue text-white py-12 relative overflow-hidden border-b-2 border-nust-blue">
                 <div className="container relative z-10 text-center max-w-3xl mx-auto px-4">
                     <span className="inline-block bg-nust-orange text-white text-xs font-bold uppercase tracking-widest px-3.5 py-1 rounded-full border-2 border-nust-blue shadow-[2px_2px_0px_var(--nust-blue)] mb-3">
@@ -119,48 +115,44 @@ export default async function NewsPage({
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-2">
                             {items.map((item) => {
                                 const sourceStyle = getSourceStyle(item.source);
+                                const validUrl = item.url?.startsWith("http") ? item.url : "https://nust.edu.pk/news";
+
                                 return (
                                     <div
                                         key={item.id}
-                                        className="group flex flex-col bg-white rounded-2xl border-2 border-nust-blue shadow-[4px_4px_0px_var(--nust-blue)] hover:shadow-[7px_7px_0px_var(--nust-orange)] hover:-translate-y-1 transition-all duration-200 p-6 justify-between"
+                                        className="group flex flex-col bg-white rounded-2xl border-2 border-nust-blue shadow-[4px_4px_0px_var(--nust-blue)] hover:shadow-[7px_7px_0px_var(--nust-orange)] hover:-translate-y-1 transition-all duration-200 p-6 justify-between h-full"
                                     >
-                                        <div>
+                                        <div className="flex flex-col flex-1">
                                             <div className="flex items-center justify-between gap-2 mb-3">
                                                 <span
                                                     className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border shadow-xs uppercase tracking-wider ${sourceStyle.bg} ${sourceStyle.text} ${sourceStyle.border}`}
                                                 >
                                                     {item.source}
                                                 </span>
-                                                <span className="text-[11px] text-nust-blue/60 font-sans font-medium">
+                                                <span className="text-[11px] text-nust-blue/60 font-mono font-semibold">
                                                     {formatDate(item.published_at)}
                                                 </span>
                                             </div>
 
-                                            <h3 className="font-heading text-2xl text-nust-blue mb-3 leading-tight group-hover:text-nust-orange transition-colors">
+                                            <h3 className="font-heading text-2xl text-nust-blue mb-2.5 leading-snug group-hover:text-nust-orange transition-colors line-clamp-2 min-h-[3.75rem]">
                                                 {item.title}
                                             </h3>
 
-                                            <p className="text-xs text-gray-600 font-sans leading-relaxed line-clamp-4 mb-4">
+                                            <p className="text-xs text-gray-600 font-sans leading-relaxed line-clamp-3 mb-4 min-h-[3.25rem]">
                                                 {item.summary}
                                             </p>
                                         </div>
 
                                         <div className="pt-3 border-t-2 border-dashed border-gray-100 mt-auto">
-                                            {item.url && item.url !== "#" ? (
-                                                <Link
-                                                    href={item.url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-xs font-bold text-nust-orange hover:underline flex items-center justify-between"
-                                                >
-                                                    <span>View Official Notice</span>
-                                                    <ExternalLink className="w-3.5 h-3.5" />
-                                                </Link>
-                                            ) : (
-                                                <span className="text-xs text-gray-400 font-sans">
-                                                    Verified Campus Notice
-                                                </span>
-                                            )}
+                                            <Link
+                                                href={validUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-xs font-bold text-nust-orange hover:underline flex items-center justify-between"
+                                            >
+                                                <span>View Official Circular</span>
+                                                <ExternalLink className="w-3.5 h-3.5" />
+                                            </Link>
                                         </div>
                                     </div>
                                 );
